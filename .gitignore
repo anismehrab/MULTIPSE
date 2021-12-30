@@ -2,6 +2,6 @@
 /checkpoints/*.pth
 checkpoints/*.pth
 ./checkpoints
-/testsets/
+
 testsets/*
-./testsets
+
