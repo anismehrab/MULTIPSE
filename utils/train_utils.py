@@ -10,10 +10,12 @@ import time
 
 
 
-def train(base_model,head_model,train_loader,optimizer,l1_criterion,epoch,device,args,logger):
+def train(base_model,head_model,train_loader,optimizer,l1_criterion,epoch,device,args,logger,pre_base_model=None):
 
     base_model.train()
     head_model.train()
+    if pre_base_model != None:
+        pre_base_model.train()
 
     start = torch.cuda.Event(enable_timing=True)
     end = torch.cuda.Event(enable_timing=True)
@@ -31,6 +33,10 @@ def train(base_model,head_model,train_loader,optimizer,l1_criterion,epoch,device
         hr_tensor = sample["img_H"].to(device)  # ranges from [0, 1]
         
         optimizer.zero_grad()
+       
+        if pre_base_model != None:
+            lr_tensor = pre_base_model(lr_tensor) 
+
 
         base_tensor = base_model(lr_tensor)
         sr_tensor = head_model(base_tensor)
@@ -54,9 +60,11 @@ def train(base_model,head_model,train_loader,optimizer,l1_criterion,epoch,device
 
 
 
-def valid(base_model,head_model,valid_loader,l1_criterion,device,args,logger):
+def valid(base_model,head_model,valid_loader,l1_criterion,device,args,logger,pre_base_model=None):
     base_model.eval()
     head_model.eval()
+    if pre_base_model != None:
+         pre_base_model.eval()
     avg_psnr, avg_ssim = 0, 0
     l_loss = 0.0
     for sample in valid_loader:
@@ -66,6 +74,9 @@ def valid(base_model,head_model,valid_loader,l1_criterion,device,args,logger):
 
 
         with torch.no_grad():
+            if pre_base_model != None:
+                lr_tensor = pre_base_model(lr_tensor) 
+ 
             base_tensor = base_model(lr_tensor)
             sr_tensor = head_model(base_tensor)
 
@@ -94,12 +105,25 @@ def valid(base_model,head_model,valid_loader,l1_criterion,device,args,logger):
 
 
 
-def save_checkpoint(base_model,head_model,epoch,loss_train,loss_valid,psnr,ssim,optimizer,logger,args):
+def save_checkpoint(base_model,head_model,epoch,loss_train,loss_valid,psnr,ssim,optimizer,logger,args,pre_base_model = None):
     model_foler = args.checkpoint_path
     model_path = ""
     if not os.path.exists(model_foler):
         os.makedirs(model_foler)
-    if(base_model != None and head_model != None):
+    if(pre_base_model != None):    
+        model_path = os.path.join(model_foler,"checkpoint_" + "epoch_{}.pth".format(epoch))
+        torch.save({
+            'epoch': epoch,
+            'model_base_state_dict': base_model.state_dict(),
+            'pre_model_base_state_dict': pre_base_model.state_dict(),
+            'model_head_state_dict': head_model.state_dict(),
+            'optimizer_state_dict': optimizer.state_dict(),
+            'loss_train': loss_train,
+            'loss_valid': loss_valid,
+            'psnr': psnr,
+            'ssim':ssim
+            }, model_path)
+    elif(base_model != None and head_model != None):
         model_path = os.path.join(model_foler,"checkpoint_" + "epoch_{}.pth".format(epoch))
         torch.save({
             'epoch': epoch,

@@ -258,9 +258,10 @@ class FaceRescale(object):
             to output_size keeping aspect ratio the same.
     """
 
-    def __init__(self, output_size):
+    def __init__(self, output_size,same=False):
         assert isinstance(output_size, (int, tuple))
         self.output_size = output_size
+        self.same = same
 
     def __call__(self, sample):
 
@@ -279,6 +280,8 @@ class FaceRescale(object):
 
         #resize
         img_L = cv2.resize(img_H, (new_h, new_w), interpolation=cv2.INTER_CUBIC)
+        if self.same:
+            img_H = cv2.resize(img_H, (new_h, new_w), interpolation=cv2.INTER_CUBIC)
 
 
         return {'img_H': img_H, 'img_L': img_L}               

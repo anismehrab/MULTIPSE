@@ -81,7 +81,7 @@ class BaseNet_Large(nn.Module):
         self.upscale = upscale
         self.fea_conv = nn.Sequential(B.conv_layer(in_nc, nf, 3),
                                       nn.ReLU(inplace=True),
-                                      B.conv_layer(nf, nf, 3, stride=2, bias=False))
+                                      B.conv_layer(nf, nf, 3, stride=2, bias=False),)
 
         self.block1 = B.IMDModule_Large(nf)
         self.block2 = B.IMDModule_Large(nf)
@@ -104,6 +104,31 @@ class BaseNet_Large(nn.Module):
 
         out_lr = self.LR_conv(out_b6) + fea
         return out_lr        
+
+
+
+
+class PreNetBase_AS(nn.Module):
+    def __init__(self, nf=3,in_nc=3):
+        super(PreNetBase_AS, self).__init__()
+
+        self.fea_conv = nn.Sequential(B.conv_layer(in_nc, nf, kernel_size=3, stride=2),
+                                      nn.LeakyReLU(0.05),
+                                      B.conv_layer(nf, nf, kernel_size=3),
+                                      nn.LeakyReLU(0.05),
+                                      B.conv_layer(nf, nf, kernel_size=3),
+                                      nn.LeakyReLU(0.05),
+                                      B.conv_layer(nf, nf, kernel_size=3, stride=2),
+                                      nn.LeakyReLU(0.05),
+                                      B.conv_layer(nf, nf, kernel_size=3),
+                                      nn.LeakyReLU(0.05),
+                                      B.conv_layer(nf, nf, kernel_size=3),
+                                      nn.LeakyReLU(0.05))
+    
+    def forward(self,input):
+        output = self.fea_conv(input)
+        return output
+
 
 
 class UpsamplerNet_Face(nn.Module):
