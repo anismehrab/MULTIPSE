@@ -26,7 +26,6 @@ def train(base_model,head_model,train_loader,optimizer,l1_criterion,epoch,device
     iteration = 0
     start.record()
     for sample in train_loader:
-        iteration += 1
 
         torch.cuda.empty_cache()
         lr_tensor = sample["img_L"].to(device)  # ranges from [0, 1]
@@ -48,9 +47,10 @@ def train(base_model,head_model,train_loader,optimizer,l1_criterion,epoch,device
         
         loss_l1.backward()
         optimizer.step()
-        if iteration % 250 == 0:
+        if iteration % 200 == 1:
             print("===> Epoch[{}]({}/{}): Loss_l1: {:.5f}".format(epoch, iteration, len(train_loader),l_loss/iteration))
-            
+        iteration += 1
+    
         
     end.record()
     torch.cuda.synchronize()

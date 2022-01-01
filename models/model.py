@@ -113,17 +113,17 @@ class DownSampler_x4(nn.Module):
         super(DownSampler_x4, self).__init__()
 
         self.fea_conv = nn.Sequential(B.conv_layer(in_nc, nf, kernel_size=3, stride=2),
-                                      nn.LeakyReLU(0.05),
+                                      nn.ReLU(),
                                       B.conv_layer(nf, nf, kernel_size=3),
-                                      nn.LeakyReLU(0.05),
+                                      nn.ReLU(),
                                       B.conv_layer(nf, nf, kernel_size=3),
-                                      nn.LeakyReLU(0.05),
+                                      nn.ReLU(),
                                       B.conv_layer(nf, nf, kernel_size=3, stride=2),
-                                      nn.LeakyReLU(0.05),
+                                      nn.ReLU(),
                                       B.conv_layer(nf, nf, kernel_size=3),
-                                      nn.LeakyReLU(0.05),
+                                      nn.ReLU(),
                                       B.conv_layer(nf, nf, kernel_size=3),
-                                      nn.LeakyReLU(0.05))
+                                      nn.ReLU())
     
     def forward(self,input):
         output = self.fea_conv(input)

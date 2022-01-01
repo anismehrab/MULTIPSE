@@ -30,7 +30,7 @@ parser.add_argument('--threads', type=int, default=4, help='threads number.')
 
 parser.add_argument('--batch_size', type=int, default=4, help='batch size.')
 parser.add_argument('--epoch', type=int, default=5, help='epoch.')
-parser.add_argument("--scale", type=int, default=1,help="super-resolution scale")
+parser.add_argument("--scale", type=int, default=4,help="super-resolution scale")
 parser.add_argument("--lr", type=float, default=1e-5,help="learning rate")
 parser.add_argument("--step_size", type=int, default=30,help="learning rate decay per N epochs")
 parser.add_argument("--gamma", type=float, default=0.5,help="learning rate decay factor for step decay")
@@ -53,7 +53,7 @@ logger.info("scale"+str(args.scale))
 def reInitLoader(box):
     """box = (min_h,max_h,min_w,max_w)
         max = max_image_width * max_image_high to fit in GPU """
-    data_compos = transforms.Compose([FaceRescale(1024,same=True),AddMaskFace(256),FaceNormalize(),FaceToTensor()])
+    data_compos = transforms.Compose([FaceRescale(256,same=True),AddMaskFace(256),FaceNormalize(),FaceToTensor()])
     training_data = FaceDataset(data_dir=args.data_train,transform=data_compos)
     validation_data = FaceDataset(data_dir=args.data_valid,transform=data_compos)
     logger.info("===>Trainning Data:[ Train:{}  Valid:{}] Batch:{}".format(len(training_data),len(validation_data),args.batch_size))
@@ -71,15 +71,15 @@ box = (args.min_dim,args.max_dim,args.min_dim,args.max_dim)
 trainloader,validloader = reInitLoader(box)
 #load models
 print("loading model")
-pre_base_model = model.DownSampler_x4()
+tail_model = model.DownSampler_x4()
 base_model = model.BaseNet()
 head_model = model.UpsamplerNet_Face(upscale=args.scale)
 
 #training device
 device = torch.device('cuda' if torch.cuda.is_available() else "cpu")
 logger.info('{:>16s} : {:<s}'.format('DEVICE ID', device.type))
-if pre_base_model != None:
-    pre_base_model.to(device)
+if tail_model != None:
+    tail_model.to(device)
 base_model.to(device)
 head_model.to(device)
 
@@ -98,8 +98,8 @@ logger.info("L1 loss function")
 
 #optimzer
 params = list(head_model.parameters())
-if pre_base_model != None:
-    params += list(pre_base_model.parameters())
+if tail_model != None:
+    params += list(tail_model.parameters())
 
 optimizer = optim.Adam(params, lr=args.lr)
 
@@ -110,8 +110,8 @@ if(args.checkpoint != ""):
 
     checkpoint = torch.load(args.checkpoint)
     base_model.load_state_dict(checkpoint["model_base_state_dict"])
-    # if pre_base_model != None:
-    #     pre_base_model.load_state_dict(checkpoint["pre_model_base_state_dict"])
+    # if tail_model != None:
+    #     tail_model.load_state_dict(checkpoint["pre_model_base_state_dict"])
     # head_model.load_state_dict(checkpoint["model_head_state_dict"])
     # optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
     # epoch_i = checkpoint["epoch"] +1
@@ -124,6 +124,6 @@ for param in base_model.parameters():
 
 for i in range(epoch_i,epoch_i+args.epoch):
 
-    loss_t = train(base_model,head_model,trainloader,optimizer,l1_criterion,i,device,args,logger,pre_base_model)
-    psnr,ssim,loss_v = valid(base_model,head_model,validloader,l1_criterion,device,args,logger,pre_base_model)
-    save_checkpoint(base_model,head_model,i,loss_t,loss_v,psnr,ssim,optimizer,logger,args,pre_base_model)
+    loss_t = train(base_model,head_model,trainloader,optimizer,l1_criterion,i,device,args,logger,tail_model)
+    psnr,ssim,loss_v = valid(base_model,head_model,validloader,l1_criterion,device,args,logger,tail_model)
+    save_checkpoint(base_model,head_model,i,loss_t,loss_v,psnr,ssim,optimizer,logger,args,tail_model)
