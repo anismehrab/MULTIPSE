@@ -108,9 +108,9 @@ class BaseNet_Large(nn.Module):
 
 
 
-class PreNetBase_AS(nn.Module):
+class DownSampler_x4(nn.Module):
     def __init__(self, nf=3,in_nc=3):
-        super(PreNetBase_AS, self).__init__()
+        super(DownSampler_x4, self).__init__()
 
         self.fea_conv = nn.Sequential(B.conv_layer(in_nc, nf, kernel_size=3, stride=2),
                                       nn.LeakyReLU(0.05),

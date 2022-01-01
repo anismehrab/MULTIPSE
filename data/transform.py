@@ -277,12 +277,14 @@ class FaceRescale(object):
             new_h, new_w = self.output_size
 
         new_h, new_w = int(new_h), int(new_w)
-
-        #resize
-        img_L = cv2.resize(img_H, (new_h, new_w), interpolation=cv2.INTER_CUBIC)
-        if self.same:
-            img_H = cv2.resize(img_H, (new_h, new_w), interpolation=cv2.INTER_CUBIC)
-
+        
+        #
+        if(new_h != h or new_w != w):
+            img_L = cv2.resize(img_H, (new_h, new_w), interpolation=cv2.INTER_CUBIC)
+            if self.same:
+                img_H = cv2.resize(img_H, (new_h, new_w), interpolation=cv2.INTER_CUBIC)
+        else:
+            img_L = img_H
 
         return {'img_H': img_H, 'img_L': img_L}               
 

@@ -53,7 +53,7 @@ logger.info("scale"+str(args.scale))
 def reInitLoader(box):
     """box = (min_h,max_h,min_w,max_w)
         max = max_image_width * max_image_high to fit in GPU """
-    data_compos = transforms.Compose([FaceRescale(256,same=True),AddMaskFace(256),FaceNormalize(),FaceToTensor()])
+    data_compos = transforms.Compose([FaceRescale(1024,same=True),AddMaskFace(256),FaceNormalize(),FaceToTensor()])
     training_data = FaceDataset(data_dir=args.data_train,transform=data_compos)
     validation_data = FaceDataset(data_dir=args.data_valid,transform=data_compos)
     logger.info("===>Trainning Data:[ Train:{}  Valid:{}] Batch:{}".format(len(training_data),len(validation_data),args.batch_size))
@@ -71,7 +71,7 @@ box = (args.min_dim,args.max_dim,args.min_dim,args.max_dim)
 trainloader,validloader = reInitLoader(box)
 #load models
 print("loading model")
-pre_base_model = None #model.PreNetBase_AS()
+pre_base_model = model.DownSampler_x4()
 base_model = model.BaseNet()
 head_model = model.UpsamplerNet_Face(upscale=args.scale)
 
