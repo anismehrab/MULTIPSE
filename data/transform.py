@@ -157,7 +157,7 @@ class DataBatch:
         min_h,max_h,min_w,max_w = self.max_box
         patch_h = 2000
         patch_w = 2000
-        while(patch_h*patch_w > self.max_cells):
+        while(patch_h*patch_w > self.max_cells or (patch_h%2 !=0 or patch_w%2 !=0)):
             patch_h = randint(min_h,max_h)
             patch_w = randint(min_w,max_w)
 
