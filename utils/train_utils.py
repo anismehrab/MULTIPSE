@@ -43,9 +43,9 @@ def train(models_list,train_loader,optimizer,l1_criterion,epoch,device,args,logg
         
         loss_l1.backward()
         optimizer.step()
+        iteration += 1
         if iteration % 200 == 1:
             print("===> Epoch[{}]({}/{}): Loss_l1: {:.5f}".format(epoch, iteration, len(train_loader),l_loss/iteration))
-        iteration += 1
     
         
     end.record()
