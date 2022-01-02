@@ -10,12 +10,10 @@ import time
 
 
 
-def train(base_model,head_model,train_loader,optimizer,l1_criterion,epoch,device,args,logger,pre_base_model=None):
+def train(models_list,train_loader,optimizer,l1_criterion,epoch,device,args,logger):
 
-    base_model.train()
-    head_model.train()
-    if pre_base_model != None:
-        pre_base_model.train()
+    for model in models_list:
+        model.train()
 
     start = torch.cuda.Event(enable_timing=True)
     end = torch.cuda.Event(enable_timing=True)
@@ -32,17 +30,15 @@ def train(base_model,head_model,train_loader,optimizer,l1_criterion,epoch,device
         hr_tensor = sample["img_H"].to(device)  # ranges from [0, 1]
         
         optimizer.zero_grad()
-       
-        if pre_base_model != None:
-            lr_tensor = pre_base_model(lr_tensor) 
 
+        temp_tensor = lr_tensor;
+        for model in models_list:
+            temp_tensor = model(temp_tensor)
 
-        base_tensor = base_model(lr_tensor)
-        sr_tensor = head_model(base_tensor)
+        # torch.cuda.empty_cache()
+        #print(temp_tensor.size())
 
-        torch.cuda.empty_cache()
-
-        loss_l1 = l1_criterion(sr_tensor, hr_tensor)
+        loss_l1 = l1_criterion(temp_tensor, hr_tensor)
         l_loss += loss_l1.item()
         
         loss_l1.backward()
@@ -60,11 +56,9 @@ def train(base_model,head_model,train_loader,optimizer,l1_criterion,epoch,device
 
 
 
-def valid(base_model,head_model,valid_loader,l1_criterion,device,args,logger,pre_base_model=None):
-    base_model.eval()
-    head_model.eval()
-    if pre_base_model != None:
-         pre_base_model.eval()
+def valid(models_list,valid_loader,l1_criterion,device,args,logger):
+    for model in models_list:
+        model.eval()
     avg_psnr, avg_ssim = 0, 0
     l_loss = 0.0
     for sample in valid_loader:
@@ -72,30 +66,26 @@ def valid(base_model,head_model,valid_loader,l1_criterion,device,args,logger,pre
         lr_tensor = sample["img_L"].to(device)  # ranges from [0, 1]
         hr_tensor = sample["img_H"].to(device)  # ranges from [0, 1]
 
-
+        
         with torch.no_grad():
-            if pre_base_model != None:
-                lr_tensor = pre_base_model(lr_tensor) 
- 
-            base_tensor = base_model(lr_tensor)
-            sr_tensor = head_model(base_tensor)
+            temp_tensor = lr_tensor
+            for model in models_list:
+                temp_tensor = model(temp_tensor)
 
-        loss_l1 = l1_criterion(sr_tensor, hr_tensor)
+
+        loss_l1 = l1_criterion(temp_tensor, hr_tensor)
         l_loss += loss_l1.item()
 
         temp_psnr = 0
         tem_ssim = 0
-        batch = sr_tensor.size()[0]
+        batch = temp_tensor.size()[0]
         for i in range(batch):
-            sr_img = utils.tensor2np(sr_tensor.detach()[i])
+            sr_img = utils.tensor2np(temp_tensor.detach()[i])
             gt_img = utils.tensor2np(hr_tensor.detach()[i])
             temp_psnr += utils.compute_psnr(sr_img, gt_img)
             tem_ssim += utils.compute_ssim(sr_img, gt_img)
         temp_psnr = temp_psnr / batch
         tem_ssim = tem_ssim / batch
-        # crop_size = args.scale
-        # im_pre = utils.shave(sr_img, crop_size)
-        # im_label = utils.shave(gt_img, crop_size)
 
         avg_psnr += temp_psnr
         avg_ssim += tem_ssim
@@ -105,7 +95,7 @@ def valid(base_model,head_model,valid_loader,l1_criterion,device,args,logger,pre
 
 
 
-def save_checkpoint(base_model,head_model,epoch,loss_train,loss_valid,psnr,ssim,optimizer,logger,args,pre_base_model = None):
+def save_checkpoint(base_model,head_model,pre_base_model,epoch,loss_train,loss_valid,psnr,ssim,optimizer,logger,args):
     model_foler = args.checkpoint_path
     model_path = ""
     if not os.path.exists(model_foler):

@@ -109,12 +109,12 @@ if(args.checkpoint != ""):
     epoch_i = checkpoint["epoch"] +1
     print("optimizer",optimizer)
 
-
+model = [base_model,head_model]
 
 #trainning
 
 for i in range(epoch_i,epoch_i+args.epoch):
 
-    loss_t = train(base_model,head_model,trainloader,optimizer,l1_criterion,i,device,args,logger)
-    psnr,ssim,loss_v = valid(base_model,head_model,validloader,l1_criterion,device,args,logger)
-    save_checkpoint(base_model,head_model,i,loss_t,loss_v,psnr,ssim,optimizer,logger,args)
+    loss_t = train(model,trainloader,optimizer,l1_criterion,i,device,args,logger)
+    psnr,ssim,loss_v = valid(model,validloader,l1_criterion,device,args,logger)
+    save_checkpoint(model[0],model[1],i,loss_t,loss_v,psnr,ssim,optimizer,logger,args)

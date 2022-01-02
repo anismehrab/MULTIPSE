@@ -218,6 +218,7 @@ def pixelshuffle_block_large(in_channels, out_channels, upscale_factor=2, kernel
     conv6 = conv_layer(out_channels * (upscale_factor ** 2), out_channels * (upscale_factor ** 2), kernel_size, stride)
     conv7 = conv_layer(out_channels * (upscale_factor ** 2), out_channels * (upscale_factor ** 2), kernel_size, stride)
     conv8 = conv_layer(out_channels * (upscale_factor ** 2), out_channels * (upscale_factor ** 2), kernel_size, stride)
+
     conv = nn.Sequential(conv0,conv1,conv2,conv3,conv4,conv5,conv6,conv7,conv8)
     pixel_shuffle = nn.PixelShuffle(upscale_factor)
     return sequential(conv, pixel_shuffle)

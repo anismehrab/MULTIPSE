@@ -14,139 +14,17 @@ import random
 np_str_obj_array_pattern = re.compile(r'[SaUO]')
 
 
-class Normalize(object):
-    """Convert ndarrays in sample to Tensors."""
-
-    def __call__(self, sample):
-
-
-        img_origin = sample["img_origin"]
-        img_noisy = sample["img_noisy"]
-
-        image_o = np.float32(img_origin/255.)
-        image_n = np.float32(img_noisy/255.)
-
-        sample_ = {"img_H": image_o,"img_L":image_n}
-  
-        return sample_
-
-
-class Rotate(object):
-    """Convert ndarrays in sample to Tensors."""
-
-    def __init__(self,degree = None):
-        self.degree = degree
-        
-
-
-    def __call__(self, sample):
-
-        if(self.degree == None):
-            return sample
-
-        
-        image_o = cv2.rotate(sample["img_H"],  self.degree)
-        image_n = cv2.rotate(sample["img_L"],  self.degree)
-
-        sample_ = {"img_H": image_o,"img_L":image_n}
-  
-        return sample_
-
-
-
-class Degradate(object):
-    def __init__(self,scale = 4,patch_size_w = 64,patch_size_h=64):
-        self.scale = scale
-        self.patch_size_w = patch_size_w
-        self.patch_size_h= patch_size_h
-
-    def __call__(self, sample):
-        img_origin = sample["img_H"]
-        img_noisy = sample["img_L"]
-
-        img_L, img_H = degradation_bsrgan_plus_an(img=img_noisy,hq=img_origin, sf=self.scale, lq_patchsize_w=self.patch_size_w,lq_patchsize_h=self.patch_size_h,degrade=True,noise=False)
-        
-        # cv image: H x W x C 
-        return {'img_L': img_L,
-                'img_H': img_H}
-
-
-
-
-class RandomCrop(object):
-    """Crop randomly the image in a sample.
-
-    Args:
-        output_size (tuple or int): Desired output size. If int, square crop
-            is made.
-    """
-
-    def __init__(self, output_size):
-        assert isinstance(output_size, (int, tuple))
-        if isinstance(output_size, int):
-            self.output_size = (output_size, output_size)
-            self._size = output_size
-        else:
-            assert len(output_size) == 2
-            self.output_size = output_size
-
-    def __call__(self, sample):
-        imagehr = sample['img_H']
-        if(imagehr.shape[0] < self._size or imagehr.shape[1] < self._size):
-            raise Exception("image dimenstion is low") 
-
-        print("image shape",imagehr.shape)
-        h, w = imagehr.shape[:2]
-        new_h, new_w = self.output_size
-
-        top = np.random.randint(0, h - new_h)
-        left = np.random.randint(0, w - new_w)
-
-        image = imagehr[top: top + new_h,
-                      left: left + new_w]
-
- 
-
-        return {'img_H': imagehr}
-
-
-
-class ToTensor(object):
-    """Convert ndarrays in sample to Tensors."""
-
-    def __call__(self, sample):
-        imagelr, imagehr = sample['img_L'], sample['img_H']
-
-        #convert to tensor
-        img_L_ = torch.from_numpy(imagelr)
-        img_H_ = torch.from_numpy(imagehr)
-        # torch image: C x H x W
-        img_L = img_L_.permute(2, 0, 1).float()
-        img_H = img_H_.permute(2, 0, 1).float()
-
-        return {'img_L': img_L,
-                'img_H': img_H}
-
-
-
-
-
-
-
-
 default_collate_err_msg_format = (
     "default_collate: batch must contain tensors, numpy arrays, numbers, "
     "dicts or lists; found {}")
 
 
-
-
 class DataBatch:
-    def __init__(self,transfrom,scale,max_box,max_cells):
+    def __init__(self,transfrom,max_box,max_cells,scale=4):
         self.transfrom = transfrom
-        self.scale = scale
         self.max_box = max_box
         self.max_cells = max_cells
+        self.scale = scale
         self.rotate_degree = [None,cv2.ROTATE_90_CLOCKWISE,cv2.ROTATE_180,cv2.ROTATE_90_CLOCKWISE]
         
 
@@ -157,17 +35,18 @@ class DataBatch:
         min_h,max_h,min_w,max_w = self.max_box
         patch_h = 2000
         patch_w = 2000
-        while(patch_h*patch_w > self.max_cells):
-            patch_h = randint(min_h,max_h)
+        while(patch_h*patch_w > self.max_cells or (patch_h%self.scale !=0 or patch_w%self.scale !=0)):
+            patch_h = randint(min_h,max_h) 
             patch_w = randint(min_w,max_w)
+        rescale = FaceRescale((patch_h,patch_w),(patch_h,patch_w))
 
-        degrade = Degradate(scale=self.scale,patch_size_w=patch_w,patch_size_h=patch_h)
-        rotate = Rotate(degree=self.rotate_degree[randint(0,3)])
         batch_= []
         for sample in batch:
-            sample_ = rotate(sample)
-            sample_ = degrade(sample_)
+            sample_ = rescale(sample)
             sample_ = self.transfrom(sample_)
+            # print(sample_["img_H"].size())
+            # print(sample_["img_L"].size())
+
             batch_.append(sample_)
 
         # elem = batch[0]
@@ -248,7 +127,6 @@ class DataBatch:
 
 
 
-
 class FaceRescale(object):
     """Rescale the image in a sample to a given size.
 
@@ -282,8 +160,8 @@ class FaceRescale(object):
 
         new_h, new_w = int(new_h), int(new_w)
         
-        img_L = cv2.resize(img_H, (new_h, new_w), interpolation=cv2.INTER_CUBIC)
-
+        img_L_ = cv2.resize(img_H, (new_h, new_w), interpolation=cv2.INTER_CUBIC)
+        # print("img_L",img_L_.shape)
 
         if isinstance(self.output_size, int):
             if h > w:
@@ -295,13 +173,17 @@ class FaceRescale(object):
 
         new_h, new_w = int(new_h), int(new_w)
 
-        img_H = cv2.resize(img_H, (new_h, new_w), interpolation=cv2.INTER_CUBIC)
+        img_H_ = cv2.resize(img_H, (new_h, new_w), interpolation=cv2.INTER_CUBIC)
+        # print("img_H_",img_H_.shape)
 
 
 
     
 
-        return {'img_H': img_H, 'img_L': img_L}               
+        return {'img_H': img_H_, 'img_L': img_L_}     
+
+
+
 
 
 
@@ -311,9 +193,8 @@ class FaceRescale(object):
 
 class AddMaskFace(object):
     """Convert ndarrays in sample to Tensors."""
-    def __init__(self, output_size=256):
-        assert isinstance(output_size, int)
-        self.output_size = output_size
+    def __init__(self):
+        self.output_size = None
         self.masks = [self.line,self.rectangle,self.circle]
 
     def __call__(self, sample):
@@ -321,9 +202,11 @@ class AddMaskFace(object):
 
         img_H = cv2.cvtColor(img_H, cv2.COLOR_BGR2RGB)
         img_L = cv2.cvtColor(img_L, cv2.COLOR_BGR2RGB)
-
+        h, w = img_L.shape[:2]
+        self.output_size = min(h,w)
         idx = randint(0,2)
         img_L = self.masks[idx](img_L)
+        # print("img_L",img_L.shape)
 
         return {'img_H': img_H,'img_L': img_L}
 
@@ -398,4 +281,7 @@ class FaceToTensor(object):
         # torch image: C x H x W
         img_L = img_L.permute(2, 0, 1).float()
         img_H = img_H.permute(2, 0, 1).float()
-        return {'img_H': img_H,'img_L': img_L}
+        # print("img_L",img_L.shape)
+        # print("img_H",img_H.shape)
+
+        return {'img_H': img_H,'img_L': img_L}        
