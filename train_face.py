@@ -24,7 +24,7 @@ parser.add_argument('--data_train', nargs="+",default=["/media/anis/InWork/Data/
 
 parser.add_argument("--checkpoint", type=str, default="",help="checkpoint path")
 parser.add_argument("--checkpoint_path", type=str, default="checkpoints/face_checkpoints",help="checkpoint_folder_path")
-parser.add_argument("--logger_path", type=str, default="face_train_logging.log",help="logger path")
+parser.add_argument("--logger_path", type=str, default="checkpoints/face_checkpoints/face_train_logging.log",help="logger path")
 
 parser.add_argument('--threads', type=int, default=4, help='threads number.')
 
