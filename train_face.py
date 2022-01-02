@@ -55,7 +55,7 @@ logger.info("scale"+str(args.scale))
 def reInitLoader(box):
     """box = (min_h,max_h,min_w,max_w)
         max = max_image_width * max_image_high to fit in GPU """
-    data_compos = transforms.Compose([FaceRescale(input_size=128,output_size=512),AddMaskFace(256),FaceNormalize(),FaceToTensor()])
+    data_compos = transforms.Compose([FaceRescale(input_size=256,output_size=1024),AddMaskFace(256),FaceNormalize(),FaceToTensor()])
     training_data = FaceDataset(data_dir=args.data_train,transform=data_compos)
     validation_data = FaceDataset(data_dir=args.data_valid,transform=data_compos)
     logger.info("===>Trainning Data:[ Train:{}  Valid:{}] Batch:{}".format(len(training_data),len(validation_data),args.batch_size))
