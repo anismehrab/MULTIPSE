@@ -66,7 +66,6 @@ def valid(models_list,valid_loader,l1_criterion,device,args,logger):
         lr_tensor = sample["img_L"].to(device)  # ranges from [0, 1]
         hr_tensor = sample["img_H"].to(device)  # ranges from [0, 1]
 
-        
         with torch.no_grad():
             temp_tensor = lr_tensor
             for model in models_list:

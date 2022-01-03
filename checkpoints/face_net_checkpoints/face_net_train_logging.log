@@ -106,3 +106,24 @@
 22-01-02 17:53:50.895 : 
 
 22-01-02 17:53:50.896 : ===> TrainEpoch =12  lr = 0.0001
+22-01-02 18:14:46.276 : ===> Epoch[12]: Loss_l1: 0.02320  Duration: 20.925140 min
+22-01-02 18:16:20.729 : ===> Valid. psnr: 28.3537, ssim: 0.8251, loss: 0.0227
+22-01-02 18:16:20.804 : ===> Checkpoint saved to checkpoints/face_net_checkpoints/checkpoint_baseepoch_12.pth
+22-01-02 18:16:20.804 : 
+
+22-01-02 18:16:20.805 : ===> TrainEpoch =13  lr = 0.0001
+22-01-02 18:36:15.169 : ===> Epoch[13]: Loss_l1: 0.02291  Duration: 19.905654 min
+22-01-02 18:37:52.825 : ===> Valid. psnr: 28.6438, ssim: 0.8326, loss: 0.0221
+22-01-02 18:37:52.876 : ===> Checkpoint saved to checkpoints/face_net_checkpoints/checkpoint_baseepoch_13.pth
+22-01-02 18:37:52.876 : 
+
+22-01-02 18:37:52.877 : ===> TrainEpoch =14  lr = 0.0001
+22-01-02 18:58:09.865 : ===> Epoch[14]: Loss_l1: 0.02234  Duration: 20.283131 min
+22-01-02 18:59:44.560 : ===> Valid. psnr: 28.6682, ssim: 0.8362, loss: 0.0217
+22-01-02 18:59:44.612 : ===> Checkpoint saved to checkpoints/face_net_checkpoints/checkpoint_baseepoch_14.pth
+22-01-02 18:59:44.612 : 
+
+22-01-03 09:28:28.037 : 
+
+22-01-03 09:28:28.038 : #################### Trainning Resumed ####################
+22-01-03 09:28:30.179 : ===>Trainning Data:[ Train:9143  Valid:1000] Batch:8
