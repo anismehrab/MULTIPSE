@@ -6,14 +6,30 @@ class EnhanceNet(nn.Module):
     def __init__(self, in_nc=3, nf=64,out_nc=3,upscale=4):
         super(EnhanceNet, self).__init__()
 
+        # self.downsampleer = nn.Sequential(
+        #             B.conv_layer(in_nc, int(nf/2), kernel_size=3, stride=2),
+        #             B.activation('lrelu', neg_slope=0.05),
+        #             B.conv_layer(int(nf/2), int(nf/2), kernel_size=3),
+        #             B.activation('lrelu', neg_slope=0.05),
+        #             B.conv_layer(int(nf/2), int(nf/2), kernel_size=3),
+        #             B.activation('lrelu', neg_slope=0.05),
+        #             B.conv_layer(int(nf/2), nf, kernel_size=3)
+        #             )
+
+
+
         self.downsampleer = nn.Sequential(
-                    B.conv_layer(in_nc, int(nf/2), kernel_size=3, stride=2),
+                    B.conv_layer(in_nc, int(nf/4), kernel_size=3, stride=2),
                     B.activation('lrelu', neg_slope=0.05),
-                    B.conv_layer(int(nf/2), int(nf/2), kernel_size=3),
+                    B.conv_layer(int(nf/4), int(nf/4), kernel_size=3),
                     B.activation('lrelu', neg_slope=0.05),
-                    B.conv_layer(int(nf/2), int(nf/2), kernel_size=3),
+                    B.conv_layer(int(nf/4), int(nf/4), kernel_size=3),
                     B.activation('lrelu', neg_slope=0.05),
-                    B.conv_layer(int(nf/2), nf, kernel_size=3)
+                    B.conv_layer(int(nf/4), nf, kernel_size=3, stride=2),
+                    B.activation('lrelu', neg_slope=0.05),
+                    B.conv_layer(nf, nf, kernel_size=3),
+                    B.activation('lrelu', neg_slope=0.05),
+                    B.conv_layer(nf, nf, kernel_size=3),
                     )
 
         # IMDBs
@@ -26,14 +42,13 @@ class EnhanceNet(nn.Module):
         self.IMDB7 = B.IMDModule(in_channels=nf)
         self.IMDB8 = B.IMDModule(in_channels=nf)
         self.IMDB9 = B.IMDModule(in_channels=nf)
-        self.IMDB10 = B.IMDModule(in_channels=nf)
 
-        num_modules=10
+        num_modules=9
         self.conv_cat = B.conv_block(nf * num_modules, nf, kernel_size=1, act_type='lrelu')
         self.LR_conv = B.conv_layer(nf, nf, kernel_size=3)
 
         upsample_block = B.pixelshuffle_block
-        self.upsampler = upsample_block(nf, out_nc, upscale_factor=upscale*2)
+        self.upsampler = upsample_block(nf, out_nc, upscale_factor=upscale*4)
 
 
     def forward(self, input):
@@ -57,8 +72,7 @@ class EnhanceNet(nn.Module):
         out_B7 = self.IMDB7(out_B6)
         out_B8 = self.IMDB8(out_B7)       
         out_B9 = self.IMDB9(out_B8)
-        out_B10 = self.IMDB9(out_B9)
-        out_B = self.conv_cat(torch.cat([out_B1, out_B2, out_B3, out_B4, out_B5, out_B6, out_B7, out_B8, out_B9,out_B10], dim=1))
+        out_B = self.conv_cat(torch.cat([out_B1, out_B2, out_B3, out_B4, out_B5, out_B6, out_B7, out_B8, out_B9], dim=1))
         #print("out_B",out_B.size())        
 
         out_lr = self.LR_conv(out_B) + out_fea

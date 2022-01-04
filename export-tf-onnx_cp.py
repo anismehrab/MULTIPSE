@@ -3,14 +3,14 @@ import onnxruntime
 from onnx_tf.backend import prepare
 from onnxruntime.quantization import quantize
 from onnxruntime.quantization.quant_utils import QuantizationMode
-import random
+
 import tensorflow as tf
 
 import os
 import numpy as np
 from tensorflow.lite.python.interpreter import Interpreter
 import torch
-from models.face_model import FaceNet
+from models import model
 import utils
 import time
 from torch.utils.mobile_optimizer import optimize_for_mobile
@@ -24,88 +24,61 @@ import cv2
 
 
 
-torch_model_scripted_vulkan_path = os.path.join('model_zoo', 'BSRGAN_scripted_vulkan.pth')
-torch_model_quant_scripted_lite_path = os.path.join('model_zoo', 'BSRGAN_scripted.pth')
-torch_model_path = os.path.join('model_zoo', 'BSRGAN.pth') 
-torch_model_quant_path = os.path.join('model_zoo', 'BSRGAN_quant.pth') 
-torch_model_static_quant_graph_path = os.path.join('model_zoo', 'BSRGAN_static_quant_graph.pth') 
-torch_model_quant_dynamic_path = os.path.join('model_zoo', 'BSRGAN_quant_graph_dynamic.pth') 
-torch_model_quant_graph_dynamic_path = os.path.join('model_zoo', 'BSRGAN_quant_graph_dynamic.pth') 
-torch_model_quant_dynamic_scripted_path = os.path.join('model_zoo', 'BSRGAN_quant_scripted.pth') 
-torch_model_scripted_nnapi_path = os.path.join('model_zoo', 'BSRGAN_scripted_nnapi.pth') 
-torch_model_quant_scripted_vulakn_path = os.path.join('model_zoo', 'BSRGAN_quant_scripted_vulkan.pth') 
-onnx_path = os.path.join('model_zoo', 'BSRGAN_ONNX.onnx')        
-onnx_quant_path = os.path.join('model_zoo', 'BSRGAN_ONNX_quant.onnx')        
-onnx_quant_static_path = os.path.join('model_zoo', 'BSRGAN_ONNX_quant_static.onnx')        
-tf_rep_path = os.path.join('model_zoo', 'BSRGAN_tf_Rep')         
-tf_lite_path = os.path.join('model_zoo', 'BSRGAN_tf_Lite')         
+
+
+
+
+
+
+
+
+
+
+
 device = torch.device('cpu')#'cuda' if torch.cuda.is_available() else 'cpu')
 L_path = os.path.join("testsets", 'test_data')
-D_path = os.path.join("testsets", 'test')
 
 print(device)
 
-# def test_with_image(model,OUT_NAME,dtype = torch.float32):
-#     model.to(device)
-#     with torch.no_grad():
-#         for img in util.get_image_paths(L_path):
-#             if('bakbak' in img):
-#                 torch.cuda.empty_cache()
-#                 img_L = util.imread_uint(img, n_channels=3)
-#                 if(np.shape(img_L)[0] < 512 and np.shape(img_L)[1] < 512):
-#                     print("img{}".format(np.shape(img_L)))
-#                     img_L = torch.from_numpy(np.ascontiguousarray(img_L)).permute(2, 0, 1).div(255.).unsqueeze(0)
-#                     img_L = img_L.type(dtype)
-#                     img_L = img_L.to(device)
-#                     start = time.time()
-#                     img_E = model(img_L)
-#                     print("inference time: {}".format(time.time() - start))
-#                     img_E = util.tensor2uint(img_E)
-#                     util.imsave(img_E, os.path.join('test/', OUT_NAME+'.png'))
-
-#     model.cpu()
-
-
-def test_with_image(model,OUT_NAME,dtype = torch.float32):
-    model.to(device)
+def test_with_image(model_base,model_head,OUT_NAME,dtype = torch.float32):
+    model_base.to(device)
+    model_head.to(device)
     with torch.no_grad():
         for img in util.get_image_paths(L_path):
-            if('69008' in img):
+            if('bakbak' in img):
                 torch.cuda.empty_cache()
-                img_L = util.imread_uint(img, n_channels=3)
-                w= np.shape(img_L)[1]
-                h = np.shape(img_L)[0]
-                # img_L = cv2.line(img_L,pt1 = (700, 500), pt2 = (800, 300),
-                #             color = (0, 0, 0),thickness = random.randint(5,20))
-                img_L =  cv2.circle(img_L,center = (350, 278),radius = 20,color = (0, 0, 0),thickness = -1)
-                util.imsave(img_L, os.path.join('testsets/exported', 'input'+'.png'))
-            
-                if(np.shape(img_L)[0] < 1055 and np.shape(img_L)[1] < 1055):
+                img_L = util.imread_uint(img, n_channels=3)#return numpy array RGB H*W*C
+                if(np.shape(img_L)[0] < 512 and np.shape(img_L)[1] < 512):
                     print("img{}".format(np.shape(img_L)))
                     img_L = torch.from_numpy(np.ascontiguousarray(img_L)).permute(2, 0, 1).div(255.).unsqueeze(0)
                     img_L = img_L.type(dtype)
                     img_L = img_L.to(device)
                     start = time.time()
-                    img_E = model(img_L)
+                    img_E = model_base(img_L)
+                    img_E = model_head(img_E)
                     print("inference time: {}".format(time.time() - start))
                     img_E = util.tensor2uint(img_E)
                     util.imsave(img_E, os.path.join('testsets/exported', OUT_NAME+'.png'))
 
-    model.cpu()
 
 
 
+#init TORCH MODEL
+base_model = model.BaseNet()
+head_model = model.UpsamplerNet(upscale=3)
 
-#LOAD TORCH MODEL
-toch_model_path = os.path.join('checkpoints/face_net_checkpoints', 'checkpoint_baseepoch_33.pth')
-torch_model = FaceNet()
-        
-#torch_model = architecture.IMDN(upscale=4)
-checkpoint = torch.load(toch_model_path)
-torch_model.load_state_dict(checkpoint["model_base_state_dict"])
-torch_model.eval()
-torch_model.to(device)
-test_with_image(torch_model,'output')
+#load torch model
+epoch = 22
+checkpoint_ =  'checkpoint_epoch_'+str(epoch)+'.pth'    
+checkpoint = os.path.join('checkpoints', checkpoint_)
+checkpoint = torch.load(checkpoint)
+base_model.load_state_dict(checkpoint["model_base_state_dict"])
+head_model.load_state_dict(checkpoint["model_head_state_dict"])
+head_model.eval()
+base_model.eval()
+head_model.to(device)
+base_model.to(device)
+# # test_with_image(torch_model,'test_gournd_truth')
 # #torch_model = torch_model.to(device)
 
 # #Post Training Static Quantization
@@ -215,8 +188,12 @@ test_with_image(torch_model,'output')
 # test_with_image(torch_model,"static_quantized_torch_model",dtype=torch.float32)
 
 
-
-# # # torch_model.to(device)
+# # # #TORCHSCRIPT
+scripted_base = torch.jit.script(base_model)
+scripted_head = torch.jit.script(head_model)
+torch.jit.save(scripted_base,os.path.join('checkpoints/torch_script',"scripted_base_"+checkpoint_))
+torch.jit.save(scripted_head,os.path.join('checkpoints/torch_script',"scripted_head_"+checkpoint_))
+test_with_image(scripted_base,scripted_head,"checkpoint_"+str(epoch))
 
 # # #Trace
 # # # torch.cuda.empty_cache()
@@ -226,19 +203,16 @@ test_with_image(torch_model,'output')
 # # torch.jit.save(traced_model,os.path.join('model_zoo','BSRGAN_traced_model.pth'))
 
 # #save for lite interpreted
-# # # #TORCHSCRIPT
 #scripted_model = torch.jit.load(os.path.join('model_zoo','BSRGAN_scripted_static_quantized_model.pth'))
-# scripted_model._save_for_lite_interpreter(os.path.join('model_zoo','BSRGAN_lite_static_quantized_model.pth'))
-# scripted_model_optimized = optimize_for_mobile(scripted_model,backend="cpu")
-# scripted_model_optimized._save_for_lite_interpreter(os.path.join('model_zoo','BSRGAN_cpu_lite_static_quantized_model.pth'))
-# scripted_model_optimized = optimize_for_mobile(scripted_model,backend="Vulkan")
-# scripted_model_optimized._save_for_lite_interpreter(os.path.join('model_zoo','BSRGAN_vulkan_lite_static_quantized_model.pth'))
-scripted_torch_model = torch.jit.script(torch_model)
-scripted_model_optimized = optimize_for_mobile(scripted_torch_model,backend="cpu")
-scripted_model_optimized._save_for_lite_interpreter(os.path.join('checkpoints/face_net_checkpoints/script','lite_cpu_multispe_facenet.pth'))
-scripted_model_optimized = optimize_for_mobile(scripted_torch_model,backend="Vulkan")
-scripted_model_optimized._save_for_lite_interpreter(os.path.join('checkpoints/face_net_checkpoints/script','lite_vulakn_multispe_facenet.pth'))
-
+#scripted_base._save_for_lite_interpreter(os.path.join('checkpoints/script','checkpoint_+".pth'))
+scripted_base_optimized = optimize_for_mobile(scripted_base,backend="cpu")
+scripted_base_optimized._save_for_lite_interpreter(os.path.join('checkpoints/torch_script','base_'+str(epoch)+'_cpu_lite.pth'))
+scripted_base_optimized = optimize_for_mobile(scripted_base,backend="vulkan")
+scripted_base_optimized._save_for_lite_interpreter(os.path.join('checkpoints/torch_script','base_'+str(epoch)+'_vulkan_lite.pth'))
+scripted_head_optimized = optimize_for_mobile(scripted_head,backend="cpu")
+scripted_head_optimized._save_for_lite_interpreter(os.path.join('checkpoints/torch_script','head_'+str(epoch)+'_cpu_lite.pth'))
+scripted_head_optimized = optimize_for_mobile(scripted_head,backend="vulkan")
+scripted_head_optimized._save_for_lite_interpreter(os.path.join('checkpoints/torch_script','head_'+str(epoch)+'_vulkan_lite.pth'))
 # # #to NNAPI 
 # # scripted_model = torch.jit.script(model_int8_quantized)
 # # input_tensor = torch.from_numpy(np.random.randn(1, 3, 50, 50).astype(np.float32))
@@ -279,7 +253,7 @@ scripted_model_optimized._save_for_lite_interpreter(os.path.join('checkpoints/fa
 
 
 # # # # Load the ONNX model
-onnx_path = os.path.join('model_zoo', 'IMDN_x4_ONNX.pth')
+# onnx_path = os.path.join('model_zoo', 'IMDN_x4_ONNX.pth')
 # print("load onnx")
 # model_onnx = onnx.load(onnx_path)
 
@@ -304,7 +278,7 @@ onnx_path = os.path.join('model_zoo', 'IMDN_x4_ONNX.pth')
 # print(np.shape(outputs))
 
 
-tf_rep_path = os.path.join('model_zoo', 'IMDN_x4_tf_rep')
+# tf_rep_path = os.path.join('model_zoo', 'IMDN_x4_tf_rep')
 # #ONNX to TF
 # model_onnx = onnx.load(onnx_path)
 # print("convert onnx to tensorflow representation")
