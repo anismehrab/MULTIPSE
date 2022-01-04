@@ -97,7 +97,7 @@ def test_with_image(model,OUT_NAME,dtype = torch.float32):
 
 
 #LOAD TORCH MODEL
-toch_model_path = os.path.join('checkpoints/face_net_checkpoints', 'checkpoint_baseepoch_33.pth')
+toch_model_path = os.path.join('checkpoints/face_net_checkpoints', 'checkpoint_baseepoch_63.pth')
 torch_model = FaceNet()
         
 #torch_model = architecture.IMDN(upscale=4)

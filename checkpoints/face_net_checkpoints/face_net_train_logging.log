@@ -404,3 +404,74 @@
 22-01-04 15:37:13.994 : 
 
 22-01-04 15:37:13.995 : ===> TrainEpoch =53  lr = 0.0001
+22-01-04 15:58:59.542 : ===> Epoch[53]: Loss_l1: 0.01482  Duration: 21.759246 min
+22-01-04 16:00:40.050 : ===> Valid. psnr: 31.6322, ssim: 0.9162, loss: 0.0161
+22-01-04 16:00:40.130 : ===> Checkpoint saved to checkpoints/face_net_checkpoints/checkpoint_baseepoch_53.pth
+22-01-04 16:00:40.131 : 
+
+22-01-04 16:00:40.131 : ===> TrainEpoch =54  lr = 0.0001
+22-01-04 16:20:42.540 : ===> Epoch[54]: Loss_l1: 0.01483  Duration: 20.040856 min
+22-01-04 16:22:20.687 : ===> Valid. psnr: 32.1152, ssim: 0.9212, loss: 0.0144
+22-01-04 16:22:20.736 : ===> Checkpoint saved to checkpoints/face_net_checkpoints/checkpoint_baseepoch_54.pth
+22-01-04 16:22:20.736 : 
+
+22-01-04 16:22:20.736 : ===> TrainEpoch =55  lr = 0.0001
+22-01-04 16:42:31.151 : ===> Epoch[55]: Loss_l1: 0.01470  Duration: 20.174919 min
+22-01-04 16:44:00.924 : ===> Valid. psnr: 31.0902, ssim: 0.9189, loss: 0.0184
+22-01-04 16:44:01.000 : ===> Checkpoint saved to checkpoints/face_net_checkpoints/checkpoint_baseepoch_55.pth
+22-01-04 16:44:01.000 : 
+
+22-01-04 16:44:01.001 : ===> TrainEpoch =56  lr = 0.0001
+22-01-04 17:04:15.363 : ===> Epoch[56]: Loss_l1: 0.01453  Duration: 20.240423 min
+22-01-04 17:05:45.959 : ===> Valid. psnr: 31.8442, ssim: 0.9220, loss: 0.0154
+22-01-04 17:05:46.008 : ===> Checkpoint saved to checkpoints/face_net_checkpoints/checkpoint_baseepoch_56.pth
+22-01-04 17:05:46.008 : 
+
+22-01-04 17:05:46.009 : ===> TrainEpoch =57  lr = 0.0001
+22-01-04 17:25:36.884 : ===> Epoch[57]: Loss_l1: 0.01446  Duration: 19.846769 min
+22-01-04 17:27:09.677 : ===> Valid. psnr: 32.0367, ssim: 0.9203, loss: 0.0146
+22-01-04 17:27:09.724 : ===> Checkpoint saved to checkpoints/face_net_checkpoints/checkpoint_baseepoch_57.pth
+22-01-04 17:27:09.724 : 
+
+22-01-04 17:27:09.724 : ===> TrainEpoch =58  lr = 0.0001
+22-01-04 17:47:08.666 : ===> Epoch[58]: Loss_l1: 0.01436  Duration: 19.982521 min
+22-01-04 17:48:39.442 : ===> Valid. psnr: 32.1617, ssim: 0.9239, loss: 0.0142
+22-01-04 17:48:39.494 : ===> Checkpoint saved to checkpoints/face_net_checkpoints/checkpoint_baseepoch_58.pth
+22-01-04 17:48:39.494 : 
+
+22-01-04 17:48:39.494 : ===> TrainEpoch =59  lr = 0.0001
+22-01-04 18:08:24.696 : ===> Epoch[59]: Loss_l1: 0.01420  Duration: 19.753629 min
+22-01-04 18:10:00.664 : ===> Valid. psnr: 32.4125, ssim: 0.9260, loss: 0.0137
+22-01-04 18:10:00.738 : ===> Checkpoint saved to checkpoints/face_net_checkpoints/checkpoint_baseepoch_59.pth
+22-01-04 18:10:00.738 : 
+
+22-01-04 18:10:00.738 : ===> TrainEpoch =60  lr = 0.0001
+22-01-04 18:30:14.628 : ===> Epoch[60]: Loss_l1: 0.01410  Duration: 20.231681 min
+22-01-04 18:31:47.828 : ===> Valid. psnr: 32.2008, ssim: 0.9251, loss: 0.0139
+22-01-04 18:31:47.880 : ===> Checkpoint saved to checkpoints/face_net_checkpoints/checkpoint_baseepoch_60.pth
+22-01-04 18:31:47.880 : 
+
+22-01-04 18:31:47.881 : ===> TrainEpoch =61  lr = 0.0001
+22-01-04 18:51:56.260 : ===> Epoch[61]: Loss_l1: 0.01409  Duration: 20.139885 min
+22-01-04 18:53:29.876 : ===> Valid. psnr: 32.4608, ssim: 0.9262, loss: 0.0136
+22-01-04 18:53:29.925 : ===> Checkpoint saved to checkpoints/face_net_checkpoints/checkpoint_baseepoch_61.pth
+22-01-04 18:53:29.926 : 
+
+22-01-04 18:53:29.926 : ===> TrainEpoch =62  lr = 0.0001
+22-01-04 19:13:24.371 : ===> Epoch[62]: Loss_l1: 0.01399  Duration: 19.908060 min
+22-01-04 19:14:55.867 : ===> Valid. psnr: 32.0891, ssim: 0.9259, loss: 0.0147
+22-01-04 19:14:55.918 : ===> Checkpoint saved to checkpoints/face_net_checkpoints/checkpoint_baseepoch_62.pth
+22-01-04 19:14:55.918 : 
+
+22-01-04 19:14:55.919 : ===> TrainEpoch =63  lr = 0.0001
+22-01-04 19:35:01.822 : ===> Epoch[63]: Loss_l1: 0.01392  Duration: 20.098802 min
+22-01-04 19:36:39.574 : ===> Valid. psnr: 32.3221, ssim: 0.9270, loss: 0.0143
+22-01-04 19:36:41.277 : ===> Checkpoint saved to checkpoints/face_net_checkpoints/checkpoint_baseepoch_63.pth
+22-01-04 19:36:41.277 : 
+
+22-01-04 19:36:41.277 : ===> TrainEpoch =64  lr = 0.0001
+22-01-04 19:56:28.314 : ===> Epoch[64]: Loss_l1: 0.01388  Duration: 19.784331 min
+22-01-04 19:58:01.659 : ===> Valid. psnr: 32.4297, ssim: 0.9282, loss: 0.0136
+22-01-04 19:58:01.711 : ===> Checkpoint saved to checkpoints/face_net_checkpoints/checkpoint_baseepoch_64.pth
+22-01-04 19:58:01.711 : 
+

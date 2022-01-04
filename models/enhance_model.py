@@ -19,13 +19,13 @@ class EnhanceNet(nn.Module):
 
 
         self.downsampleer = nn.Sequential(
-                    B.conv_layer(in_nc, int(nf/4), kernel_size=3, stride=2),
+                    B.conv_layer(in_nc, int(nf/2), kernel_size=3, stride=2),
                     B.activation('lrelu', neg_slope=0.05),
-                    B.conv_layer(int(nf/4), int(nf/4), kernel_size=3),
+                    B.conv_layer(int(nf/2), int(nf/2), kernel_size=3),
                     B.activation('lrelu', neg_slope=0.05),
-                    B.conv_layer(int(nf/4), int(nf/4), kernel_size=3),
+                    B.conv_layer(int(nf/2), int(nf/2), kernel_size=3),
                     B.activation('lrelu', neg_slope=0.05),
-                    B.conv_layer(int(nf/4), nf, kernel_size=3, stride=2),
+                    B.conv_layer(int(nf/2), nf, kernel_size=3, stride=2),
                     B.activation('lrelu', neg_slope=0.05),
                     B.conv_layer(nf, nf, kernel_size=3),
                     B.activation('lrelu', neg_slope=0.05),
