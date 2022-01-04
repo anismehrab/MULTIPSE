@@ -3,6 +3,3 @@ checkpoints/face__net_checkpoints/*.pth
 checkpoints/enhance/*.pth
 checkpoints/face_checkpoints/*.pth
 
-
-testsets/*
-
