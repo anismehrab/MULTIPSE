@@ -36,7 +36,7 @@ parser.add_argument("--lr", type=float, default=1e-4,help="learning rate")
 parser.add_argument("--step_size", type=int, default=50,help="learning rate decay per N epochs")
 parser.add_argument("--gamma", type=float, default=0.1,help="learning rate decay factor for step decay")
 
-parser.add_argument("--max_dim", type=int, default=330,help="max image dimension")
+parser.add_argument("--max_dim", type=int, default=256,help="max image dimension")
 parser.add_argument("--min_dim", type=int, default=80,help="min image dimension")
 parser.add_argument("--max_cells", type=int, default=210*210,help="min image dimension")
 
