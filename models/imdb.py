@@ -205,22 +205,3 @@ def pixelshuffle_block(in_channels, out_channels, upscale_factor=2, kernel_size=
     conv = conv_layer(in_channels, out_channels * (upscale_factor ** 2), kernel_size, stride)
     pixel_shuffle = nn.PixelShuffle(upscale_factor)
     return sequential(conv, pixel_shuffle)
-
-
-def pixelshuffle_block_large(in_channels, out_channels, upscale_factor=2, kernel_size=3, stride=1):
-
-    conv0 = conv_layer(in_channels, out_channels * (upscale_factor ** 2), kernel_size, stride)
-    conv1 = conv_layer(out_channels * (upscale_factor ** 2), out_channels * (upscale_factor ** 2), kernel_size, stride)
-    conv2 = conv_layer(out_channels * (upscale_factor ** 2), out_channels * (upscale_factor ** 2), kernel_size, stride)
-    conv3 = conv_layer(out_channels * (upscale_factor ** 2), out_channels * (upscale_factor ** 2), kernel_size, stride)
-    conv4 = conv_layer(out_channels * (upscale_factor ** 2), out_channels * (upscale_factor ** 2), kernel_size, stride)
-    conv5 = conv_layer(out_channels * (upscale_factor ** 2), out_channels * (upscale_factor ** 2), kernel_size, stride)
-    conv6 = conv_layer(out_channels * (upscale_factor ** 2), out_channels * (upscale_factor ** 2), kernel_size, stride)
-    conv7 = conv_layer(out_channels * (upscale_factor ** 2), out_channels * (upscale_factor ** 2), kernel_size, stride)
-    conv8 = conv_layer(out_channels * (upscale_factor ** 2), out_channels * (upscale_factor ** 2), kernel_size, stride)
-
-    conv = nn.Sequential(conv0,conv1,conv2,conv3,conv4,conv5,conv6,conv7,conv8)
-    pixel_shuffle = nn.PixelShuffle(upscale_factor)
-    return sequential(conv, pixel_shuffle)
-
-3

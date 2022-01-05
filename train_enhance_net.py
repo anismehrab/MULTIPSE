@@ -29,7 +29,7 @@ parser.add_argument("--logger_path", type=str, default="checkpoints/enhance_net_
 parser.add_argument('--threads', type=int, default=4, help='threads number.')
 parser.add_argument("--start_iter", type=int, default=0,help="iteration")
 
-parser.add_argument('--batch_size', type=int, default=8, help='batch size.')
+parser.add_argument('--batch_size', type=int, default=4, help='batch size.')
 parser.add_argument('--epoch', type=int, default=5, help='epoch.')
 parser.add_argument("--scale", type=int, default=4,help="super-resolution scale")
 parser.add_argument("--lr", type=float, default=1e-4,help="learning rate")
@@ -104,7 +104,7 @@ if(args.checkpoint != ""):
 
     checkpoint = torch.load(args.checkpoint)
     model.load_state_dict(checkpoint["model_base_state_dict"])
-    optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
+    # optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
     epoch_i = checkpoint["epoch"] +1
     print("optimizer",optimizer)
 
