@@ -126,7 +126,7 @@ def save_checkpoint(base_model,head_model,pre_base_model,epoch,loss_train,loss_v
             }, model_path)
 
     elif(base_model != None):
-        model_path = os.path.join(model_foler,"checkpoint_base" + "epoch_{}.pth".format(epoch))
+        model_path = os.path.join(model_foler,"checkpoint_base" + "_epoch_{}.pth".format(epoch))
         torch.save({
             'epoch': epoch,
             'model_base_state_dict': base_model.state_dict(),
@@ -137,7 +137,7 @@ def save_checkpoint(base_model,head_model,pre_base_model,epoch,loss_train,loss_v
             'ssim':ssim
             }, model_path)
     else:
-        model_path = os.path.join(model_foler,"checkpoint_head" + "epoch_{}.pth".format(epoch))
+        model_path = os.path.join(model_foler,"checkpoint_head" + "_epoch_{}.pth".format(epoch))
         torch.save({
             'epoch': epoch,
             'model_head_state_dict': head_model.state_dict(),

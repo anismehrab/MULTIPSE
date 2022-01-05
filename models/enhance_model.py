@@ -39,8 +39,8 @@ class EnhanceNet(nn.Module):
         self.conv_cat = B.conv_block(nf * num_modules, nf, kernel_size=1, act_type='lrelu')
         self.LR_conv = B.conv_layer(nf, nf, kernel_size=3)
 
-        #up by 
-      
+        #up by x8
+
         self.upsampler = nn.Sequential(
                                     B.conv_layer(nf, out_nc * (upscale ** 2) * (pre_upscale ** 2), kernel_size=3),
                                     nn.PixelShuffle(pre_upscale),
