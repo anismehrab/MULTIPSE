@@ -11,6 +11,7 @@ import numpy as np
 from tensorflow.lite.python.interpreter import Interpreter
 import torch
 from models.face_model import FaceNet
+from models.enhance_model import EnhanceNet
 import utils
 import time
 from torch.utils.mobile_optimizer import optimize_for_mobile
@@ -97,8 +98,8 @@ def test_with_image(model,OUT_NAME,dtype = torch.float32):
 
 
 #LOAD TORCH MODEL
-toch_model_path = os.path.join('checkpoints/face_net_checkpoints', 'checkpoint_baseepoch_63.pth')
-torch_model = FaceNet()
+toch_model_path = os.path.join('checkpoints/enhance_net_checkpoints', 'checkpoint_base_epoch_0.pth')
+torch_model = EnhanceNet()
         
 #torch_model = architecture.IMDN(upscale=4)
 checkpoint = torch.load(toch_model_path)
@@ -235,9 +236,9 @@ test_with_image(torch_model,'output')
 # scripted_model_optimized._save_for_lite_interpreter(os.path.join('model_zoo','BSRGAN_vulkan_lite_static_quantized_model.pth'))
 scripted_torch_model = torch.jit.script(torch_model)
 scripted_model_optimized = optimize_for_mobile(scripted_torch_model,backend="cpu")
-scripted_model_optimized._save_for_lite_interpreter(os.path.join('checkpoints/face_net_checkpoints/script','lite_cpu_multispe_facenet.pth'))
+scripted_model_optimized._save_for_lite_interpreter(os.path.join('checkpoints/enhance_net_checkpoints/script','lite_cpu_multispe_facenet.pth'))
 scripted_model_optimized = optimize_for_mobile(scripted_torch_model,backend="Vulkan")
-scripted_model_optimized._save_for_lite_interpreter(os.path.join('checkpoints/face_net_checkpoints/script','lite_vulakn_multispe_facenet.pth'))
+scripted_model_optimized._save_for_lite_interpreter(os.path.join('checkpoints/enhance_net_checkpoints/script','lite_vulakn_multispe_facenet.pth'))
 
 # # #to NNAPI 
 # # scripted_model = torch.jit.script(model_int8_quantized)

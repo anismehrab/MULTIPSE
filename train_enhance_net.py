@@ -38,7 +38,7 @@ parser.add_argument("--gamma", type=float, default=0.1,help="learning rate decay
 
 parser.add_argument("--max_dim", type=int, default=256,help="max image dimension")
 parser.add_argument("--min_dim", type=int, default=128,help="min image dimension")
-parser.add_argument("--max_cells", type=int, default=256*256,help="min image dimension")
+parser.add_argument("--max_cells", type=int, default=244*244,help="min image dimension")
 
 args = parser.parse_args()
 
