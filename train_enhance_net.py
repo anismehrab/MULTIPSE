@@ -29,16 +29,16 @@ parser.add_argument("--logger_path", type=str, default="checkpoints/enhance_net_
 parser.add_argument('--threads', type=int, default=4, help='threads number.')
 parser.add_argument("--start_iter", type=int, default=0,help="iteration")
 
-parser.add_argument('--batch_size', type=int, default=4, help='batch size.')
+parser.add_argument('--batch_size', type=int, default=8, help='batch size.')
 parser.add_argument('--epoch', type=int, default=5, help='epoch.')
-parser.add_argument("--scale", type=int, default=4,help="super-resolution scale")
+parser.add_argument("--scale", type=int, default=3,help="super-resolution scale")
 parser.add_argument("--lr", type=float, default=1e-4,help="learning rate")
 parser.add_argument("--step_size", type=int, default=50,help="learning rate decay per N epochs")
 parser.add_argument("--gamma", type=float, default=0.1,help="learning rate decay factor for step decay")
 
 parser.add_argument("--max_dim", type=int, default=256,help="max image dimension")
 parser.add_argument("--min_dim", type=int, default=128,help="min image dimension")
-parser.add_argument("--max_cells", type=int, default=244*244,help="min image dimension")
+parser.add_argument("--max_cells", type=int, default=165*165,help="min image dimension")
 
 args = parser.parse_args()
 
@@ -55,7 +55,7 @@ def reInitLoader(box):
         max = max_image_width * max_image_high to fit in GPU """
     data_compos = transforms.Compose([Normalize()])
     batch_compos = transforms.Compose([ToTensor()])
-    dataBatch = DataBatch(transfrom=batch_compos,scale =args.scale ,max_box = box,max_cells= args.max_cells,devider=args.scale)
+    dataBatch = DataBatch(transfrom=batch_compos,scale =args.scale ,max_box = box,max_cells= args.max_cells,devider=2)
     training_data = Dataset(data_dir=args.data_train,transform=data_compos)
     validation_data = Dataset(data_dir=args.data_valid,transform=data_compos)
     logger.info("===>Trainning Data:[ Train:{}  Valid:{}] Batch:{}".format(len(training_data),len(validation_data),args.batch_size))
@@ -72,7 +72,7 @@ box = (args.min_dim,args.max_dim,args.min_dim,args.max_dim)
 trainloader,validloader = reInitLoader(box)
 #load models
 print("loading model")
-model = enhance_model.EnhanceNet(upscale=args.scale)
+model = enhance_model.EnhanceModel(upscale=args.scale)
 
 
 #training device

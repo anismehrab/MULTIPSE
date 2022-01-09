@@ -204,22 +204,25 @@ class AddMaskFace(object):
         img_L = cv2.cvtColor(img_L, cv2.COLOR_BGR2RGB)
         h, w = img_L.shape[:2]
         self.output_size = min(h,w)
-        idx = randint(0,2)
-        img_L = self.masks[idx](img_L)
+        img_L = self.masks[0](img_L)
+        for i in range(randint(2,4)):
+            img_L = self.masks[2](img_L)
+
         # print("img_L",img_L.shape)
 
         return {'img_H': img_H,'img_L': img_L}
 
     def line(self,image):
-        s_h = randint(0,self.output_size-10)
-        s_w = randint(0,self.output_size-10)
-        e_h = randint(s_h,self.output_size)
-        e_w = randint(s_w,self.output_size)
+        offset = self.output_size / 9
+        s_h = randint(offset,self.output_size-offset)
+        s_w = randint(offset,self.output_size-offset)
+        e_h = randint(s_h,self.output_size-offset)
+        e_w = randint(s_w,self.output_size-offset)
 
         img_masked = cv2.line(
             image,
             pt1 = (s_w, s_h), pt2 = (e_w, e_h),
-            color = (0, 0, 0),
+            color = (255, 255, 255),
             thickness = randint(5,20))
         return img_masked    
     
@@ -232,22 +235,21 @@ class AddMaskFace(object):
         img_masked = cv2.rectangle(
                 image,
                 pt1 = (s_w, s_h), pt2 = (e_w, e_h),
-                color = (0, 0, 0),
+                color = (255, 255, 255),
                 thickness = -1)
-
 
         return img_masked 
 
     def circle(self,image):
-        s_h = randint(0,self.output_size-10)
-        s_w = randint(0,self.output_size-10)
-        raduis = randint(5,int(min(self.output_size - max(s_h,s_w),self.output_size/7)))
-
+        s_h = randint(self.output_size/2-(self.output_size/3),self.output_size-10)
+        s_w = randint(self.output_size/2-(self.output_size/3),self.output_size-10)
+        raduis = randint(5,int(min(self.output_size - max(s_h,s_w),self.output_size/20)))
+        
         img_masked = cv2.circle(
                     image,
                     center = (s_w, s_h),
                     radius = raduis,
-                    color = (0, 0, 0),
+                    color = (255, 255, 255),
                     thickness = -1
                     )
 

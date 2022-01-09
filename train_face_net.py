@@ -104,7 +104,7 @@ epoch_i = 0
 if(args.checkpoint != ""):
     checkpoint = torch.load(args.checkpoint)
     model.load_state_dict(checkpoint["model_base_state_dict"])
-    optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
+    # optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
     epoch_i = checkpoint["epoch"] +1
     print("optimizer",optimizer)
 

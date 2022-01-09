@@ -1,10 +1,10 @@
-import onnx
-import onnxruntime
-from onnx_tf.backend import prepare
-from onnxruntime.quantization import quantize
-from onnxruntime.quantization.quant_utils import QuantizationMode
+# import onnx
+# import onnxruntime
+# from onnx_tf.backend import prepare
+# from onnxruntime.quantization import quantize
+# from onnxruntime.quantization.quant_utils import QuantizationMode
 
-import tensorflow as tf
+# import tensorflow as tf
 
 import os
 import numpy as np
@@ -70,10 +70,13 @@ head_model = model.UpsamplerNet(upscale=3)
 #load torch model
 epoch = 22
 checkpoint_ =  'checkpoint_epoch_'+str(epoch)+'.pth'    
-checkpoint = os.path.join('checkpoints', checkpoint_)
+checkpoint = os.path.join('checkpoints/enhance_checkpoints', checkpoint_)
 checkpoint = torch.load(checkpoint)
 base_model.load_state_dict(checkpoint["model_base_state_dict"])
 head_model.load_state_dict(checkpoint["model_head_state_dict"])
+# torch_model =torch.nn.Sequential(base_model,head_model)
+# torch_model.eval()
+# torch_model.to(device)
 head_model.eval()
 base_model.eval()
 head_model.to(device)
@@ -189,11 +192,11 @@ base_model.to(device)
 
 
 # # # #TORCHSCRIPT
-scripted_base = torch.jit.script(base_model)
-scripted_head = torch.jit.script(head_model)
-torch.jit.save(scripted_base,os.path.join('checkpoints/torch_script',"scripted_base_"+checkpoint_))
-torch.jit.save(scripted_head,os.path.join('checkpoints/torch_script',"scripted_head_"+checkpoint_))
-test_with_image(scripted_base,scripted_head,"checkpoint_"+str(epoch))
+# scripted_base = torch.jit.script(base_model)
+# scripted_head = torch.jit.script(head_model)
+# torch.jit.save(scripted_base,os.path.join('checkpoints/torch_script',"scripted_base_"+checkpoint_))
+# torch.jit.save(scripted_head,os.path.join('checkpoints/torch_script',"scripted_head_"+checkpoint_))
+# test_with_image(scripted_base,scripted_head,"checkpoint_"+str(epoch))
 
 # # #Trace
 # # # torch.cuda.empty_cache()
@@ -203,16 +206,17 @@ test_with_image(scripted_base,scripted_head,"checkpoint_"+str(epoch))
 # # torch.jit.save(traced_model,os.path.join('model_zoo','BSRGAN_traced_model.pth'))
 
 # #save for lite interpreted
-#scripted_model = torch.jit.load(os.path.join('model_zoo','BSRGAN_scripted_static_quantized_model.pth'))
-#scripted_base._save_for_lite_interpreter(os.path.join('checkpoints/script','checkpoint_+".pth'))
+scripted_base = torch.jit.script(base_model)
+scripted_head = torch.jit.script(head_model)
+# scripted_model._save_for_lite_interpreter(os.path.join('checkpoints/enhance_checkpoints/torch_script','checkpoint_+'+str(epoch)+'.pth'))
 scripted_base_optimized = optimize_for_mobile(scripted_base,backend="cpu")
-scripted_base_optimized._save_for_lite_interpreter(os.path.join('checkpoints/torch_script','base_'+str(epoch)+'_cpu_lite.pth'))
+scripted_base_optimized._save_for_lite_interpreter(os.path.join('checkpoints/enhance_checkpoints/torch_script','base_lite_cpu_enhancenet.pth'))
 scripted_base_optimized = optimize_for_mobile(scripted_base,backend="vulkan")
-scripted_base_optimized._save_for_lite_interpreter(os.path.join('checkpoints/torch_script','base_'+str(epoch)+'_vulkan_lite.pth'))
+scripted_base_optimized._save_for_lite_interpreter(os.path.join('checkpoints/enhance_checkpoints/torch_script','base_lite_vulkan_enhancenet.pth'))
 scripted_head_optimized = optimize_for_mobile(scripted_head,backend="cpu")
-scripted_head_optimized._save_for_lite_interpreter(os.path.join('checkpoints/torch_script','head_'+str(epoch)+'_cpu_lite.pth'))
+scripted_head_optimized._save_for_lite_interpreter(os.path.join('checkpoints/enhance_checkpoints/torch_script','head_lite_cpu_enhancenet.pth'))
 scripted_head_optimized = optimize_for_mobile(scripted_head,backend="vulkan")
-scripted_head_optimized._save_for_lite_interpreter(os.path.join('checkpoints/torch_script','head_'+str(epoch)+'_vulkan_lite.pth'))
+scripted_head_optimized._save_for_lite_interpreter(os.path.join('checkpoints/enhance_checkpoints/torch_script','head_lite_vulkan_enhancenet.pth'))
 # # #to NNAPI 
 # # scripted_model = torch.jit.script(model_int8_quantized)
 # # input_tensor = torch.from_numpy(np.random.randn(1, 3, 50, 50).astype(np.float32))
