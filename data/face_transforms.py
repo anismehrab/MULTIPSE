@@ -213,7 +213,7 @@ class AddMaskFace(object):
         return {'img_H': img_H,'img_L': img_L}
 
     def line(self,image):
-        offset = self.output_size / 9
+        offset = int(self.output_size / 9)
         s_h = randint(offset,self.output_size-offset)
         s_w = randint(offset,self.output_size-offset)
         e_h = randint(s_h,self.output_size-offset)
@@ -241,9 +241,9 @@ class AddMaskFace(object):
         return img_masked 
 
     def circle(self,image):
-        s_h = randint(self.output_size/2-(self.output_size/3),self.output_size-10)
-        s_w = randint(self.output_size/2-(self.output_size/3),self.output_size-10)
-        raduis = randint(5,int(min(self.output_size - max(s_h,s_w),self.output_size/20)))
+        s_h = randint(int(self.output_size/2-(self.output_size/3)),self.output_size-10)
+        s_w = randint(int(self.output_size/2-(self.output_size/3)),self.output_size-10)
+        raduis = randint(5,int(min(self.output_size - max(s_h,s_w),int(self.output_size/20))))
         
         img_masked = cv2.circle(
                     image,
