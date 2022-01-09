@@ -98,10 +98,9 @@ class EnhanceLite(nn.Module):
 
 
 class EnhanceNet(nn.Module):
-    def __init__(self, in_nc=3, nf=64,out_nc=3):
+    def __init__(self, in_nc=3, nf=64,out_nc=3,upscale = 4):
         super(EnhanceNet, self).__init__()
 
-        upscale=4
         self.downsampleer = nn.Sequential(
                     B.conv_layer(in_nc, int(nf/upscale), kernel_size=3, stride=2),
                     B.activation('lrelu', neg_slope=0.05),
@@ -127,13 +126,13 @@ class EnhanceNet(nn.Module):
         self.IMDB9 = B.IMDModule(in_channels=nf)
 
         num_modules=10
-        upscale_factor = 2*upscale
+        upscale_factor = upscale * 4
         out_channels = out_nc*(upscale_factor)**2
         self.conv_cat = B.conv_block(nf * num_modules, out_channels, kernel_size=1, act_type='lrelu')
         self.LR_conv = B.conv_layer(out_channels, out_channels, kernel_size=3)
 
-        upsample_block = B.pixelshuffle_block
-        self.upsampler = upsample_block(out_channels, out_nc, upscale_factor=upscale_factor)  
+        self.upsampler = nn.Sequential(B.conv_layer(out_channels, out_channels, kernel_size=3),
+                                    nn.PixelShuffle(upscale_factor)) 
 
     def forward(self, input):
         # print("input",input.size())

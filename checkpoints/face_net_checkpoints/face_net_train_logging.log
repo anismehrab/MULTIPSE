@@ -34,3 +34,8 @@
 22-01-09 22:32:39.150 :        DEVICE ID : cuda
 22-01-09 22:32:46.940 : L1 loss function
 22-01-09 22:32:47.050 : ===> TrainEpoch =1  lr = 0.0001
+22-01-09 23:02:28.998 : ===> Epoch[1]: Loss_l1: 0.03872  Duration: 29.698465 min
+22-01-09 23:04:30.138 : ===> Valid. psnr: 25.5453, ssim: 0.7328, loss: 0.0333
+22-01-09 23:04:30.235 : ===> Checkpoint saved to checkpoints/face_net_checkpoints/checkpoint_base_epoch_1.pth
+22-01-09 23:04:30.235 : 
+
