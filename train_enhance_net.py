@@ -31,7 +31,7 @@ parser.add_argument("--start_iter", type=int, default=0,help="iteration")
 
 parser.add_argument('--batch_size', type=int, default=8, help='batch size.')
 parser.add_argument('--epoch', type=int, default=5, help='epoch.')
-parser.add_argument("--scale", type=int, default=3,help="super-resolution scale")
+parser.add_argument("--scale", type=int, default=4,help="super-resolution scale")
 parser.add_argument("--lr", type=float, default=1e-4,help="learning rate")
 parser.add_argument("--step_size", type=int, default=50,help="learning rate decay per N epochs")
 parser.add_argument("--gamma", type=float, default=0.1,help="learning rate decay factor for step decay")
@@ -72,7 +72,7 @@ box = (args.min_dim,args.max_dim,args.min_dim,args.max_dim)
 trainloader,validloader = reInitLoader(box)
 #load models
 print("loading model")
-model = enhance_model.EnhanceModel(upscale=args.scale)
+model = enhance_model.EnhanceNet(upscale=args.scale)
 
 
 #training device

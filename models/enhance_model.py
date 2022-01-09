@@ -93,3 +93,68 @@ class EnhanceLite(nn.Module):
         out_lr = self.LR_conv(out_B) + out_fea
         out = self.upsampler(out_lr)
         return out        
+
+
+
+
+class EnhanceNet(nn.Module):
+    def __init__(self, in_nc=3, nf=64,out_nc=3):
+        super(EnhanceNet, self).__init__()
+
+        upscale=4
+        self.downsampleer = nn.Sequential(
+                    B.conv_layer(in_nc, int(nf/upscale), kernel_size=3, stride=2),
+                    B.activation('lrelu', neg_slope=0.05),
+                    B.conv_layer(int(nf/upscale), int(nf/upscale), kernel_size=3),
+                    B.activation('lrelu', neg_slope=0.05),
+                    B.conv_layer(int(nf/upscale), int(nf/upscale), kernel_size=3),
+                    B.activation('lrelu', neg_slope=0.05),
+                    B.conv_layer(int(nf/upscale), nf, kernel_size=3, stride=2),
+                    B.activation('lrelu', neg_slope=0.05),
+                    B.conv_layer(nf, nf, kernel_size=3),
+                    B.activation('lrelu', neg_slope=0.05))
+
+        self.conv_fea = B.conv_layer(nf, nf, kernel_size=1);
+        # IMDBs
+        self.IMDB1 = B.IMDModule(in_channels=nf)
+        self.IMDB2 = B.IMDModule(in_channels=nf)
+        self.IMDB3 = B.IMDModule(in_channels=nf)
+        self.IMDB4 = B.IMDModule(in_channels=nf)
+        self.IMDB5 = B.IMDModule(in_channels=nf)
+        self.IMDB6 = B.IMDModule(in_channels=nf)
+        self.IMDB7 = B.IMDModule(in_channels=nf)
+        self.IMDB8 = B.IMDModule(in_channels=nf)
+        self.IMDB9 = B.IMDModule(in_channels=nf)
+
+        num_modules=10
+        upscale_factor = 2*upscale
+        out_channels = out_nc*(upscale_factor)**2
+        self.conv_cat = B.conv_block(nf * num_modules, out_channels, kernel_size=1, act_type='lrelu')
+        self.LR_conv = B.conv_layer(out_channels, out_channels, kernel_size=3)
+
+        upsample_block = B.pixelshuffle_block
+        self.upsampler = upsample_block(out_channels, out_nc, upscale_factor=upscale_factor)  
+
+    def forward(self, input):
+        # print("input",input.size())
+        down_sample = self.downsampleer(input)
+        out_fea = self.conv_fea(down_sample)
+        # print("out_fea",out_fea.size())
+        out_B1 = self.IMDB1(out_fea)
+        out_B2 = self.IMDB2(out_B1)
+        out_B3 = self.IMDB3(out_B2)
+        out_B4 = self.IMDB4(out_B3)
+        out_B5 = self.IMDB5(out_B4)
+        out_B6 = self.IMDB6(out_B5)
+        out_B7 = self.IMDB7(out_B6)
+        out_B8 = self.IMDB8(out_B7)       
+        out_B9 = self.IMDB9(out_B8)
+
+        out_B = self.conv_cat(torch.cat([out_fea,out_B1, out_B2, out_B3, out_B4, out_B5, out_B6, out_B7, out_B8, out_B9], dim=1))
+        #print("out_B",out_B.size())        
+
+        out_lr = self.LR_conv(out_B)
+        output = self.upsampler(out_lr)
+        # print("out_put",output.size())
+
+        return output
