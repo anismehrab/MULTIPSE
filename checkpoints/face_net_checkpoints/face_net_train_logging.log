@@ -39,3 +39,45 @@
 22-01-09 23:04:30.235 : ===> Checkpoint saved to checkpoints/face_net_checkpoints/checkpoint_base_epoch_1.pth
 22-01-09 23:04:30.235 : 
 
+22-01-10 09:14:02.861 : 
+
+22-01-10 09:14:02.862 : #################### Trainning Resumed ####################
+22-01-10 09:14:14.149 : 
+
+22-01-10 09:14:14.149 : #################### Trainning Resumed ####################
+22-01-10 09:14:15.965 : ===>Trainning Data:[ Train:12858  Valid:1000] Batch:8
+22-01-10 09:14:21.275 : ===>Input:[8,3,444,244] output:[8,3,444,244]
+22-01-10 09:14:21.356 :        DEVICE ID : cuda
+22-01-10 09:14:28.843 : L1 loss function
+22-01-10 09:14:28.964 : ===> TrainEpoch =2  lr = 0.0001
+22-01-10 09:43:26.870 : ===> Epoch[2]: Loss_l1: 0.03118  Duration: 28.965046 min
+22-01-10 09:45:46.472 : ===> Valid. psnr: 26.5194, ssim: 0.7591, loss: 0.0287
+22-01-10 09:45:46.579 : ===> Checkpoint saved to checkpoints/face_net_checkpoints/checkpoint_base_epoch_2.pth
+22-01-10 09:45:46.579 : 
+
+22-01-10 09:56:24.083 : 
+
+22-01-10 09:56:24.083 : #################### Trainning Resumed ####################
+22-01-10 09:56:24.686 : ===>Trainning Data:[ Train:12858  Valid:1000] Batch:8
+22-01-10 09:56:32.955 : ===>Input:[8,3,460,372] output:[8,3,460,372]
+22-01-10 09:56:33.022 :        DEVICE ID : cuda
+22-01-10 09:56:40.596 : L1 loss function
+22-01-10 09:56:40.703 : ===> TrainEpoch =3  lr = 0.0001
+22-01-10 10:27:25.231 : ===> Epoch[3]: Loss_l1: 0.02910  Duration: 30.742612 min
+22-01-10 10:29:46.735 : ===> Valid. psnr: 26.6344, ssim: 0.7699, loss: 0.0282
+22-01-10 10:29:46.817 : ===> Checkpoint saved to checkpoints/face_net_checkpoints/checkpoint_base_epoch_3.pth
+22-01-10 10:29:46.817 : 
+
+22-01-10 10:42:34.279 : 
+
+22-01-10 10:42:34.280 : #################### Trainning Resumed ####################
+22-01-10 10:42:36.370 : ===>Trainning Data:[ Train:12858  Valid:1000] Batch:8
+22-01-10 10:42:38.351 : ===>Input:[8,3,188,388] output:[8,3,188,388]
+22-01-10 10:42:38.431 :        DEVICE ID : cuda
+22-01-10 10:42:46.072 : L1 loss function
+22-01-10 10:42:46.174 : ===> TrainEpoch =4  lr = 0.0001
+22-01-10 11:12:42.237 : ===> Epoch[4]: Loss_l1: 0.02763  Duration: 29.933640 min
+22-01-10 11:14:25.504 : ===> Valid. psnr: 26.8774, ssim: 0.7865, loss: 0.0292
+22-01-10 11:14:25.586 : ===> Checkpoint saved to checkpoints/face_net_checkpoints/checkpoint_base_epoch_4.pth
+22-01-10 11:14:25.586 : 
+
