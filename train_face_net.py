@@ -34,7 +34,7 @@ parser.add_argument("--step_size", type=int, default=80,help="learning rate deca
 parser.add_argument("--gamma", type=float, default=0.1,help="learning rate decay factor for step decay")
 
 parser.add_argument("--max_dim", type=int, default=512,help="max image dimension")
-parser.add_argument("--min_dim", type=int, default=150,help="min image dimension")
+parser.add_argument("--min_dim", type=int, default=128,help="min image dimension")
 parser.add_argument("--max_cells", type=int, default=420*420,help="min image dimension")
 
 args = parser.parse_args()

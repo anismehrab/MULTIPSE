@@ -37,9 +37,9 @@ class DataBatch:
         patch_w = 2000
         while(patch_h*patch_w > self.max_cells or (patch_h%self.scale !=0 or patch_w%self.scale !=0)):
             patch_h = randint(min_h,max_h) 
-            patch_w = randint(min_w,max_w)
+            patch_w = patch_h #randint(min_w,max_w)
 
-        rescale = FaceRescale(patch_h,patch_h) #FaceRescale((patch_h,patch_w),(patch_h,patch_w))
+        rescale = FaceRescale((patch_h,patch_w),(patch_h,patch_w))
 
         batch_= []
         for sample in batch:
