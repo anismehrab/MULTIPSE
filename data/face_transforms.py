@@ -208,16 +208,20 @@ class AddMaskFace(object):
 
     def line(self,image):
         offset = int(self.output_size / 9)
-        s_h = randint(offset,self.output_size-offset)
-        s_w = randint(offset,self.output_size-offset)
-        e_h = randint(s_h,self.output_size-offset)
-        e_w = randint(s_w,self.output_size-offset)
+        threshold = int(self.output_size / 5)
+        line_dim = 50000;
+        while(line_dim > threshold):
+            s_h = randint(offset,self.output_size-offset)
+            s_w = randint(offset,self.output_size-offset)
+            e_h = randint(s_h,self.output_size-offset)
+            e_w = randint(s_w,self.output_size-offset)
+            line_dim = np.sqrt((s_h - e_h)**2 + (s_w - e_w)**2)
 
         img_masked = cv2.line(
             image,
             pt1 = (s_w, s_h), pt2 = (e_w, e_h),
             color = (255, 255, 255),
-            thickness = randint(5,20))
+            thickness = randint(5,30))
         return img_masked    
     
     def rectangle(self,image):

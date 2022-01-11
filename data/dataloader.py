@@ -126,7 +126,10 @@ class AnimeDataSet(Dataset):
 
 
         if(len(self.anime_Images) != len(self.origin_Images)):
-            print("data and origin folder does not have the same size")     
+        
+            print("data and origin folder does not have the same size")  
+            print("anime",len(self.anime_Images))
+            print("origin",len(self.origin_Images))   
 
         self.transform = transform
 

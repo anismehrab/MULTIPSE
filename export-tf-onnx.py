@@ -79,6 +79,9 @@ def test_with_image(model,OUT_NAME,dtype = torch.float32):
                 # img_L = cv2.line(img_L,pt1 = (700, 500), pt2 = (800, 300),
                 #             color = (0, 0, 0),thickness = random.randint(5,20))
                 img_L =  cv2.circle(img_L,center = (350, 278),radius = 20,color = (0, 0, 0),thickness = -1)
+                img_L =  cv2.circle(img_L,center = (330, 278),radius = 20,color = (0, 0, 0),thickness = -1)
+                img_L =  cv2.circle(img_L,center = (310, 278),radius = 20,color = (0, 0, 0),thickness = -1)
+                img_L = cv2.line(img_L,pt1 = (500, 600), pt2 = (600, 800),color = (0, 0, 0),thickness = 30)
                 util.imsave(img_L, os.path.join('testsets/exported', 'input'+'.png'))
             
                 if(np.shape(img_L)[0] < 1055 and np.shape(img_L)[1] < 1055):
@@ -98,7 +101,7 @@ def test_with_image(model,OUT_NAME,dtype = torch.float32):
 
 
 #LOAD TORCH MODEL
-toch_model_path = os.path.join('checkpoints/face_net_checkpoints', 'checkpoint_baseepoch_61.pth')
+toch_model_path = "/home/anis/Desktop/AI/MultiSPE/checkpoints/face_net_checkpoints/previous_checkpoits/checkpoint_baseepoch_63.pth"#"/home/anis/Desktop/AI/MultiSPE/checkpoints/face_net_checkpoints/checkpoint_base_epoch_19.pth"#os.path.join('checkpoints/face_net_checkpoints', 'checkpoint_base_epoch_19.pth')
 torch_model = FaceNet()
         
 #torch_model = architecture.IMDN(upscale=4)

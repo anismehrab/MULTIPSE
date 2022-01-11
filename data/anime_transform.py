@@ -194,4 +194,4 @@ class AnimeToTensor(object):
         # print("img_L",img_L.shape)
         # print("img_H",img_H.shape)
 
-        return {'img_A': img_A, 'img_O': img_O}         
+        return {'img_H': img_A, 'img_L': img_O}         
