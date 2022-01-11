@@ -38,7 +38,7 @@ class DataBatch:
             patch_h = randint(min_h,max_h) 
             patch_w = patch_h #randint(min_w,max_w)
 
-        rescale = FaceRescale((patch_h,patch_w),(patch_h,patch_w))
+        rescale = AnimeRescale((patch_h,patch_w))
 
         batch_= []
         for sample in batch:
@@ -127,7 +127,7 @@ class DataBatch:
 
 
 
-class FaceRescale(object):
+class AnimeRescale(object):
     """Rescale the image in a sample to a given size.
 
     Args:
@@ -136,20 +136,16 @@ class FaceRescale(object):
             to output_size keeping aspect ratio the same.
     """
 
-    def __init__(self ,input_size,output_size):
-        assert isinstance(output_size, (int, tuple))
-        self.output_size = output_size
-        self.input_size = input_size
+    def __init__(self ,img_size):
+        assert isinstance(img_size, (int, tuple))
+        self.input_size = img_size
   
 
     def __call__(self, sample):
 
-        img_H= sample['img_H']
+        img_A,img_O = sample['img_A'] , sample["img_O"]
 
-        h, w = img_H.shape[:2]
-        if(h == self.input_size and w == self.input_size):
-            return {'img_H': img_H, 'img_L': img_H}  
-
+        h, w = img_O.shape[:2]
         if isinstance(self.input_size, int):
             if h > w:
                 new_h, new_w = self.input_size * h / w, self.input_size
@@ -160,124 +156,42 @@ class FaceRescale(object):
 
         new_h, new_w = int(new_h), int(new_w)
         
-        img_L_ = cv2.resize(img_H, (new_h, new_w), interpolation=cv2.INTER_CUBIC)
-        # print("img_L",img_L_.shape)
+        img_O = cv2.resize(img_O, (new_h, new_w), interpolation=cv2.INTER_CUBIC)
 
-        if isinstance(self.output_size, int):
-            if h > w:
-                new_h, new_w = self.output_size * h / w, self.output_size
-            else:
-                new_h, new_w = self.output_size, self.output_size * w / h
-        else:
-            new_h, new_w = self.output_size
-
-        new_h, new_w = int(new_h), int(new_w)
-
-        img_H_ = cv2.resize(img_H, (new_h, new_w), interpolation=cv2.INTER_CUBIC)
+        img_A = cv2.resize(img_A, (new_h, new_w), interpolation=cv2.INTER_CUBIC)
         # print("img_H_",img_H_.shape)
 
+        return {'img_A': img_A, 'img_O': img_O}     
 
 
-    
-
-        return {'img_H': img_H_, 'img_L': img_L_}     
-
-
-
-
-class AddMaskFace(object):
-    """Convert ndarrays in sample to Tensors."""
-    def __init__(self):
-        self.output_size = None
-        self.masks = [self.line,self.rectangle,self.circle]
-
-    def __call__(self, sample):
-        img_H,img_L = sample['img_H'] , sample["img_L"]
-
-        img_H = cv2.cvtColor(img_H, cv2.COLOR_BGR2RGB)
-        img_L = cv2.cvtColor(img_L, cv2.COLOR_BGR2RGB)
-        h, w = img_L.shape[:2]
-        self.output_size = min(h,w)
-        img_L = self.masks[0](img_L)
-        for i in range(randint(2,4)):
-            img_L = self.masks[2](img_L)
-
-        # print("img_L",img_L.shape)
-
-        return {'img_H': img_H,'img_L': img_L}
-
-    def line(self,image):
-        offset = int(self.output_size / 9)
-        s_h = randint(offset,self.output_size-offset)
-        s_w = randint(offset,self.output_size-offset)
-        e_h = randint(s_h,self.output_size-offset)
-        e_w = randint(s_w,self.output_size-offset)
-
-        img_masked = cv2.line(
-            image,
-            pt1 = (s_w, s_h), pt2 = (e_w, e_h),
-            color = (255, 255, 255),
-            thickness = randint(5,20))
-        return img_masked    
-    
-    def rectangle(self,image):
-        s_h = randint(0,int(self.output_size/3)-10)
-        s_w = randint(0,int(self.output_size/3)-10)
-        e_h = randint(s_h,int(self.output_size/3))
-        e_w = randint(s_w,int(self.output_size/3))
-        
-        img_masked = cv2.rectangle(
-                image,
-                pt1 = (s_w, s_h), pt2 = (e_w, e_h),
-                color = (255, 255, 255),
-                thickness = -1)
-
-        return img_masked 
-
-    def circle(self,image):
-        s_h = randint(int(self.output_size/2-(self.output_size/3)),self.output_size-10)
-        s_w = randint(int(self.output_size/2-(self.output_size/3)),self.output_size-10)
-        raduis = randint(5,int(min(self.output_size - max(s_h,s_w),int(self.output_size/20))))
-        
-        img_masked = cv2.circle(
-                    image,
-                    center = (s_w, s_h),
-                    radius = raduis,
-                    color = (255, 255, 255),
-                    thickness = -1
-                    )
-
-        return img_masked
-
-
-class FaceNormalize(object):
+class AnimeNormalize(object):
     """Convert ndarrays in sample to Tensors."""
 
     def __call__(self, sample):
 
-        img_H,img_L = sample['img_H'] , sample["img_L"]
+        img_A,img_O = sample['img_A'] , sample["img_O"]
 
-        img_H = np.float32(img_H/255.)
-        img_L = np.float32(img_L/255.)
+        img_A = np.float32(img_A/255.)
+        img_O = np.float32(img_O/255.)
 
-        sample_ ={'img_H': img_H, 'img_L': img_L}               
+        sample_ ={'img_A': img_A, 'img_O': img_O}                 
   
         return sample_
 
 
-class FaceToTensor(object):
+class AnimeToTensor(object):
     """Convert ndarrays in sample to Tensors."""
 
     def __call__(self, sample):
-        img_H,img_L = sample['img_H'] , sample["img_L"]
+        img_A,img_O = sample['img_A'] , sample["img_O"]
 
         #convert to tensor
-        img_H = torch.from_numpy(img_H)
-        img_L = torch.from_numpy(img_L)
+        img_O = torch.from_numpy(img_O)
+        img_A = torch.from_numpy(img_A)
         # torch image: C x H x W
-        img_L = img_L.permute(2, 0, 1).float()
-        img_H = img_H.permute(2, 0, 1).float()
+        img_O = img_O.permute(2, 0, 1).float()
+        img_A = img_A.permute(2, 0, 1).float()
         # print("img_L",img_L.shape)
         # print("img_H",img_H.shape)
 
-        return {'img_H': img_H,'img_L': img_L}        
+        return {'img_A': img_A, 'img_O': img_O}         

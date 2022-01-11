@@ -104,3 +104,71 @@
 22-01-10 14:01:56.232 :        DEVICE ID : cuda
 22-01-10 14:02:00.119 : L1 loss function
 22-01-10 14:02:00.237 : ===> TrainEpoch =5  lr = 0.0001
+22-01-10 14:32:03.254 : ===> Epoch[5]: Loss_l1: 0.02876  Duration: 30.050238 min
+22-01-10 14:34:25.507 : ===> Valid. psnr: 26.9146, ssim: 0.7870, loss: 0.0279
+22-01-10 14:34:25.593 : ===> Checkpoint saved to checkpoints/face_net_checkpoints/checkpoint_base_epoch_5.pth
+22-01-10 14:34:25.593 : 
+
+22-01-10 14:34:25.594 : ===> TrainEpoch =6  lr = 0.0001
+22-01-10 15:03:06.449 : ===> Epoch[6]: Loss_l1: 0.02778  Duration: 28.681165 min
+22-01-10 15:05:06.460 : ===> Valid. psnr: 27.2426, ssim: 0.7991, loss: 0.0268
+22-01-10 15:05:06.531 : ===> Checkpoint saved to checkpoints/face_net_checkpoints/checkpoint_base_epoch_6.pth
+22-01-10 15:05:06.531 : 
+
+22-01-10 18:24:30.164 : 
+
+22-01-10 18:24:30.165 : #################### Trainning Resumed ####################
+22-01-10 18:24:31.826 : ===>Trainning Data:[ Train:12858  Valid:1000] Batch:8
+22-01-10 18:24:34.104 : ===>Input:[8,3,208,208] output:[8,3,208,208]
+22-01-10 18:24:34.171 :        DEVICE ID : cuda
+22-01-10 18:24:41.641 : L1 loss function
+22-01-10 18:24:41.748 : ===> TrainEpoch =7  lr = 0.0001
+22-01-10 18:53:24.739 : ===> Epoch[7]: Loss_l1: 0.02682  Duration: 28.715373 min
+22-01-10 18:55:40.497 : ===> Valid. psnr: 27.3628, ssim: 0.8051, loss: 0.0258
+22-01-10 18:55:40.570 : ===> Checkpoint saved to checkpoints/face_net_checkpoints/checkpoint_base_epoch_7.pth
+22-01-10 18:55:40.570 : 
+
+22-01-10 18:55:40.570 : ===> TrainEpoch =8  lr = 0.0001
+22-01-10 19:22:25.394 : ===> Epoch[8]: Loss_l1: 0.02618  Duration: 26.747665 min
+22-01-10 19:24:13.853 : ===> Valid. psnr: 27.4779, ssim: 0.8135, loss: 0.0259
+22-01-10 19:24:13.930 : ===> Checkpoint saved to checkpoints/face_net_checkpoints/checkpoint_base_epoch_8.pth
+22-01-10 19:24:13.930 : 
+
+22-01-10 19:32:31.945 : 
+
+22-01-10 19:32:31.946 : #################### Trainning Resumed ####################
+22-01-10 19:32:32.500 : ===>Trainning Data:[ Train:12858  Valid:1000] Batch:8
+22-01-10 19:32:39.117 : ===>Input:[8,3,368,368] output:[8,3,368,368]
+22-01-10 19:32:39.190 :        DEVICE ID : cuda
+22-01-10 19:32:46.640 : L1 loss function
+22-01-10 19:32:46.739 : ===> TrainEpoch =9  lr = 0.0001
+22-01-10 20:01:00.573 : ===> Epoch[9]: Loss_l1: 0.02538  Duration: 28.230915 min
+22-01-10 20:03:00.940 : ===> Valid. psnr: 27.8843, ssim: 0.8202, loss: 0.0243
+22-01-10 20:03:01.011 : ===> Checkpoint saved to checkpoints/face_net_checkpoints/checkpoint_base_epoch_9.pth
+22-01-10 20:03:01.011 : 
+
+22-01-10 20:03:01.012 : ===> TrainEpoch =10  lr = 0.0001
+22-01-10 20:31:37.552 : ===> Epoch[10]: Loss_l1: 0.02501  Duration: 28.609460 min
+22-01-10 20:33:42.244 : ===> Valid. psnr: 27.9221, ssim: 0.8255, loss: 0.0249
+22-01-10 20:33:42.318 : ===> Checkpoint saved to checkpoints/face_net_checkpoints/checkpoint_base_epoch_10.pth
+22-01-10 20:33:42.318 : 
+
+22-01-10 20:37:41.225 : 
+
+22-01-10 20:37:41.225 : #################### Trainning Resumed ####################
+22-01-10 20:37:41.826 : ===>Trainning Data:[ Train:12858  Valid:1000] Batch:8
+22-01-10 20:37:49.910 : ===>Input:[8,3,324,324] output:[8,3,324,324]
+22-01-10 20:37:49.987 :        DEVICE ID : cuda
+22-01-10 20:37:57.694 : L1 loss function
+22-01-10 20:37:57.801 : ===> TrainEpoch =11  lr = 0.0001
+22-01-10 21:06:04.114 : ===> Epoch[11]: Loss_l1: 0.02449  Duration: 28.105625 min
+22-01-10 21:08:07.798 : ===> Valid. psnr: 27.8199, ssim: 0.8286, loss: 0.0263
+22-01-10 21:08:07.870 : ===> Checkpoint saved to checkpoints/face_net_checkpoints/checkpoint_base_epoch_11.pth
+22-01-10 21:08:07.870 : 
+
+22-01-10 21:08:07.871 : ===> TrainEpoch =12  lr = 0.0001
+22-01-10 21:35:47.991 : ===> Epoch[12]: Loss_l1: 0.02395  Duration: 27.669398 min
+22-01-10 21:37:48.661 : ===> Valid. psnr: 28.1249, ssim: 0.8319, loss: 0.0236
+22-01-10 21:37:48.732 : ===> Checkpoint saved to checkpoints/face_net_checkpoints/checkpoint_base_epoch_12.pth
+22-01-10 21:37:48.732 : 
+
