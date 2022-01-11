@@ -143,7 +143,7 @@ class AnimeDataSet(Dataset):
         #image path
         origin_path = self.origin_Images[idx]
         anime_path = self.anime_Images[idx]
-        if(origin_path == None):
+        if(origin_path == None or anime_path == None):
           print("path none",self.origin_Images[idx])
           origin_path = self.origin_Images[idx-1]
           anime_path = self.anime_Images[idx-1]

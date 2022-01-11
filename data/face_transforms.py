@@ -199,7 +199,7 @@ class AddMaskFace(object):
         h, w = img_L.shape[:2]
         self.output_size = min(h,w)
         img_L = self.masks[0](img_L)
-        for i in range(randint(2,4)):
+        for i in range(randint(2,5)):
             img_L = self.masks[2](img_L)
 
         # print("img_L",img_L.shape)
@@ -221,7 +221,7 @@ class AddMaskFace(object):
             image,
             pt1 = (s_w, s_h), pt2 = (e_w, e_h),
             color = (255, 255, 255),
-            thickness = randint(5,30))
+            thickness = randint(12,30))
         return img_masked    
     
     def rectangle(self,image):
