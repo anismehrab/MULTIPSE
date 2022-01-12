@@ -23,22 +23,22 @@ parser.add_argument('--data_valid', nargs="+" ,default=["/media/anis/InWork/Data
 parser.add_argument('--data_train', nargs="+",default=["/media/anis/InWork/Data/enhance_dataset/DIV_FLICKR_2K/train","/media/anis/InWork/Data/enhance_dataset/FFHQ/train","/media/anis/InWork/Data/enhance_dataset/CAMERA_FUSION/train","/media/anis/InWork/Data/enhance_dataset/CLOTH/train","/media/anis/InWork/Data/enhance_dataset/DHD_CAMPUS/train","/media/anis/InWork/Data/enhance_dataset/MY_DATA/train","/media/anis/InWork/Data/enhance_dataset/HAND_WRITTING/train","/media/anis/InWork/Data/enhance_dataset/URBAN/train"], help='Path to trainning dataset.')
 
 parser.add_argument("--checkpoint", type=str, default="",help="checkpoint path")
-parser.add_argument("--checkpoint_path", type=str, default="checkpoints/enhance_net_checkpoints",help="checkpoint_folder_path")
-parser.add_argument("--logger_path", type=str, default="checkpoints/enhance_net_checkpoints/train_logging.log",help="logger path")
+parser.add_argument("--checkpoint_path", type=str, default="checkpoints/enhance_net_checkpoints/enhance_net_x1",help="checkpoint_folder_path")
+parser.add_argument("--logger_path", type=str, default="checkpoints/enhance_net_checkpoints/enhance_net_x1/train_logging.log",help="logger path")
 
 parser.add_argument('--threads', type=int, default=4, help='threads number.')
 parser.add_argument("--start_iter", type=int, default=0,help="iteration")
 
 parser.add_argument('--batch_size', type=int, default=8, help='batch size.')
 parser.add_argument('--epoch', type=int, default=5, help='epoch.')
-parser.add_argument("--scale", type=int, default=3,help="super-resolution scale")
+parser.add_argument("--scale", type=int, default=1,help="super-resolution scale")
 parser.add_argument("--lr", type=float, default=1e-4,help="learning rate")
 parser.add_argument("--step_size", type=int, default=50,help="learning rate decay per N epochs")
 parser.add_argument("--gamma", type=float, default=0.1,help="learning rate decay factor for step decay")
 
-parser.add_argument("--max_dim", type=int, default=340,help="max image dimension")
+parser.add_argument("--max_dim", type=int, default=512,help="max image dimension")
 parser.add_argument("--min_dim", type=int, default=128,help="min image dimension")
-parser.add_argument("--max_cells", type=int, default=336*336,help="min image dimension")
+parser.add_argument("--max_cells", type=int, default=440*440,help="min image dimension")
 
 args = parser.parse_args()
 
@@ -72,7 +72,7 @@ box = (args.min_dim,args.max_dim,args.min_dim,args.max_dim)
 trainloader,validloader = reInitLoader(box)
 #load models
 print("loading model")
-model = enhance_model.EnhanceNet(upscale=args.scale)
+model = enhance_model.EnhanceNetSame() #enhance_model.EnhanceNet(upscale=args.scale)
 
 
 #training device

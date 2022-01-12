@@ -513,3 +513,72 @@
 22-01-12 14:21:56.092 : ===> Checkpoint saved to checkpoints/face_net_checkpoints/previous_checkpoits/checkpoint_base_epoch_67.pth
 22-01-12 14:21:56.092 : 
 
+22-01-12 14:31:21.431 : 
+
+22-01-12 14:31:21.431 : #################### Trainning Resumed ####################
+22-01-12 14:31:23.908 : ===>Trainning Data:[ Train:12858  Valid:1000] Batch:8
+22-01-12 14:31:27.427 : ===>Input:[8,3,380,380] output:[8,3,380,380]
+22-01-12 14:31:27.529 :        DEVICE ID : cuda
+22-01-12 14:31:36.117 : L1 loss function
+22-01-12 14:31:36.394 : ===> TrainEpoch =68  lr = 0.0001
+22-01-12 14:57:49.360 : ===> Epoch[68]: Loss_l1: 0.01503  Duration: 26.213767 min
+22-01-12 14:59:22.494 : ===> Valid. psnr: 31.6276, ssim: 0.9212, loss: 0.0150
+22-01-12 14:59:22.573 : ===> Checkpoint saved to checkpoints/face_net_checkpoints/previous_checkpoits/checkpoint_base_epoch_68.pth
+22-01-12 14:59:22.574 : 
+
+22-01-12 14:59:22.574 : ===> TrainEpoch =69  lr = 0.0001
+22-01-12 15:25:01.339 : ===> Epoch[69]: Loss_l1: 0.01491  Duration: 25.646162 min
+22-01-12 15:26:36.713 : ===> Valid. psnr: 31.8855, ssim: 0.9242, loss: 0.0150
+22-01-12 15:26:36.769 : ===> Checkpoint saved to checkpoints/face_net_checkpoints/previous_checkpoits/checkpoint_base_epoch_69.pth
+22-01-12 15:26:36.769 : 
+
+22-01-12 15:45:43.964 : 
+
+22-01-12 15:45:43.965 : #################### Trainning Resumed ####################
+22-01-12 15:45:44.545 : ===>Trainning Data:[ Train:12858  Valid:1000] Batch:8
+22-01-12 15:45:52.739 : ===>Input:[8,3,372,372] output:[8,3,372,372]
+22-01-12 15:45:52.839 :        DEVICE ID : cuda
+22-01-12 15:45:59.408 : L1 loss function
+22-01-12 15:45:59.518 : ===> TrainEpoch =70  lr = 0.0001
+22-01-12 16:13:42.658 : ===> Epoch[70]: Loss_l1: 0.01511  Duration: 27.719462 min
+22-01-12 16:16:04.243 : ===> Valid. psnr: 31.9366, ssim: 0.9258, loss: 0.0145
+22-01-12 16:16:04.316 : ===> Checkpoint saved to checkpoints/face_net_checkpoints/previous_checkpoits/checkpoint_base_epoch_70.pth
+22-01-12 16:16:04.316 : 
+
+22-01-12 16:16:04.317 : ===> TrainEpoch =71  lr = 0.0001
+22-01-12 16:45:33.552 : ===> Epoch[71]: Loss_l1: 0.01479  Duration: 29.487404 min
+22-01-12 16:47:50.316 : ===> Valid. psnr: 31.6482, ssim: 0.9246, loss: 0.0157
+22-01-12 16:47:50.385 : ===> Checkpoint saved to checkpoints/face_net_checkpoints/previous_checkpoits/checkpoint_base_epoch_71.pth
+22-01-12 16:47:50.385 : 
+
+22-01-12 16:47:50.386 : ===> TrainEpoch =72  lr = 0.0001
+22-01-12 17:14:59.126 : ===> Epoch[72]: Loss_l1: 0.01457  Duration: 27.145808 min
+22-01-12 17:16:58.112 : ===> Valid. psnr: 31.7107, ssim: 0.9249, loss: 0.0149
+22-01-12 17:16:58.181 : ===> Checkpoint saved to checkpoints/face_net_checkpoints/previous_checkpoits/checkpoint_base_epoch_72.pth
+22-01-12 17:16:58.181 : 
+
+22-01-12 17:34:56.367 : 
+
+22-01-12 17:34:56.368 : #################### Trainning Resumed ####################
+22-01-12 17:34:56.595 : ===>Trainning Data:[ Train:12858  Valid:1000] Batch:8
+22-01-12 17:35:01.609 : ===>Input:[8,3,192,192] output:[8,3,192,192]
+22-01-12 17:35:01.690 :        DEVICE ID : cuda
+22-01-12 17:35:08.196 : L1 loss function
+22-01-12 17:35:08.319 : ===> TrainEpoch =73  lr = 0.0001
+22-01-12 18:02:48.746 : ===> Epoch[73]: Loss_l1: 0.01447  Duration: 27.673875 min
+22-01-12 18:04:51.368 : ===> Valid. psnr: 32.0379, ssim: 0.9295, loss: 0.0143
+22-01-12 18:04:51.435 : ===> Checkpoint saved to checkpoints/face_net_checkpoints/previous_checkpoits/checkpoint_base_epoch_73.pth
+22-01-12 18:04:51.436 : 
+
+22-01-12 18:04:51.436 : ===> TrainEpoch =74  lr = 0.0001
+22-01-12 18:32:20.279 : ===> Epoch[74]: Loss_l1: 0.01413  Duration: 27.480850 min
+22-01-12 18:34:21.163 : ===> Valid. psnr: 31.8601, ssim: 0.9276, loss: 0.0147
+22-01-12 18:34:21.252 : ===> Checkpoint saved to checkpoints/face_net_checkpoints/previous_checkpoits/checkpoint_base_epoch_74.pth
+22-01-12 18:34:21.253 : 
+
+22-01-12 18:34:21.253 : ===> TrainEpoch =75  lr = 0.0001
+22-01-12 19:00:56.962 : ===> Epoch[75]: Loss_l1: 0.01405  Duration: 26.595871 min
+22-01-12 19:02:56.216 : ===> Valid. psnr: 32.2384, ssim: 0.9325, loss: 0.0142
+22-01-12 19:02:56.281 : ===> Checkpoint saved to checkpoints/face_net_checkpoints/previous_checkpoits/checkpoint_base_epoch_75.pth
+22-01-12 19:02:56.281 : 
+
