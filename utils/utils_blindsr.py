@@ -633,8 +633,8 @@ def degradation_bsrgan_plus_an(img,hq=None, sf=4, shuffle_prob=0.5, use_sharp=Fa
     img: low-quality patch, size: lq_patchsizeXlq_patchsizeXC, range: [0, 1]
     hq: corresponding high-quality patch, size: (lq_patchsizexsf)X(lq_patchsizexsf)XC, range: [0, 1]
     """
-    h1, w1 = img.shape[:2]
-    img = img.copy()[:w1 - w1 % sf, :h1 - h1 % sf, ...]  # mod crop
+    # h1, w1 = img.shape[:2]
+    # img = img[:w1 - w1 % sf, :h1 - h1 % sf, ...]  # mod crop
     h, w = img.shape[:2]
  
     if h < lq_patchsize_h*sf or w < lq_patchsize_w*sf:
@@ -642,6 +642,7 @@ def degradation_bsrgan_plus_an(img,hq=None, sf=4, shuffle_prob=0.5, use_sharp=Fa
         raise ValueError(f'img size ({h1}X{w1}) is too small!')
 
     if(noise):
+        print("noise is used")
         if use_sharp and noise:
             img = add_sharpening(img)
         hq = img.copy()
@@ -704,9 +705,9 @@ def degradation_bsrgan_plus_an(img,hq=None, sf=4, shuffle_prob=0.5, use_sharp=Fa
     img_l = None
     if(degrade):
         # random crop
+        
         if(degrade and not noise):
             img = cv2.resize(img, (int(1/sf*hq.shape[1]), int(1/sf*hq.shape[0])), interpolation=random.choice([1, 2, 3]))
-
         img_l, img = random_crop(img, hq, sf, lq_patchsize_w,lq_patchsize_h)
     
     return img_l, img
