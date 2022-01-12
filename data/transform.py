@@ -164,12 +164,13 @@ class DataBatch:
         degrade = Degradate(scale=self.scale,patch_size_w=patch_w,patch_size_h=patch_h)
         rotate = Rotate(degree=self.rotate_degree[randint(0,3)])
         batch_= []
+        
         for sample in batch:
-            sample_ = rotate(sample)
-            sample_ = degrade(sample_)
+            sample_ = degrade(sample)
+            sample_ = rotate(sample_)
             sample_ = self.transfrom(sample_)
             batch_.append(sample_)
-
+        
         # elem = batch[0]
         # return {key: self.cellect([d[key] for d in batch]) for key in elem}
         return self.default_collate(batch_)
