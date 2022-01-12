@@ -187,9 +187,10 @@ class FaceRescale(object):
 
 class AddMaskFace(object):
     """Convert ndarrays in sample to Tensors."""
-    def __init__(self):
+    def __init__(self,color = (255,255,255)):
         self.output_size = None
-        self.masks = [self.line,self.rectangle,self.circle]
+        self.masks = [self.circle,self.circle_mask,self.line,self.rectangle]
+        self.color = color;
 
     def __call__(self, sample):
         img_H,img_L = sample['img_H'] , sample["img_L"]
@@ -198,9 +199,11 @@ class AddMaskFace(object):
         img_L = cv2.cvtColor(img_L, cv2.COLOR_BGR2RGB)
         h, w = img_L.shape[:2]
         self.output_size = min(h,w)
-        img_L = self.masks[0](img_L)
-        for i in range(randint(2,5)):
-            img_L = self.masks[2](img_L)
+        
+        img_L = self.masks[randint(1,2)](img_L)
+        
+        for i in range(randint(1,5)):
+            img_L = self.masks[0](img_L)
 
         # print("img_L",img_L.shape)
 
@@ -220,7 +223,7 @@ class AddMaskFace(object):
         img_masked = cv2.line(
             image,
             pt1 = (s_w, s_h), pt2 = (e_w, e_h),
-            color = (255, 255, 255),
+            color = self.color,
             thickness = randint(12,30))
         return img_masked    
     
@@ -233,9 +236,8 @@ class AddMaskFace(object):
         img_masked = cv2.rectangle(
                 image,
                 pt1 = (s_w, s_h), pt2 = (e_w, e_h),
-                color = (255, 255, 255),
+                color = self.color,
                 thickness = -1)
-
         return img_masked 
 
     def circle(self,image):
@@ -247,10 +249,23 @@ class AddMaskFace(object):
                     image,
                     center = (s_w, s_h),
                     radius = raduis,
-                    color = (255, 255, 255),
+                    color = self.color,
                     thickness = -1
                     )
+        return img_masked
 
+    def circle_mask(self,image):
+        s_h = randint(int(self.output_size/2-(self.output_size/3)),self.output_size-10)
+        s_w = randint(int(self.output_size/2-(self.output_size/3)),self.output_size-10)
+        raduis = randint(5,int(min(self.output_size - max(s_h,s_w),int(self.output_size/20))))
+        
+        img_masked = cv2.circle(
+                    image,
+                    center = (s_w, s_h),
+                    radius = raduis,
+                    color = self.color,
+                    thickness = randint(1,4)
+                    )
         return img_masked
 
 
