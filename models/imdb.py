@@ -121,7 +121,7 @@ class CCALayer(nn.Module):
 
 
 class IMDModule(nn.Module):
-    def __init__(self, in_channels, distillation_rate=0.25):
+    def __init__(self, in_channels, distillation_rate=0.25,act_type = "lrelu"):
         super(IMDModule, self).__init__()
         self.distilled_channels = int(in_channels * distillation_rate)
         self.remaining_channels = int(in_channels - self.distilled_channels)
@@ -129,7 +129,7 @@ class IMDModule(nn.Module):
         self.c2 = conv_layer(self.remaining_channels, in_channels, 3)
         self.c3 = conv_layer(self.remaining_channels, in_channels, 3)
         self.c4 = conv_layer(self.remaining_channels, self.distilled_channels, 3)
-        self.act = activation('lrelu', neg_slope=0.05)
+        self.act = activation(act_type=act_type, neg_slope=0.05)
         self.c5 = conv_layer(in_channels, in_channels, 1)
         self.cca = CCALayer(self.distilled_channels * 4)
 
