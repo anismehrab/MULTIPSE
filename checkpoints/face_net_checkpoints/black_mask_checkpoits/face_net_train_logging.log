@@ -582,3 +582,11 @@
 22-01-12 19:02:56.281 : ===> Checkpoint saved to checkpoints/face_net_checkpoints/previous_checkpoits/checkpoint_base_epoch_75.pth
 22-01-12 19:02:56.281 : 
 
+22-01-15 21:48:39.544 : 
+
+22-01-15 21:48:39.544 : #################### Trainning Resumed ####################
+22-01-15 21:48:39.648 : ===>Trainning Data:[ Train:12858  Valid:1000] Batch:8
+22-01-15 21:51:42.260 : 
+
+22-01-15 21:51:42.261 : #################### Trainning Resumed ####################
+22-01-15 21:51:42.321 : ===>Trainning Data:[ Train:12858  Valid:1000] Batch:8

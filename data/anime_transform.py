@@ -20,11 +20,11 @@ default_collate_err_msg_format = (
 
 
 class DataBatch:
-    def __init__(self,transfrom,max_box,max_cells,scale=4):
+    def __init__(self,transfrom,max_box,max_cells,devider=4):
         self.transfrom = transfrom
         self.max_box = max_box
         self.max_cells = max_cells
-        self.scale = scale
+        self.devider = devider
         
 
 
@@ -34,10 +34,10 @@ class DataBatch:
         min_h,max_h,min_w,max_w = self.max_box
         patch_h = 2000
         patch_w = 2000
-        while(patch_h*patch_w > self.max_cells or (patch_h%self.scale !=0 or patch_w%self.scale !=0)):
+        while(patch_h*patch_w > self.max_cells or (patch_h%self.devider !=0 or patch_w%self.devider !=0)):
             patch_h = randint(min_h,max_h) 
             patch_w = patch_h #randint(min_w,max_w)
-
+        
         rescale = AnimeRescale((patch_h,patch_w))
 
         batch_= []

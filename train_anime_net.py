@@ -16,8 +16,8 @@ from utils import utils_logger
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--data_valid', nargs="+" ,default=["/media/anis/InWork/Data/face_dataset/valid"], help='path validation dataset.')
-parser.add_argument('--data_train', nargs="+",default=["/media/anis/InWork/Data/face_dataset/train"], help='Path to trainning dataset.')
+parser.add_argument('--data_valid', nargs="+" ,default=["/media/anis/InWork/Data/anime_dataset/valid"], help='path validation dataset.')
+parser.add_argument('--data_train', nargs="+",default=["/media/anis/InWork/Data/anime_dataset/train"], help='Path to trainning dataset.')
 
 parser.add_argument("--checkpoint", type=str, default="",help="checkpoint path")
 parser.add_argument("--checkpoint_path", type=str, default="checkpoints/anime_net_checkpoints",help="checkpoint_folder_path")
@@ -33,7 +33,7 @@ parser.add_argument("--gamma", type=float, default=0.1,help="learning rate decay
 
 parser.add_argument("--max_dim", type=int, default=512,help="max image dimension")
 parser.add_argument("--min_dim", type=int, default=128,help="min image dimension")
-parser.add_argument("--max_cells", type=int, default=420*420,help="min image dimension")
+parser.add_argument("--max_cells", type=int, default=350*350,help="min image dimension")
 
 args = parser.parse_args()
 
@@ -49,7 +49,7 @@ def reInitLoader(box):
     """box = (min_h,max_h,min_w,max_w)
         max = max_image_width * max_image_high to fit in GPU """
     batch_compos = transforms.Compose([AnimeNormalize(),AnimeToTensor()])
-    dataBatch = DataBatch(transfrom=batch_compos,max_box = box,max_cells= args.max_cells)
+    dataBatch = DataBatch(transfrom=batch_compos,max_box = box,max_cells= args.max_cells,devider=4)
     training_data = AnimeDataSet(data_dir=args.data_train)
     validation_data = AnimeDataSet(data_dir=args.data_valid)
     logger.info("===>Trainning Data:[ Train:{}  Valid:{}] Batch:{}".format(len(training_data),len(validation_data),args.batch_size))

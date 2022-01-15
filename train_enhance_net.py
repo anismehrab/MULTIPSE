@@ -38,7 +38,7 @@ parser.add_argument("--gamma", type=float, default=0.1,help="learning rate decay
 
 parser.add_argument("--max_dim", type=int, default=256,help="max image dimension")
 parser.add_argument("--min_dim", type=int, default=128,help="min image dimension")
-parser.add_argument("--max_cells", type=int, default=200*200,help="min image dimension")
+parser.add_argument("--max_cells", type=int, default=190*190,help="min image dimension")
 
 args = parser.parse_args()
 
@@ -72,7 +72,7 @@ box = (args.min_dim,args.max_dim,args.min_dim,args.max_dim)
 trainloader,validloader = reInitLoader(box)
 #load models
 print("loading model")
-model = enhance_model.EnhanceNet(upscale=args.scale) #enhance_model.EnhanceNetSame() 
+model = enhance_model.EnhanceNet(upscale=args.scale,act_type="lrelu") #enhance_model.EnhanceNetSame() 
 
 
 #training device

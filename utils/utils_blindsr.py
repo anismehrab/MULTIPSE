@@ -708,9 +708,9 @@ def degradation_bsrgan_plus_an(img,hq=None, sf=4, shuffle_prob=0.5, use_sharp=Fa
         
         if(degrade and not noise):
             img = cv2.resize(img, (int(1/sf*hq.shape[1]), int(1/sf*hq.shape[0])), interpolation=random.choice([1, 2, 3]))
-        img_l, img = random_crop(img, hq, sf, lq_patchsize_w,lq_patchsize_h)
+        img_l, img_hq = random_crop(img, hq, sf, lq_patchsize_w,lq_patchsize_h)
         
-    return img_l, img
+    return img_l, img_hq
 
 
 

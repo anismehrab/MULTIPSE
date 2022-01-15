@@ -173,10 +173,10 @@ test_with_image(torch_model,'output')
 # # # torch.save(model_quantized.state_dict(), torch_model_quant_graph_path)
 
 
-# # # quantized_model = torch.quantization.quantize_dynamic(
-# # #     torch_model, {torch.nn.Conv2d}, dtype=torch.qint8)
-# # # test_with_image(quantized_model,'quantizated_dynamic_test')
-# # # torch.save(quantized_model.state_dict(),os.path.join('model_zoo','BSRGAN_dynamic_quantiated_model.pth'))
+# quantized_model = torch.quantization.quantize_dynamic(
+#     torch_model, {torch.nn.Conv2d}, dtype=torch.qint8)
+test_with_image(quantized_model,'quantizated_dynamic_test')
+torch.save(quantized_model.state_dict(),os.path.join('model_zoo','BSRGAN_dynamic_quantiated_model.pth'))
 
 # # #dynamic/weight_only Quantization
 # # # model_to_quantize = copy.deepcopy(torch_model)
