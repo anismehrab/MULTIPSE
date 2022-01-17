@@ -11,6 +11,7 @@ import re
 import collections
 from torch._six import string_classes
 import random
+from utils.mask_utils import get_random_points,get_bezier_curve
 np_str_obj_array_pattern = re.compile(r'[SaUO]')
 
 
@@ -189,7 +190,7 @@ class AddMaskFace(object):
     """Convert ndarrays in sample to Tensors."""
     def __init__(self,color = (255,255,255)):
         self.output_size = None
-        self.masks = [self.circle,self.circle_mask,self.line,self.rectangle]
+        self.masks = [self.circle,self.arbitrary_shape,self.line,self.circle_mask,self.rectangle]
         self.color = color;
 
     def __call__(self, sample):
@@ -200,10 +201,10 @@ class AddMaskFace(object):
         h, w = img_L.shape[:2]
         self.output_size = min(h,w)
         
-        img_L = self.masks[randint(1,2)](img_L)
+        img_L = self.masks[3](img_L)
         
-        for i in range(randint(1,5)):
-            img_L = self.masks[0](img_L)
+        for i in range(randint(1,3)):
+            img_L = self.masks[randint(0,2)](img_L)
 
         # print("img_L",img_L.shape)
 
@@ -267,6 +268,19 @@ class AddMaskFace(object):
                     thickness = randint(1,4)
                     )
         return img_masked
+
+
+    def arbitrary_shape(self,image):
+        offset = int(self.output_size / 7)
+        rad = 0.2
+        edgy = 0.05
+        c = [randint(offset,self.output_size-offset),randint(offset,self.output_size-offset)]
+        a = get_random_points(n=randint(5,20), scale=randint(4,int(self.output_size/7))) + c
+        x,y, _ = get_bezier_curve(a,rad=rad, edgy=edgy)
+        pts = np.array([x[:],y[:]]).T
+        pts = pts.reshape((-1,1,2)).astype(np.int32)
+        masked_image = cv2.polylines(image,[pts],True,self.color,thickness=18)
+        return masked_image
 
 
 class FaceNormalize(object):

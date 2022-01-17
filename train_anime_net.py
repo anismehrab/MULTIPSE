@@ -21,7 +21,7 @@ parser.add_argument('--data_train', nargs="+",default=["/media/anis/InWork/Data/
 
 parser.add_argument("--checkpoint", type=str, default="",help="checkpoint path")
 parser.add_argument("--checkpoint_path", type=str, default="checkpoints/anime_net_checkpoints",help="checkpoint_folder_path")
-parser.add_argument("--logger_path", type=str, default="checkpoints/anime_net_checkpoints/face_net_train_logging.log",help="logger path")
+parser.add_argument("--logger_path", type=str, default="checkpoints/anime_net_checkpoints/train_logging.log",help="logger path")
 
 parser.add_argument('--threads', type=int, default=4, help='threads number.')
 
@@ -39,8 +39,8 @@ args = parser.parse_args()
 
 
 #init logger
-utils_logger.logger_info('face_net_train_logging', log_path=args.logger_path)
-logger = logging.getLogger('face_net_train_logging')
+utils_logger.logger_info('train_logging', log_path=args.logger_path)
+logger = logging.getLogger('train_logging')
 logger.info('\n')
 logger.info('#################### Trainning Resumed ####################')
 

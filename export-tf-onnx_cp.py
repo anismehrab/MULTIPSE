@@ -81,7 +81,7 @@ head_model.eval()
 base_model.eval()
 head_model.to(device)
 base_model.to(device)
-# # test_with_image(torch_model,'test_gournd_truth')
+test_with_image(base_model,head_model,'test_gournd_truth22')
 # #torch_model = torch_model.to(device)
 
 # #Post Training Static Quantization
