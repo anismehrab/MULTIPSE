@@ -201,7 +201,7 @@ class EnhanceNetX3(nn.Module):
         super(EnhanceNetX3, self).__init__()
 
         
-        self.fea_conv = B.conv_layer(in_nc, int(nf), kernel_size=3, stride=2),
+        self.fea_conv = B.conv_layer(in_nc, int(nf), kernel_size=3)
                    
 
         # IMDBs
@@ -261,7 +261,7 @@ class EnhanceNetX4(nn.Module):
         super(EnhanceNetX4, self).__init__()
 
         
-        self.fea_conv = B.conv_layer(in_nc, int(nf), kernel_size=3, stride=2),
+        self.fea_conv = B.conv_layer(in_nc, int(nf), kernel_size=3)
                    
 
         # IMDBs
