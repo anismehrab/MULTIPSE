@@ -11,7 +11,7 @@ import numpy as np
 from tensorflow.lite.python.interpreter import Interpreter
 import torch
 from models.face_model import FaceNet
-from models.enhance_model import EnhanceNet,EnhanceNetSame
+from models.enhance_model import EnhanceNet,EnhanceNetX1
 from models.anime_model import AnimeNet
 import utils
 import time
