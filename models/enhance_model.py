@@ -158,11 +158,8 @@ class EnhanceNetX2(nn.Module):
         self.IMDB7 = B.IMDModule(in_channels=nf)
         self.IMDB8 = B.IMDModule(in_channels=nf)
         self.IMDB9 = B.IMDModule(in_channels=nf)
-        self.IMDB10 = B.IMDModule(in_channels=nf)
-        self.IMDB11 = B.IMDModule(in_channels=nf)
-        self.IMDB12 = B.IMDModule(in_channels=nf)
 
-        num_modules=12
+        num_modules=9
         self.conv_cat = B.conv_block(nf * num_modules, nf, kernel_size=1, act_type='lrelu')
         self.LR_conv = B.conv_layer(nf, nf, kernel_size=3)
         
@@ -183,11 +180,8 @@ class EnhanceNetX2(nn.Module):
         out_B7 = self.IMDB7(out_B6)
         out_B8 = self.IMDB8(out_B7)       
         out_B9 = self.IMDB9(out_B8)
-        out_B10 = self.IMDB10(out_B9)
-        out_B11 = self.IMDB11(out_B10)
-        out_B12 = self.IMDB12(out_B11)
 
-        out_B = self.conv_cat(torch.cat([out_B1, out_B2, out_B3, out_B4, out_B5, out_B6, out_B7, out_B8, out_B9, out_B10, out_B11, out_B12], dim=1))
+        out_B = self.conv_cat(torch.cat([out_B1, out_B2, out_B3, out_B4, out_B5, out_B6, out_B7, out_B8, out_B9], dim=1))
         #print("out_B",out_B.size())        
 
         out_lr = torch.add(self.LR_conv(out_B), out_fea)
@@ -214,11 +208,8 @@ class EnhanceNetX3(nn.Module):
         self.IMDB7 = B.IMDModule(in_channels=nf)
         self.IMDB8 = B.IMDModule(in_channels=nf)
         self.IMDB9 = B.IMDModule(in_channels=nf)
-        self.IMDB10 = B.IMDModule(in_channels=nf)
-        self.IMDB11 = B.IMDModule(in_channels=nf)
-        self.IMDB12 = B.IMDModule(in_channels=nf)
 
-        num_modules=12
+        num_modules=9
         self.conv_cat = B.conv_block(nf * num_modules, nf, kernel_size=1, act_type='lrelu')
         self.LR_conv = B.conv_layer(nf, nf, kernel_size=3)
         
@@ -239,11 +230,9 @@ class EnhanceNetX3(nn.Module):
         out_B7 = self.IMDB7(out_B6)
         out_B8 = self.IMDB8(out_B7)       
         out_B9 = self.IMDB9(out_B8)
-        out_B10 = self.IMDB10(out_B9)
-        out_B11 = self.IMDB11(out_B10)
-        out_B12 = self.IMDB12(out_B11)
 
-        out_B = self.conv_cat(torch.cat([out_B1, out_B2, out_B3, out_B4, out_B5, out_B6, out_B7, out_B8, out_B9, out_B10, out_B11, out_B12], dim=1))
+
+        out_B = self.conv_cat(torch.cat([out_B1, out_B2, out_B3, out_B4, out_B5, out_B6, out_B7, out_B8, out_B9], dim=1))
         #print("out_B",out_B.size())        
 
         out_lr = torch.add(self.LR_conv(out_B), out_fea)
