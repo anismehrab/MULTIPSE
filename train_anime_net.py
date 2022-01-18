@@ -49,7 +49,7 @@ def reInitLoader(box):
     """box = (min_h,max_h,min_w,max_w)
         max = max_image_width * max_image_high to fit in GPU """
         
-    batch_compos = transforms.Compose([AnimeNormalize(),AnimeToTensor(),AnimeTensorNormalize()])
+    batch_compos = transforms.Compose([AnimeNormalize(),AnimeToTensor()])
     dataBatch = DataBatch(transfrom=batch_compos,max_box = box,max_cells= args.max_cells,devider=4,forc_size=256)
     training_data = AnimeDataSet(data_dir=args.data_train)
     validation_data = AnimeDataSet(data_dir=args.data_valid)

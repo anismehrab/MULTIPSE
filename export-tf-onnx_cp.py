@@ -35,7 +35,7 @@ import cv2
 
 
 
-device = torch.device('cpu')#'cuda' if torch.cuda.is_available() else 'cpu')
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 L_path = os.path.join("testsets", 'test_data')
 
 print(device)
@@ -45,20 +45,24 @@ def test_with_image(model_base,model_head,OUT_NAME,dtype = torch.float32):
     model_head.to(device)
     with torch.no_grad():
         for img in util.get_image_paths(L_path):
-            if('bakbak' in img):
+            if('1641290199114' in img):
+
                 torch.cuda.empty_cache()
                 img_L = util.imread_uint(img, n_channels=3)#return numpy array RGB H*W*C
-                if(np.shape(img_L)[0] < 512 and np.shape(img_L)[1] < 512):
-                    print("img{}".format(np.shape(img_L)))
-                    img_L = torch.from_numpy(np.ascontiguousarray(img_L)).permute(2, 0, 1).div(255.).unsqueeze(0)
-                    img_L = img_L.type(dtype)
-                    img_L = img_L.to(device)
-                    start = time.time()
-                    img_E = model_base(img_L)
-                    img_E = model_head(img_E)
-                    print("inference time: {}".format(time.time() - start))
-                    img_E = util.tensor2uint(img_E)
-                    util.imsave(img_E, os.path.join('testsets/exported', OUT_NAME+'.png'))
+                util.imsave(img_L, os.path.join('testsets/exported', 'input'+'.png'))
+
+                # if(np.shape(img_L)[0] < 512 and np.shape(img_L)[1] < 512):
+                print("img{}".format(np.shape(img_L)))
+                img_L = torch.from_numpy(np.ascontiguousarray(img_L)).permute(2, 0, 1).div(255.).unsqueeze(0)
+
+                img_L = img_L.type(dtype)
+                img_L = img_L.to(device)
+                start = time.time()
+                img_E = model_base(img_L)
+                img_E = model_head(img_E)
+                print("inference time: {}".format(time.time() - start))
+                img_E = util.tensor2uint(img_E)
+                util.imsave(img_E, os.path.join('testsets/exported', 'output'+'.png'))
 
 
 
@@ -68,9 +72,9 @@ base_model = model.BaseNet()
 head_model = model.UpsamplerNet(upscale=3)
 
 #load torch model
-epoch = 22
+epoch = 39
 checkpoint_ =  'checkpoint_epoch_'+str(epoch)+'.pth'    
-checkpoint = os.path.join('checkpoints/enhance_checkpoints', checkpoint_)
+checkpoint = os.path.join('checkpoints/enhance_net_checkpoints/enhance_net_x3/enhance_checkpoints', checkpoint_)
 checkpoint = torch.load(checkpoint)
 base_model.load_state_dict(checkpoint["model_base_state_dict"])
 head_model.load_state_dict(checkpoint["model_head_state_dict"])
@@ -210,13 +214,13 @@ scripted_base = torch.jit.script(base_model)
 scripted_head = torch.jit.script(head_model)
 # scripted_model._save_for_lite_interpreter(os.path.join('checkpoints/enhance_checkpoints/torch_script','checkpoint_+'+str(epoch)+'.pth'))
 scripted_base_optimized = optimize_for_mobile(scripted_base,backend="cpu")
-scripted_base_optimized._save_for_lite_interpreter(os.path.join('checkpoints/enhance_checkpoints/torch_script','base_lite_cpu_enhancenet.pth'))
+scripted_base_optimized._save_for_lite_interpreter(os.path.join('checkpoints/enhance_net_checkpoints/enhance_net_x3/enhance_checkpoints/torch_script','base_lite_cpu_enhancenet.pth'))
 scripted_base_optimized = optimize_for_mobile(scripted_base,backend="vulkan")
-scripted_base_optimized._save_for_lite_interpreter(os.path.join('checkpoints/enhance_checkpoints/torch_script','base_lite_vulkan_enhancenet.pth'))
+scripted_base_optimized._save_for_lite_interpreter(os.path.join('checkpoints/enhance_net_checkpoints/enhance_net_x3/enhance_checkpoints/torch_script','base_lite_vulkan_enhancenet.pth'))
 scripted_head_optimized = optimize_for_mobile(scripted_head,backend="cpu")
-scripted_head_optimized._save_for_lite_interpreter(os.path.join('checkpoints/enhance_checkpoints/torch_script','head_lite_cpu_enhancenet.pth'))
+scripted_head_optimized._save_for_lite_interpreter(os.path.join('checkpoints/enhance_net_checkpoints/enhance_net_x3/enhance_checkpoints/torch_script','head_lite_cpu_enhancenet.pth'))
 scripted_head_optimized = optimize_for_mobile(scripted_head,backend="vulkan")
-scripted_head_optimized._save_for_lite_interpreter(os.path.join('checkpoints/enhance_checkpoints/torch_script','head_lite_vulkan_enhancenet.pth'))
+scripted_head_optimized._save_for_lite_interpreter(os.path.join('checkpoints/enhance_net_checkpoints/enhance_net_x3/enhance_checkpoints/torch_script','head_lite_vulkan_enhancenet.pth'))
 # # #to NNAPI 
 # # scripted_model = torch.jit.script(model_int8_quantized)
 # # input_tensor = torch.from_numpy(np.random.randn(1, 3, 50, 50).astype(np.float32))
