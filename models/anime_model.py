@@ -8,17 +8,11 @@ class AnimeNet(nn.Module):
 
         upscale=4
         self.downsampleer = nn.Sequential(
-                    B.conv_layer(in_nc, int(nf/upscale), kernel_size=3, stride=2),
-                    B.activation('lrelu', neg_slope=0.05),
-                    B.conv_layer(int(nf/upscale), int(nf/upscale), kernel_size=3),
-                    B.activation('lrelu', neg_slope=0.05),
-                    B.conv_layer(int(nf/upscale), int(nf/upscale), kernel_size=3),
-                    B.activation('lrelu', neg_slope=0.05),
-                    B.conv_layer(int(nf/upscale), nf, kernel_size=3, stride=2),
+                    B.conv_layer(in_nc, nf, kernel_size=3, stride=2),
                     B.activation('lrelu', neg_slope=0.05),
                     B.conv_layer(nf, nf, kernel_size=3),
                     B.activation('lrelu', neg_slope=0.05),
-                    B.conv_layer(nf, nf, kernel_size=3),
+                    B.conv_layer(nf, nf, kernel_size=3, stride=2)
                     )
 
         # IMDBs

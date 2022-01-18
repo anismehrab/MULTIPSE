@@ -155,7 +155,7 @@ class AnimeDataSet(Dataset):
 
         img_origin = utils_image.imread_uint(origin_path, 3)# RGB H*W*C
         img_anime = utils_image.imread_uint(anime_path, 3)# RGB H*W*C
-        sample = {"img_O": img_origin,"img_A":img_anime}
+        sample = {"img_L": img_origin,"img_H":img_anime}
 
         if(self.transform != None):
             sample = self.transform(sample)

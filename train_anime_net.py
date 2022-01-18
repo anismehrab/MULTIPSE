@@ -7,7 +7,7 @@ from torch._C import device
 import torch.nn as nn
 import torch.optim as optim
 from data.dataloader import AnimeDataSet
-from data.anime_transform import AnimeNormalize,AnimeToTensor,DataBatch
+from data.anime_transform import AnimeNormalize,AnimeToTensor,DataBatch,AnimeTensorNormalize
 from torch.utils.data import DataLoader
 from models import anime_model
 from utils.train_utils import train,valid,save_checkpoint
@@ -48,8 +48,9 @@ logger.info('#################### Trainning Resumed ####################')
 def reInitLoader(box):
     """box = (min_h,max_h,min_w,max_w)
         max = max_image_width * max_image_high to fit in GPU """
-    batch_compos = transforms.Compose([AnimeNormalize(),AnimeToTensor()])
-    dataBatch = DataBatch(transfrom=batch_compos,max_box = box,max_cells= args.max_cells,devider=1)
+        
+    batch_compos = transforms.Compose([AnimeNormalize(),AnimeToTensor(),AnimeTensorNormalize()])
+    dataBatch = DataBatch(transfrom=batch_compos,max_box = box,max_cells= args.max_cells,devider=4,forc_size=256)
     training_data = AnimeDataSet(data_dir=args.data_train)
     validation_data = AnimeDataSet(data_dir=args.data_valid)
     logger.info("===>Trainning Data:[ Train:{}  Valid:{}] Batch:{}".format(len(training_data),len(validation_data),args.batch_size))
@@ -71,7 +72,7 @@ box = (args.min_dim,args.max_dim,args.min_dim,args.max_dim)
 trainloader,validloader = reInitLoader(box)
 #load models
 print("loading model")
-model = anime_model.AnimeNet2()
+model = anime_model.AnimeNet()
 
 
 #training device

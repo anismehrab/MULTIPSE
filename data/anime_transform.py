@@ -20,26 +20,31 @@ default_collate_err_msg_format = (
 
 
 class DataBatch:
-    def __init__(self,transfrom,max_box,max_cells,devider=4):
+    def __init__(self,transfrom,max_box,max_cells,devider=4,forc_size = None):
         self.transfrom = transfrom
         self.max_box = max_box
         self.max_cells = max_cells
         self.devider = devider
+        self.froce_size = forc_size
         
 
 
     def collate_fn(self,batch):
         
         #calculate img crop size
-        min_h,max_h,min_w,max_w = self.max_box
-        patch_h = 2000
-        patch_w = 2000
-        while(patch_h*patch_w > self.max_cells or (patch_h%self.devider !=0 or patch_w%self.devider !=0)):
-            patch_h = randint(min_h,max_h) 
-            patch_w = patch_h #randint(min_w,max_w)
-        
-        rescale = AnimeRescale((patch_h,patch_w))
+        if(self.froce_size == None):
+            min_h,max_h,min_w,max_w = self.max_box
+            patch_h = 2000
+            patch_w = 2000
+            while(patch_h*patch_w > self.max_cells or (patch_h%self.devider !=0 or patch_w%self.devider !=0)):
+                patch_h = randint(min_h,max_h) 
+                patch_w = patch_h #randint(min_w,max_w)
+            
+            
+        else:
+            patch_h,patch_w = self.froce_size, self.froce_size
 
+        rescale = AnimeRescale((patch_h,patch_w))
         batch_= []
         for sample in batch:
             sample_ = rescale(sample)
@@ -143,7 +148,7 @@ class AnimeRescale(object):
 
     def __call__(self, sample):
 
-        img_A,img_O = sample['img_A'] , sample["img_O"]
+        img_A,img_O = sample['img_H'] , sample["img_L"]
 
         h, w = img_O.shape[:2]
         if isinstance(self.input_size, int):
@@ -161,7 +166,7 @@ class AnimeRescale(object):
         img_A = cv2.resize(img_A, (new_h, new_w), interpolation=cv2.INTER_CUBIC)
         # print("img_H_",img_H_.shape)
 
-        return {'img_A': img_A, 'img_O': img_O}     
+        return {'img_H': img_A, 'img_L': img_O}     
 
 
 class AnimeNormalize(object):
@@ -169,12 +174,12 @@ class AnimeNormalize(object):
 
     def __call__(self, sample):
 
-        img_A,img_O = sample['img_A'] , sample["img_O"]
+        img_A,img_O = sample['img_H'] , sample["img_L"]
 
         img_A = np.float32(img_A/255.)
         img_O = np.float32(img_O/255.)
 
-        sample_ ={'img_A': img_A, 'img_O': img_O}                 
+        sample_ ={'img_H': img_A, 'img_L': img_O}                 
   
         return sample_
 
@@ -183,7 +188,7 @@ class AnimeToTensor(object):
     """Convert ndarrays in sample to Tensors."""
 
     def __call__(self, sample):
-        img_A,img_O = sample['img_A'] , sample["img_O"]
+        img_A,img_O = sample['img_H'] , sample["img_L"]
 
         #convert to tensor
         img_O = torch.from_numpy(img_O)
@@ -195,3 +200,21 @@ class AnimeToTensor(object):
         # print("img_H",img_H.shape)
 
         return {'img_H': img_A, 'img_L': img_O}         
+
+
+
+class AnimeTensorNormalize(object):
+    """Convert ndarrays in sample to Tensors."""
+    def __init__(self,mean = (0.5,0.5,0.5),std=(0.5,0.5,0.5)) -> None:
+        super().__init__()
+        self.transform = transforms.Normalize(mean=mean,std=std)
+    def __call__(self, sample):
+        img_A,img_O = sample['img_H'] , sample["img_L"]
+
+        img_A = self.transform(img_A)
+        img_O = self.transform(img_O)
+
+
+        return {'img_H': img_A, 'img_L': img_O}    
+
+
