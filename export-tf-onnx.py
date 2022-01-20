@@ -12,7 +12,7 @@ from tensorflow.lite.python.interpreter import Interpreter
 import torch
 from models.face_model import FaceNet
 from models.enhance_model import EnhanceNet,EnhanceNetX1
-from models.anime_model import AnimeNet
+from models.anime_model import AnimeNet,AnimeNet2
 import utils
 import time
 from torch.utils.mobile_optimizer import optimize_for_mobile
@@ -72,17 +72,17 @@ def test_with_image(model,OUT_NAME,dtype = torch.float32):
     model.to(device)
     with torch.no_grad():
         for img in util.get_image_paths(L_path):
-            if('69008' in img):
+            if('1641290199114' in img):
                 torch.cuda.empty_cache()
                 img_L = util.imread_uint(img, n_channels=3)
                 w= np.shape(img_L)[1]
                 h = np.shape(img_L)[0]
                 # img_L = cv2.line(img_L,pt1 = (700, 500), pt2 = (800, 300),
                 #             color = (0, 0, 0),thickness = random.randint(5,20))
-                img_L =  cv2.circle(img_L,center = (350, 278),radius = 20,color = (0, 0, 0),thickness = -1)
-                img_L =  cv2.circle(img_L,center = (330, 278),radius = 20,color = (0, 0, 0),thickness = -1)
-                img_L =  cv2.circle(img_L,center = (310, 278),radius = 20,color = (0, 0, 0),thickness = -1)
-                img_L = cv2.line(img_L,pt1 = (500, 600), pt2 = (600, 800),color = (0, 0, 0),thickness = 30)
+                # img_L =  cv2.circle(img_L,center = (350, 278),radius = 20,color = (0, 0, 0),thickness = -1)
+                # img_L =  cv2.circle(img_L,center = (330, 278),radius = 20,color = (0, 0, 0),thickness = -1)
+                # img_L =  cv2.circle(img_L,center = (310, 278),radius = 20,color = (0, 0, 0),thickness = -1)
+                # img_L = cv2.line(img_L,pt1 = (500, 600), pt2 = (600, 800),color = (0, 0, 0),thickness = 30)
                 util.imsave(img_L, os.path.join('testsets/exported', 'input'+'.png'))
             
                 if(np.shape(img_L)[0] < 1055 and np.shape(img_L)[1] < 1055):
@@ -102,15 +102,15 @@ def test_with_image(model,OUT_NAME,dtype = torch.float32):
 
 
 #LOAD TORCH MODEL
-toch_model_path = "checkpoints/face_net_checkpoints/black_mask_checkpoits/checkpoint_base_epoch_80.pth"#"/home/anis/Desktop/AI/MultiSPE/checkpoints/face_net_checkpoints/checkpoint_base_epoch_19.pth"#os.path.join('checkpoints/face_net_checkpoints', 'checkpoint_base_epoch_19.pth')
-torch_model = FaceNet()
+toch_model_path = "checkpoints/anime_net_checkpoints/anime_net_2/checkpoint_base_epoch_0.pth"#"/home/anis/Desktop/AI/MultiSPE/checkpoints/face_net_checkpoints/checkpoint_base_epoch_19.pth"#os.path.join('checkpoints/face_net_checkpoints', 'checkpoint_base_epoch_19.pth')
+torch_model = AnimeNet2()
         
 #torch_model = architecture.IMDN(upscale=4)
 checkpoint = torch.load(toch_model_path)
 torch_model.load_state_dict(checkpoint["model_base_state_dict"])
 torch_model.eval()
 torch_model.to(device)
-test_with_image(torch_model,'output')
+test_with_image(torch_model,'output_anime')
 # #torch_model = torch_model.to(device)
 
 # #Post Training Static Quantization
@@ -240,9 +240,9 @@ test_with_image(torch_model,'output')
 # scripted_model_optimized._save_for_lite_interpreter(os.path.join('model_zoo','BSRGAN_vulkan_lite_static_quantized_model.pth'))
 scripted_torch_model = torch.jit.script(torch_model)
 scripted_model_optimized = optimize_for_mobile(scripted_torch_model,backend="cpu")
-scripted_model_optimized._save_for_lite_interpreter(os.path.join('checkpoints/face_net_checkpoints/black_mask_checkpoits/script','lite_cpu_facenet.pth'))
+scripted_model_optimized._save_for_lite_interpreter(os.path.join('checkpoints/anime_net_checkpoints/anime_net_3/script','lite_cpu_animenet.pth'))
 scripted_model_optimized = optimize_for_mobile(scripted_torch_model,backend="Vulkan")
-scripted_model_optimized._save_for_lite_interpreter(os.path.join('checkpoints/face_net_checkpoints/black_mask_checkpoits/script','lite_vulkan_facenet.pth'))
+scripted_model_optimized._save_for_lite_interpreter(os.path.join('checkpoints/anime_net_checkpoints/anime_net_3/script','lite_vulkan_animenet.pth'))
 
 # # #to NNAPI 
 # # scripted_model = torch.jit.script(model_int8_quantized)

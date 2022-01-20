@@ -20,8 +20,8 @@ parser.add_argument('--data_valid', nargs="+" ,default=["/media/anis/InWork/Data
 parser.add_argument('--data_train', nargs="+",default=["/media/anis/InWork/Data/anime_dataset/train"], help='Path to trainning dataset.')
 
 parser.add_argument("--checkpoint", type=str, default="",help="checkpoint path")
-parser.add_argument("--checkpoint_path", type=str, default="checkpoints/anime_net_checkpoints",help="checkpoint_folder_path")
-parser.add_argument("--logger_path", type=str, default="checkpoints/anime_net_checkpoints/train_logging.log",help="logger path")
+parser.add_argument("--checkpoint_path", type=str, default="checkpoints/anime_net_checkpoints/anime_net_2",help="checkpoint_folder_path")
+parser.add_argument("--logger_path", type=str, default="checkpoints/anime_net_checkpoints/anime_net_2/train_logging.log",help="logger path")
 
 parser.add_argument('--threads', type=int, default=4, help='threads number.')
 
@@ -72,7 +72,7 @@ box = (args.min_dim,args.max_dim,args.min_dim,args.max_dim)
 trainloader,validloader = reInitLoader(box)
 #load models
 print("loading model")
-model = anime_model.AnimeNet()
+model = anime_model.AnimeNet2()
 
 
 #training device

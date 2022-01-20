@@ -101,14 +101,14 @@ def sequential(*args):
 
 # contrast-aware channel attention module
 class CCALayer(nn.Module):
-    def __init__(self, channel, reduction=16):
+    def __init__(self, channel, reduction=16,act_type = "relu"):
         super(CCALayer, self).__init__()
 
         self.contrast = stdv_channels
         self.avg_pool = nn.AdaptiveAvgPool2d(1)
         self.conv_du = nn.Sequential(
             nn.Conv2d(channel, channel // reduction, 1, padding=0, bias=True),
-            nn.ReLU(inplace=True),
+            activation(act_type=act_type),
             nn.Conv2d(channel // reduction, channel, 1, padding=0, bias=True),
             nn.Sigmoid()
         )
@@ -132,6 +132,22 @@ class IMDModule(nn.Module):
         self.act = activation(act_type=act_type, neg_slope=0.05)
         self.c5 = conv_layer(in_channels, in_channels, 1)
         self.cca = CCALayer(self.distilled_channels * 4)
+
+
+class IMDModule_(nn.Module):
+    def __init__(self, in_channels, distillation_rate=0.25,act_type = "lrelu",bias = True):
+        super(IMDModule_, self).__init__()
+        self.distilled_channels = int(in_channels * distillation_rate)
+        self.remaining_channels = int(in_channels - self.distilled_channels)
+        self.c1 = conv_layer(in_channels, in_channels, 3,bias=bias)
+        self.c2 = conv_layer(self.remaining_channels, in_channels, 3,bias=bias)
+        self.c3 = conv_layer(self.remaining_channels, in_channels, 3,bias=bias)
+        self.c4 = conv_layer(self.remaining_channels, self.distilled_channels, 3,bias=bias)
+        self.act = activation(act_type=act_type, neg_slope=0.05)
+        self.c5 = conv_layer(in_channels, in_channels, 1,bias=bias)
+        self.cca = CCALayer(self.distilled_channels * 4,reduction=8,act_type=act_type)
+
+
 
     def forward(self, input):
         out_c1 = self.act(self.c1(input))
@@ -171,7 +187,7 @@ class IMDModule_speed(nn.Module):
         return out_fused
 
 class IMDModule_Large(nn.Module):
-    def __init__(self, in_channels, distillation_rate=1/4):
+    def __init__(self, in_channels, distillation_rate=1/4,act_type = "lrelu"):
         super(IMDModule_Large, self).__init__()
         self.distilled_channels = int(in_channels * distillation_rate)  # 6
         self.remaining_channels = int(in_channels - self.distilled_channels)  # 18
@@ -181,7 +197,7 @@ class IMDModule_Large(nn.Module):
         self.c4 = conv_layer(self.remaining_channels, self.remaining_channels, 3, bias=False)  # 15 --> 15
         self.c5 = conv_layer(self.remaining_channels-self.distilled_channels, self.remaining_channels-self.distilled_channels, 3, bias=False)  # 10 --> 10
         self.c6 = conv_layer(self.distilled_channels, self.distilled_channels, 3, bias=False)  # 5 --> 5
-        self.act = activation('relu')
+        self.act = activation(act_type)
         self.c7 = conv_layer(self.distilled_channels * 6, in_channels, 1, bias=False)
 
     def forward(self, input):

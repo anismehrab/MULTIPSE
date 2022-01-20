@@ -191,7 +191,7 @@ class AddMaskFace(object):
     def __init__(self,color = (255,255,255)):
         self.output_size = None
         self.masks = [self.circle,self.arbitrary_shape,self.line,self.circle_mask,self.rectangle]
-        self.color = color;
+        self.color = color
 
     def __call__(self, sample):
         img_H,img_L = sample['img_H'] , sample["img_L"]
@@ -279,7 +279,7 @@ class AddMaskFace(object):
         x,y, _ = get_bezier_curve(a,rad=rad, edgy=edgy)
         pts = np.array([x[:],y[:]]).T
         pts = pts.reshape((-1,1,2)).astype(np.int32)
-        masked_image = cv2.polylines(image,[pts],True,self.color,thickness=18)
+        masked_image = cv2.polylines(image,[pts],True,color = self.color,thickness=randint(int(self.output_size/35),int(self.output_size/15)))
         return masked_image
 
 
