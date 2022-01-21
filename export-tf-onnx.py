@@ -12,7 +12,7 @@ from tensorflow.lite.python.interpreter import Interpreter
 import torch
 from models.face_model import FaceNet
 from models.enhance_model import EnhanceNet,EnhanceNetX1
-from models.anime_model import AnimeNet,AnimeNet2
+from models.anime_model import AnimeNet,AnimeNet2,AnimeNet4
 import utils
 import time
 from torch.utils.mobile_optimizer import optimize_for_mobile
@@ -102,8 +102,8 @@ def test_with_image(model,OUT_NAME,dtype = torch.float32):
 
 
 #LOAD TORCH MODEL
-toch_model_path = "checkpoints/anime_net_checkpoints/anime_net_2/checkpoint_base_epoch_0.pth"#"/home/anis/Desktop/AI/MultiSPE/checkpoints/face_net_checkpoints/checkpoint_base_epoch_19.pth"#os.path.join('checkpoints/face_net_checkpoints', 'checkpoint_base_epoch_19.pth')
-torch_model = AnimeNet2()
+toch_model_path = "checkpoints/anime_net_checkpoints/anime_net_4/checkpoint_base_epoch_5.pth"#"/home/anis/Desktop/AI/MultiSPE/checkpoints/face_net_checkpoints/checkpoint_base_epoch_19.pth"#os.path.join('checkpoints/face_net_checkpoints', 'checkpoint_base_epoch_19.pth')
+torch_model = AnimeNet4()
         
 #torch_model = architecture.IMDN(upscale=4)
 checkpoint = torch.load(toch_model_path)
@@ -240,9 +240,9 @@ test_with_image(torch_model,'output_anime')
 # scripted_model_optimized._save_for_lite_interpreter(os.path.join('model_zoo','BSRGAN_vulkan_lite_static_quantized_model.pth'))
 scripted_torch_model = torch.jit.script(torch_model)
 scripted_model_optimized = optimize_for_mobile(scripted_torch_model,backend="cpu")
-scripted_model_optimized._save_for_lite_interpreter(os.path.join('checkpoints/anime_net_checkpoints/anime_net_3/script','lite_cpu_animenet.pth'))
+scripted_model_optimized._save_for_lite_interpreter(os.path.join('checkpoints/anime_net_checkpoints/anime_net_4/script','lite_cpu_animenet.pth'))
 scripted_model_optimized = optimize_for_mobile(scripted_torch_model,backend="Vulkan")
-scripted_model_optimized._save_for_lite_interpreter(os.path.join('checkpoints/anime_net_checkpoints/anime_net_3/script','lite_vulkan_animenet.pth'))
+scripted_model_optimized._save_for_lite_interpreter(os.path.join('checkpoints/anime_net_checkpoints/anime_net_4/script','lite_vulkan_animenet.pth'))
 
 # # #to NNAPI 
 # # scripted_model = torch.jit.script(model_int8_quantized)

@@ -39,10 +39,11 @@ def train(models_list,train_loader,optimizer,l1_criterion,epoch,device,args,logg
         #print(temp_tensor.size())
 
         loss_l1 = l1_criterion(temp_tensor, hr_tensor)
-        l_loss += loss_l1.item()
         
         loss_l1.backward()
         optimizer.step()
+
+        l_loss += loss_l1.item()
         iteration += 1
         if iteration % 200 == 1:
             print("===> Epoch[{}]({}/{}): Loss_l1: {:.5f}".format(epoch, iteration, len(train_loader),l_loss/iteration))
@@ -151,3 +152,50 @@ def save_checkpoint(base_model,head_model,pre_base_model,epoch,loss_train,loss_v
     logger.info("===> Checkpoint saved to {}".format(model_path))
     logger.info('\n')
 
+
+def train_cuda_f16(models_list,train_loader,optimizer,l1_criterion,epoch,device,args,logger):
+
+    scaler = torch.cuda.amp.GradScaler()
+
+    for model in models_list:
+        model.train()
+    
+    start = torch.cuda.Event(enable_timing=True)
+    end = torch.cuda.Event(enable_timing=True)
+
+    utils.adjust_learning_rate(optimizer, epoch, args.step_size, args.lr, args.gamma)
+    logger.info('===> TrainEpoch ={}  lr = {}'.format(epoch,optimizer.param_groups[0]['lr']))
+    l_loss = 0.0
+    iteration = 0
+    start.record()
+    for sample in train_loader:
+
+        torch.cuda.empty_cache()
+        lr_tensor = sample["img_L"].to(device)  # ranges from [0, 1]
+        hr_tensor = sample["img_H"].to(device)  # ranges from [0, 1]
+        
+        optimizer.zero_grad()
+        with torch.cuda.amp.autocast():
+            temp_tensor = lr_tensor;
+            for model in models_list:
+                temp_tensor = model(temp_tensor)
+
+        # torch.cuda.empty_cache()
+        #print(temp_tensor.size())
+
+        loss_l1 = l1_criterion(temp_tensor, hr_tensor)
+        
+        scaler.scale(loss_l1).backward()
+        scaler.step(optimizer)
+        scaler.update()
+
+        l_loss += loss_l1.item()
+        iteration += 1
+        if iteration % 200 == 1:
+            print("===> Epoch[{}]({}/{}): Loss_l1: {:.5f}".format(epoch, iteration, len(train_loader),l_loss/iteration))
+        
+    end.record()
+    torch.cuda.synchronize()
+    l_loss = l_loss/len(train_loader)
+    logger.info("===> Epoch[{}]: Loss_l1: {:.5f}  Duration: {:<5f} min".format(epoch,l_loss,start.elapsed_time(end)/60000.0))
+    return 
