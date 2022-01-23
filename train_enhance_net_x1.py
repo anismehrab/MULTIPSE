@@ -72,7 +72,7 @@ box = (args.min_dim,args.max_dim,args.min_dim,args.max_dim)
 trainloader,validloader = reInitLoader(box)
 #load models
 print("loading model")
-model = enhance_model.EnhanceNetSame() #enhance_model.EnhanceNet(upscale=args.scale)
+model = enhance_model.EnhanceNetX1() #enhance_model.EnhanceNet(upscale=args.scale)
 
 
 #training device

@@ -143,9 +143,9 @@ class EnhanceNetX2(nn.Module):
 
         
         self.downsampleer = nn.Sequential(
-                    B.conv_layer(in_nc, int(nf), kernel_size=3, stride=2),
+                    B.conv_layer(in_nc, nf, kernel_size=3, stride=2),
                     B.activation('lrelu', neg_slope=0.05),
-                    B.conv_layer(int(nf), int(nf), kernel_size=3),
+                    B.conv_layer(nf, nf, kernel_size=3)
                     )
 
         # IMDBs
@@ -163,9 +163,10 @@ class EnhanceNetX2(nn.Module):
         self.conv_cat = B.conv_block(nf * num_modules, nf, kernel_size=1, act_type='lrelu')
         self.LR_conv = B.conv_layer(nf, nf, kernel_size=3)
         
-        upscale=2*2
+    
         upsample_block = B.pixelshuffle_block
-        self.upsampler = upsample_block(nf, out_nc, upscale_factor=upscale)
+        self.upsampler_1 = upsample_block(nf, 16, upscale_factor=2)
+        self.upsampler_2 = upsample_block(16, out_nc, upscale_factor=2)
 
 
     def forward(self, input):
@@ -185,7 +186,8 @@ class EnhanceNetX2(nn.Module):
         #print("out_B",out_B.size())        
 
         out_lr = torch.add(self.LR_conv(out_B), out_fea)
-        output = self.upsampler(out_lr)
+        ur = self.upsampler_1(out_lr)
+        output = self.upsampler_2(ur)
         # print("out_put",output.size())
 
         return output                

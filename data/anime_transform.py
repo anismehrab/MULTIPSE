@@ -11,6 +11,7 @@ import re
 import collections
 from torch._six import string_classes
 import random
+from utils import utils_image
 np_str_obj_array_pattern = re.compile(r'[SaUO]')
 
 
@@ -20,13 +21,13 @@ default_collate_err_msg_format = (
 
 
 class DataBatch:
-    def __init__(self,transfrom,max_box,max_cells,devider=4,forc_size = None):
+    def __init__(self,transfrom,max_box,max_cells,devider=4,forc_size = None,add_style = False):
         self.transfrom = transfrom
         self.max_box = max_box
         self.max_cells = max_cells
         self.devider = devider
         self.froce_size = forc_size
-        
+        self.add_style = add_style
 
 
     def collate_fn(self,batch):
@@ -44,11 +45,16 @@ class DataBatch:
         else:
             patch_h,patch_w = self.froce_size, self.froce_size
 
+        if(self.add_style):
+            style = AddStyleImage("/home/anis/Desktop/AI/MultiSPE/data/arcane_jinx.png",size=(patch_h,patch_w))
+
         rescale = AnimeRescale((patch_h,patch_w))
         batch_= []
         for sample in batch:
             sample_ = rescale(sample)
             sample_ = self.transfrom(sample_)
+            if(self.add_style):
+                sample_ = style(sample_)
             # print(sample_["img_H"].size())
             # print(sample_["img_L"].size())
 
@@ -216,5 +222,23 @@ class AnimeTensorNormalize(object):
 
 
         return {'img_H': img_A, 'img_L': img_O}    
+
+class AddStyleImage(object):
+    """Convert ndarrays in sample to Tensors."""
+    def __init__(self,style_image_path,size) -> None:
+        super().__init__()
+        self.path = style_image_path
+        self.size = size
+    def __call__(self, sample):
+        img_A,img_O = sample['img_H'] , sample["img_L"]
+        #read image
+        style = utils_image.imread_uint(self.path, 3)
+        #resize 
+        style = cv2.resize(style, self.size, interpolation=cv2.INTER_CUBIC)
+        #normalize
+        style = np.float32(style/255.)
+        #tensor (c,h,w) 
+        style = torch.from_numpy(style).permute(2, 0, 1).float()
+        return {'img_H': img_A, 'img_L': img_O,'style':style}           
 
 

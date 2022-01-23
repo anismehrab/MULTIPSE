@@ -1,4 +1,5 @@
 import argparse, os
+from operator import mod
 import logging
 from random import randint
 import torch
@@ -31,9 +32,9 @@ parser.add_argument("--lr", type=float, default=1e-4,help="learning rate")
 parser.add_argument("--step_size", type=int, default=80,help="learning rate decay per N epochs")
 parser.add_argument("--gamma", type=float, default=0.1,help="learning rate decay factor for step decay")
 
-parser.add_argument("--max_dim", type=int, default=200,help="max image dimension")
+parser.add_argument("--max_dim", type=int, default=220,help="max image dimension")
 parser.add_argument("--min_dim", type=int, default=80,help="min image dimension")
-parser.add_argument("--max_cells", type=int, default=160*150,help="min image dimension") #prev 350*350
+parser.add_argument("--max_cells", type=int, default=200*200,help="min image dimension") #prev 350*350
 
 args = parser.parse_args()
 
@@ -50,7 +51,7 @@ def reInitLoader(box):
         max = max_image_width * max_image_high to fit in GPU """
         
     batch_compos = transforms.Compose([AnimeNormalize(),AnimeToTensor()])
-    dataBatch = DataBatch(transfrom=batch_compos,max_box = box,max_cells= args.max_cells,devider=4,forc_size=200)
+    dataBatch = DataBatch(transfrom=batch_compos,max_box = box,max_cells= args.max_cells,devider=4,forc_size=None)
     training_data = AnimeDataSet(data_dir=args.data_train)
     validation_data = AnimeDataSet(data_dir=args.data_valid)
     logger.info("===>Trainning Data:[ Train:{}  Valid:{}] Batch:{}".format(len(training_data),len(validation_data),args.batch_size))
@@ -78,7 +79,6 @@ model = anime_model.AnimeNet4()
 #training device
 device = torch.device('cuda' if torch.cuda.is_available() else "cpu")
 logger.info('{:>16s} : {:<s}'.format('DEVICE ID', device.type))
-
 model.to(device)
 
 # t = torch.cuda.get_device_properties(0).total_memory
@@ -107,6 +107,11 @@ if(args.checkpoint != ""):
     epoch_i = checkpoint["epoch"] +1
     print("optimizer",optimizer)
 
+
+# model.half()
+# for layer in model.modules():
+#     if isinstance(layer,nn.BatchNorm2d):
+#         layer.float()
 # for param in base_model.parameters():
 #     param.requires_grad = False
 
@@ -114,6 +119,6 @@ if(args.checkpoint != ""):
 
 for i in range(epoch_i,epoch_i+args.epoch):
 
-    loss_t = train_cuda_f16([model],trainloader,optimizer,l1_criterion,i,device,args,logger)
+    loss_t = train([model],trainloader,optimizer,l1_criterion,i,device,args,logger)
     psnr,ssim,loss_v = valid([model],validloader,l1_criterion,device,args,logger)
     save_checkpoint(model,None,None,i,loss_t,loss_v,psnr,ssim,optimizer,logger,args)
