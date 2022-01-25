@@ -273,62 +273,58 @@ class AnimeNet4(nn.Module):
 
 
 class AnimeNet5(nn.Module):
-    def __init__(self, in_nc=3, nf=64,out_nc=3):
+    def __init__(self, in_nc=3, nf=64,out_nc=3,act_type = 'relu'):
         super(AnimeNet5, self).__init__()
 
-        self.downsampleer = nn.Sequential(
-                    B.conv_layer(in_nc, int(nf/2), kernel_size=3, stride=2),
-                    B.activation('lrelu', neg_slope=0.05),
-                    B.conv_layer(int(nf/2), int(nf/2), kernel_size=3),
-                    B.activation('lrelu', neg_slope=0.05),
-                    B.conv_layer(int(nf/2), nf, kernel_size=3, stride=2),
+        self.downsampleer_O = nn.Sequential(
+                    B.conv_block(in_nc,int(nf/2),3,stride=2,act_type=act_type),
+                    B.conv_block(int(nf/2),int(nf/2),3,stride=1,act_type=act_type),
+                    B.conv_layer(int(nf/2), nf, kernel_size=3, stride=2)
+                    )
+
+        self.downsampleer_A = nn.Sequential(
+                    B.conv_block(in_nc,int(nf/2),3,stride=2,act_type=act_type),
+                    B.conv_block(int(nf/2),int(nf/2),3,stride=1,act_type=act_type),
+                    B.conv_layer(int(nf/2), nf, kernel_size=3, stride=2)
                     )
 
         # IMDBs
-        self.IMDB1 = B.IMDModule(in_channels=nf)
-        self.IMDB2 = B.IMDModule(in_channels=nf)
-        self.IMDB3 = B.IMDModule(in_channels=nf)
-        self.IMDB4 = B.IMDModule(in_channels=nf)
-        self.IMDB5 = B.IMDModule(in_channels=nf)
-        self.IMDB6 = B.IMDModule(in_channels=nf)
-        self.IMDB7 = B.IMDModule(in_channels=nf)
-        self.IMDB8 = B.IMDModule(in_channels=nf)
-        self.IMDB9 = B.IMDModule(in_channels=nf)
-        self.IMDB10 = B.IMDModule(in_channels=nf)
-        self.IMDB11 = B.IMDModule(in_channels=nf)
-        self.IMDB12 = B.IMDModule(in_channels=nf)
-        self.IMDB13 = B.IMDModule(in_channels=nf)
-        self.IMDB14 = B.IMDModule(in_channels=nf)
+        self.IMDB1 = B.IMDModule(in_channels=nf,cc_acti=act_type,act_type=act_type)
+        self.IMDB2 = B.IMDModule(in_channels=nf,cc_acti=act_type,act_type=act_type)
+        self.IMDB3 = B.IMDModule(in_channels=nf,cc_acti=act_type,act_type=act_type)
+        self.IMDB4 = B.IMDModule(in_channels=nf,cc_acti=act_type,act_type=act_type)
+        self.IMDB5 = B.IMDModule(in_channels=nf,cc_acti=act_type,act_type=act_type)
+        self.IMDB6 = B.IMDModule(in_channels=nf,cc_acti=act_type,act_type=act_type)
+        self.IMDB7 = B.IMDModule(in_channels=nf,cc_acti=act_type,act_type=act_type)
+        self.IMDB8 = B.IMDModule(in_channels=nf,cc_acti=act_type,act_type=act_type)
+        self.IMDB9 = B.IMDModule(in_channels=nf,cc_acti=act_type,act_type=act_type)
+        self.IMDB10 = B.IMDModule(in_channels=nf,cc_acti=act_type,act_type=act_type)
+        self.IMDB11 = B.IMDModule(in_channels=nf,cc_acti=act_type,act_type=act_type)
+        self.IMDB12 = B.IMDModule(in_channels=nf,cc_acti=act_type,act_type=act_type)
+        self.IMDB13 = B.IMDModule(in_channels=nf,cc_acti=act_type,act_type=act_type)
+        self.IMDB14 = B.IMDModule(in_channels=nf,cc_acti=act_type,act_type=act_type)
         num_modules=14
 
-        self.conv_cat = B.conv_block(nf * num_modules, nf, kernel_size=1, act_type='lrelu')
-        self.LR_conv = B.conv_block(nf, nf, kernel_size=3, act_type='lrelu')
-        self.style_conv = B.conv_block(3, nf, kernel_size=3, act_type='lrelu')
-
+        self.conv_cat = B.conv_block(nf * num_modules, nf, kernel_size=1, act_type=act_type)
+        self.LR_conv = B.conv_layer(nf, nf, kernel_size=3)
+        
+    
         upsample_block = B.pixelshuffle_block
-        self.upsampler_1 = upsample_block(nf, int(nf/4), upscale_factor=2)
-        self.Ur_conv = B.conv_block(int(nf/4), int(nf/4), kernel_size=3, act_type='lrelu')
-        self.upsampler_2 = upsample_block(int(nf/4), out_nc, upscale_factor=2)
+        self.upsampler_1 = upsample_block(nf, 16, upscale_factor=2)
+        self.upsampler_2 = upsample_block(16, out_nc, upscale_factor=2)
         
 
     def forward(self, input):
         # print("input",input.size())
-        out_fea = self.downsampleer(input[0])
-        # print("out_fea",out_fea.size())
+        out_fea = self.downsampleer_O(input[0])
+        out_or  = self.downsampleer_A(input[1])
 
         out_B1 = self.IMDB1(out_fea)
-        # print("out_B1",out_B1.size())
-
         out_B2 = self.IMDB2(out_B1)
-        #print("out_B2",out_B2.size())
         out_B3 = self.IMDB3(out_B2)
-        #print("out_B3",out_B3.size())
         out_B4 = self.IMDB4(out_B3)
-        #print("out_B4",out_B4.size())
         out_B5 = self.IMDB5(out_B4)
-        #print("out_B5",out_B5.size())
         out_B6 = self.IMDB6(out_B5)
-        #print("out_B6",out_B6.size())        
         out_B7 = self.IMDB7(out_B6)
         out_B8 = self.IMDB8(out_B7)       
         out_B9 = self.IMDB9(out_B8)
@@ -338,13 +334,12 @@ class AnimeNet5(nn.Module):
         out_B13 = self.IMDB13(out_B12)
         out_B14 = self.IMDB14(out_B13)       
         out_B = self.conv_cat(torch.cat([out_B1, out_B2, out_B3, out_B4, out_B5, out_B6, out_B7, out_B8, out_B9, out_B10, out_B11, out_B12, out_B13, out_B14], dim=1))
-        #print("out_B",out_B.size())        
+         
 
-        out_lr = torch.add(self.LR_conv(out_B),  self.style_conv(input[1]))
 
+        out_lr = torch.add(self.LR_conv(out_B), out_or)
         ur = self.upsampler_1(out_lr)
-        ur_1 = self.Ur_conv(ur)
-        output = self.upsampler_2(ur_1)
-        # print("out_put",output.size())
+        output = self.upsampler_2(ur)
+
 
         return output
