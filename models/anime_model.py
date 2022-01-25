@@ -279,13 +279,15 @@ class AnimeNet5(nn.Module):
         self.downsampleer_O = nn.Sequential(
                     B.conv_block(in_nc,int(nf/2),3,stride=2,act_type=act_type),
                     B.conv_block(int(nf/2),int(nf/2),3,stride=1,act_type=act_type),
-                    B.conv_layer(int(nf/2), nf, kernel_size=3, stride=2)
+                    B.conv_block(int(nf/2), nf, kernel_size=3, stride=2,act_type=act_type),
+                    B.conv_layer(nf,nf , kernel_size=3)
                     )
 
         self.downsampleer_A = nn.Sequential(
                     B.conv_block(in_nc,int(nf/2),3,stride=2,act_type=act_type),
                     B.conv_block(int(nf/2),int(nf/2),3,stride=1,act_type=act_type),
-                    B.conv_layer(int(nf/2), nf, kernel_size=3, stride=2)
+                    B.conv_block(int(nf/2), nf, kernel_size=3, stride=2,act_type=act_type),
+                    B.conv_layer(nf,nf , kernel_size=3)
                     )
 
         # IMDBs

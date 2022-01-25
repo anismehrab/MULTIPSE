@@ -11,7 +11,7 @@ from data.dataloader import AnimeDataSet
 from data.anime_transform import AnimeNormalize,AnimeToTensor,DataBatch,AnimeTensorNormalize
 from torch.utils.data import DataLoader
 from models import anime_model
-from utils.train_utils import train,valid,save_checkpoint,train_cuda_f16
+from utils.train_utils import train,valid,save_checkpoint,train_cuda_f16,train_with_style
 from utils import utils_logger
 
 
@@ -21,8 +21,8 @@ parser.add_argument('--data_valid', nargs="+" ,default=["/media/anis/InWork/Data
 parser.add_argument('--data_train', nargs="+",default=["/media/anis/InWork/Data/anime_dataset/train"], help='Path to trainning dataset.')
 
 parser.add_argument("--checkpoint", type=str, default="",help="checkpoint path")
-parser.add_argument("--checkpoint_path", type=str, default="checkpoints/anime_net_checkpoints/anime_net_4",help="checkpoint_folder_path")
-parser.add_argument("--logger_path", type=str, default="checkpoints/anime_net_checkpoints/anime_net_4/train_logging.log",help="logger path")
+parser.add_argument("--checkpoint_path", type=str, default="checkpoints/anime_net_checkpoints/anime_net_5",help="checkpoint_folder_path")
+parser.add_argument("--logger_path", type=str, default="checkpoints/anime_net_checkpoints/anime_net_5/train_logging.log",help="logger path")
 
 parser.add_argument('--threads', type=int, default=4, help='threads number.')
 
@@ -51,7 +51,7 @@ def reInitLoader(box):
         max = max_image_width * max_image_high to fit in GPU """
         
     batch_compos = transforms.Compose([AnimeNormalize(),AnimeToTensor()])
-    dataBatch = DataBatch(transfrom=batch_compos,max_box = box,max_cells= args.max_cells,devider=4,forc_size=None)
+    dataBatch = DataBatch(transfrom=batch_compos,max_box = box,max_cells= args.max_cells,devider=4,forc_size=None,add_style=True)
     training_data = AnimeDataSet(data_dir=args.data_train)
     validation_data = AnimeDataSet(data_dir=args.data_valid)
     logger.info("===>Trainning Data:[ Train:{}  Valid:{}] Batch:{}".format(len(training_data),len(validation_data),args.batch_size))
@@ -119,6 +119,6 @@ if(args.checkpoint != ""):
 
 for i in range(epoch_i,epoch_i+args.epoch):
 
-    loss_t = train([model],trainloader,optimizer,l1_criterion,i,device,args,logger)
+    loss_t = train_with_style([model],trainloader,optimizer,l1_criterion,i,device,args,logger)
     psnr,ssim,loss_v = valid([model],validloader,l1_criterion,device,args,logger)
     save_checkpoint(model,None,None,i,loss_t,loss_v,psnr,ssim,optimizer,logger,args)
