@@ -11,7 +11,7 @@ from data.dataloader import AnimeDataSet
 from data.anime_transform import AnimeNormalize,AnimeToTensor,DataBatch,AnimeTensorNormalize
 from torch.utils.data import DataLoader
 from models import anime_model
-from utils.train_utils import train,valid,save_checkpoint,train_cuda_f16,train_with_style
+from utils.train_utils import train,valid,save_checkpoint,train_cuda_f16,train_with_style,valid_with_style
 from utils import utils_logger
 
 
@@ -120,5 +120,5 @@ if(args.checkpoint != ""):
 for i in range(epoch_i,epoch_i+args.epoch):
 
     loss_t = train_with_style([model],trainloader,optimizer,l1_criterion,i,device,args,logger)
-    psnr,ssim,loss_v = valid([model],validloader,l1_criterion,device,args,logger)
+    psnr,ssim,loss_v = valid_with_style([model],validloader,l1_criterion,device,args,logger)
     save_checkpoint(model,None,None,i,loss_t,loss_v,psnr,ssim,optimizer,logger,args)
