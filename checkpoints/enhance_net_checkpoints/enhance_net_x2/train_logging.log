@@ -347,3 +347,9 @@
 22-01-25 10:20:04.913 : 
 
 22-01-25 10:20:04.913 : ===> TrainEpoch =26  lr = 1e-05
+22-01-25 10:57:28.242 : ===> Epoch[26]: Loss_l1: 0.02974  Duration: 37.388229 min
+22-01-25 11:04:58.785 : ===> Valid. psnr: 29.0021, ssim: 0.7552, loss: 0.0287
+22-01-25 11:04:58.845 : ===> Checkpoint saved to checkpoints/enhance_net_checkpoints/enhance_net_x2/checkpoint_base_epoch_26.pth
+22-01-25 11:04:58.845 : 
+
+22-01-25 11:04:58.846 : ===> TrainEpoch =27  lr = 1e-05

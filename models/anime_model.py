@@ -318,6 +318,8 @@ class AnimeNet5(nn.Module):
 
     def forward(self, input):
         # print("input",input.size())
+        # print(input[0].size())
+        # print(input[0].size())
         out_fea = self.downsampleer_O(input[0])
         out_or  = self.downsampleer_A(input[1])
 

@@ -26,15 +26,15 @@ parser.add_argument("--logger_path", type=str, default="checkpoints/anime_net_ch
 
 parser.add_argument('--threads', type=int, default=4, help='threads number.')
 
-parser.add_argument('--batch_size', type=int, default=8, help='batch size.')
+parser.add_argument('--batch_size', type=int, default=16, help='batch size.')
 parser.add_argument('--epoch', type=int, default=5, help='epoch.')
 parser.add_argument("--lr", type=float, default=1e-4,help="learning rate")
 parser.add_argument("--step_size", type=int, default=80,help="learning rate decay per N epochs")
 parser.add_argument("--gamma", type=float, default=0.1,help="learning rate decay factor for step decay")
 
-parser.add_argument("--max_dim", type=int, default=220,help="max image dimension")
-parser.add_argument("--min_dim", type=int, default=80,help="min image dimension")
-parser.add_argument("--max_cells", type=int, default=200*200,help="min image dimension") #prev 350*350
+parser.add_argument("--max_dim", type=int, default=256,help="max image dimension")
+parser.add_argument("--min_dim", type=int, default=128,help="min image dimension")
+parser.add_argument("--max_cells", type=int, default=256*256,help="min image dimension") #prev 350*350
 
 args = parser.parse_args()
 
@@ -73,7 +73,7 @@ box = (args.min_dim,args.max_dim,args.min_dim,args.max_dim)
 trainloader,validloader = reInitLoader(box)
 #load models
 print("loading model")
-model = anime_model.AnimeNet4()
+model = anime_model.AnimeNet5()
 
 
 #training device
