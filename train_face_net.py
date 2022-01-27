@@ -22,15 +22,15 @@ parser.add_argument('--data_valid', nargs="+" ,default=["/media/anis/InWork/Data
 parser.add_argument('--data_train', nargs="+",default=["/media/anis/InWork/Data/face_dataset/train"], help='Path to trainning dataset.')
 
 parser.add_argument("--checkpoint", type=str, default="",help="checkpoint path")
-parser.add_argument("--checkpoint_path", type=str, default="checkpoints/face_net_checkpoints/black_mask_checkpoits",help="checkpoint_folder_path")
-parser.add_argument("--logger_path", type=str, default="checkpoints/face_net_checkpoints/black_mask_checkpoits/face_net_train_logging.log",help="logger path")
+parser.add_argument("--checkpoint_path", type=str, default="checkpoints/face_net_checkpoints/black_mask_checkpoints",help="checkpoint_folder_path")
+parser.add_argument("--logger_path", type=str, default="checkpoints/face_net_checkpoints/black_mask_checkpoints/face_net_train_logging.log",help="logger path")
 
 parser.add_argument('--threads', type=int, default=4, help='threads number.')
 
 parser.add_argument('--batch_size', type=int, default=8, help='batch size.')
 parser.add_argument('--epoch', type=int, default=5, help='epoch.')
 parser.add_argument("--lr", type=float, default=1e-4,help="learning rate")
-parser.add_argument("--step_size", type=int, default=80,help="learning rate decay per N epochs")
+parser.add_argument("--step_size", type=int, default=100,help="learning rate decay per N epochs")
 parser.add_argument("--gamma", type=float, default=0.1,help="learning rate decay factor for step decay")
 
 parser.add_argument("--max_dim", type=int, default=512,help="max image dimension")

@@ -193,26 +193,25 @@ class EnhanceNetX2(nn.Module):
         return output                
 
 class EnhanceNetX3(nn.Module):
-    def __init__(self, in_nc=3, nf=64,out_nc=3):
+    def __init__(self, in_nc=3, nf=64,out_nc=3,act_type = "relu"):
         super(EnhanceNetX3, self).__init__()
 
         
-        self.fea_conv = B.conv_layer(in_nc, int(nf), kernel_size=3)
+        self.fea_conv = B.conv_layer(in_nc, nf, kernel_size=3)
                    
-
         # IMDBs
-        self.IMDB1 = B.IMDModule(in_channels=nf)
-        self.IMDB2 = B.IMDModule(in_channels=nf)
-        self.IMDB3 = B.IMDModule(in_channels=nf)
-        self.IMDB4 = B.IMDModule(in_channels=nf)
-        self.IMDB5 = B.IMDModule(in_channels=nf)
-        self.IMDB6 = B.IMDModule(in_channels=nf)
-        self.IMDB7 = B.IMDModule(in_channels=nf)
-        self.IMDB8 = B.IMDModule(in_channels=nf)
-        self.IMDB9 = B.IMDModule(in_channels=nf)
+        self.IMDB1 = B.IMDModule(in_channels=nf,cc_acti=act_type,act_type=act_type)
+        self.IMDB2 = B.IMDModule(in_channels=nf,cc_acti=act_type,act_type=act_type)
+        self.IMDB3 = B.IMDModule(in_channels=nf,cc_acti=act_type,act_type=act_type)
+        self.IMDB4 = B.IMDModule(in_channels=nf,cc_acti=act_type,act_type=act_type)
+        self.IMDB5 = B.IMDModule(in_channels=nf,cc_acti=act_type,act_type=act_type)
+        self.IMDB6 = B.IMDModule(in_channels=nf,cc_acti=act_type,act_type=act_type)
+        self.IMDB7 = B.IMDModule(in_channels=nf,cc_acti=act_type,act_type=act_type)
+        self.IMDB8 = B.IMDModule(in_channels=nf,cc_acti=act_type,act_type=act_type)
+        self.IMDB9 = B.IMDModule(in_channels=nf,cc_acti=act_type,act_type=act_type)
 
         num_modules=9
-        self.conv_cat = B.conv_block(nf * num_modules, nf, kernel_size=1, act_type='lrelu')
+        self.conv_cat = B.conv_block(nf * num_modules, nf, kernel_size=1, act_type=act_type)
         self.LR_conv = B.conv_layer(nf, nf, kernel_size=3)
         
         upscale=3

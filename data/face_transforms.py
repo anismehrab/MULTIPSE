@@ -202,9 +202,10 @@ class AddMaskFace(object):
         self.output_size = min(h,w)
         
         img_L = self.masks[3](img_L)
+        img_L = self.masks[randint(1,2)](img_L)
         
         for i in range(randint(1,3)):
-            img_L = self.masks[randint(0,2)](img_L)
+            img_L = self.masks[0](img_L)
 
         # print("img_L",img_L.shape)
 
@@ -225,7 +226,7 @@ class AddMaskFace(object):
             image,
             pt1 = (s_w, s_h), pt2 = (e_w, e_h),
             color = self.color,
-            thickness = randint(12,30))
+            thickness = randint(int(self.output_size/50),int(self.output_size/20)))
         return img_masked    
     
     def rectangle(self,image):
@@ -244,7 +245,7 @@ class AddMaskFace(object):
     def circle(self,image):
         s_h = randint(int(self.output_size/2-(self.output_size/3)),self.output_size-10)
         s_w = randint(int(self.output_size/2-(self.output_size/3)),self.output_size-10)
-        raduis = randint(5,int(min(self.output_size - max(s_h,s_w),int(self.output_size/20))))
+        raduis = randint(5,int(min(self.output_size - max(s_h,s_w),int(self.output_size/18))))
         
         img_masked = cv2.circle(
                     image,
