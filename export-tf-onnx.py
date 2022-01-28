@@ -72,17 +72,17 @@ def test_with_image(model,OUT_NAME,dtype = torch.float32):
     model.to(device)
     with torch.no_grad():
         for img in util.get_image_paths(L_path):
-            if('1641290199114' in img):
+            if('69008' in img):
                 torch.cuda.empty_cache()
                 img_L = util.imread_uint(img, n_channels=3)
                 w= np.shape(img_L)[1]
                 h = np.shape(img_L)[0]
                 # img_L = cv2.line(img_L,pt1 = (700, 500), pt2 = (800, 300),
                 #             color = (0, 0, 0),thickness = random.randint(5,20))
-                # img_L =  cv2.circle(img_L,center = (350, 278),radius = 20,color = (0, 0, 0),thickness = -1)
-                # img_L =  cv2.circle(img_L,center = (330, 278),radius = 20,color = (0, 0, 0),thickness = -1)
-                # img_L =  cv2.circle(img_L,center = (310, 278),radius = 20,color = (0, 0, 0),thickness = -1)
-                # img_L = cv2.line(img_L,pt1 = (500, 600), pt2 = (600, 800),color = (0, 0, 0),thickness = 30)
+                img_L =  cv2.circle(img_L,center = (350, 278),radius = 50,color = (0, 0, 0),thickness = -1)
+                img_L =  cv2.circle(img_L,center = (330, 278),radius = 20,color = (0, 0, 0),thickness = -1)
+                img_L =  cv2.circle(img_L,center = (310, 278),radius = 20,color = (0, 0, 0),thickness = -1)
+                img_L = cv2.line(img_L,pt1 = (500, 600), pt2 = (600, 800),color = (0, 0, 0),thickness = 30)
                 util.imsave(img_L, os.path.join('testsets/exported', 'input'+'.png'))
             
                 if(np.shape(img_L)[0] < 1055 and np.shape(img_L)[1] < 1055):
@@ -102,8 +102,8 @@ def test_with_image(model,OUT_NAME,dtype = torch.float32):
 
 
 #LOAD TORCH MODEL
-toch_model_path = "checkpoints/enhance_net_checkpoints/enhance_net_x2/checkpoint_base_epoch_22.pth"#"/home/anis/Desktop/AI/MultiSPE/checkpoints/face_net_checkpoints/checkpoint_base_epoch_19.pth"#os.path.join('checkpoints/face_net_checkpoints', 'checkpoint_base_epoch_19.pth')
-torch_model = EnhanceNetX2()
+toch_model_path = "checkpoints/face_net_checkpoints/black_mask_checkpoints/checkpoint_base_epoch_89.pth"#"/home/anis/Desktop/AI/MultiSPE/checkpoints/face_net_checkpoints/checkpoint_base_epoch_19.pth"#os.path.join('checkpoints/face_net_checkpoints', 'checkpoint_base_epoch_19.pth')
+torch_model = FaceNet()
         
 #torch_model = architecture.IMDN(upscale=4)
 checkpoint = torch.load(toch_model_path)
@@ -240,9 +240,9 @@ test_with_image(torch_model,'output')
 # scripted_model_optimized._save_for_lite_interpreter(os.path.join('model_zoo','BSRGAN_vulkan_lite_static_quantized_model.pth'))
 scripted_torch_model = torch.jit.script(torch_model)
 scripted_model_optimized = optimize_for_mobile(scripted_torch_model,backend="cpu")
-scripted_model_optimized._save_for_lite_interpreter(os.path.join('checkpoints/enhance_net_checkpoints/enhance_net_x2/script','lite_cpu_enhancenet_x2.pth'))
+scripted_model_optimized._save_for_lite_interpreter(os.path.join('checkpoints/face_net_checkpoints/black_mask_checkpoints/script','lite_cpu_facenet.pth'))
 scripted_model_optimized = optimize_for_mobile(scripted_torch_model,backend="Vulkan")
-scripted_model_optimized._save_for_lite_interpreter(os.path.join('checkpoints/enhance_net_checkpoints/enhance_net_x2/script','lite_vulkan_enhancenet_x2.pth'))
+scripted_model_optimized._save_for_lite_interpreter(os.path.join('checkpoints/face_net_checkpoints/black_mask_checkpoints/script','lite_vulkan_facenet.pth'))
 
 # # #to NNAPI 
 # # scripted_model = torch.jit.script(model_int8_quantized)

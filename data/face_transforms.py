@@ -245,7 +245,7 @@ class AddMaskFace(object):
     def circle(self,image):
         s_h = randint(int(self.output_size/2-(self.output_size/3)),self.output_size-10)
         s_w = randint(int(self.output_size/2-(self.output_size/3)),self.output_size-10)
-        raduis = randint(5,int(min(self.output_size - max(s_h,s_w),int(self.output_size/18))))
+        raduis = randint(int(self.output_size/60),int(min(self.output_size - max(s_h,s_w),int(self.output_size/16))))
         
         img_masked = cv2.circle(
                     image,
