@@ -21,11 +21,11 @@ default_collate_err_msg_format = (
 
 
 class DataBatch:
-    def __init__(self,transfrom,max_box,max_cells,scale=4):
+    def __init__(self,transfrom,max_box,max_cells,devider=4):
         self.transfrom = transfrom
         self.max_box = max_box
         self.max_cells = max_cells
-        self.scale = scale
+        self.devider = devider
         
 
 
@@ -35,7 +35,7 @@ class DataBatch:
         min_h,max_h,min_w,max_w = self.max_box
         patch_h = 2000
         patch_w = 2000
-        while(patch_h*patch_w > self.max_cells or (patch_h%self.scale !=0 or patch_w%self.scale !=0)):
+        while(patch_h*patch_w > self.max_cells or (patch_h%self.devider !=0 or patch_w%self.devider !=0)):
             patch_h = randint(min_h,max_h) 
             patch_w = patch_h #randint(min_w,max_w)
 
@@ -188,7 +188,7 @@ class FaceRescale(object):
 
 class AddMaskFace(object):
     """Convert ndarrays in sample to Tensors."""
-    def __init__(self,color = (255,255,255)):
+    def __init__(self,color = (0,0,0)):
         self.output_size = None
         self.masks = [self.circle,self.arbitrary_shape,self.line,self.circle_mask,self.rectangle]
         self.color = color
@@ -201,11 +201,8 @@ class AddMaskFace(object):
         h, w = img_L.shape[:2]
         self.output_size = min(h,w)
         
-        img_L = self.masks[3](img_L)
-        img_L = self.masks[randint(1,2)](img_L)
-        
-        for i in range(randint(1,3)):
-            img_L = self.masks[0](img_L)
+        for i in range(randint(1,5)):
+            img_L = self.masks[randint(0,4)](img_L)
 
         # print("img_L",img_L.shape)
 
@@ -230,10 +227,16 @@ class AddMaskFace(object):
         return img_masked    
     
     def rectangle(self,image):
-        s_h = randint(0,int(self.output_size/3)-10)
-        s_w = randint(0,int(self.output_size/3)-10)
-        e_h = randint(s_h,int(self.output_size/3))
-        e_w = randint(s_w,int(self.output_size/3))
+        offset = int(self.output_size / 9)
+        threshold = int(self.output_size / 5)
+        line_dim = 50000;
+        while(line_dim > threshold):
+            s_h = randint(offset,self.output_size-offset)
+            s_w = randint(offset,self.output_size-offset)
+            e_h = randint(s_h,self.output_size-offset)
+            e_w = randint(s_w,self.output_size-offset)
+            line_dim = np.sqrt((s_h - e_h)**2 + (s_w - e_w)**2)
+
         
         img_masked = cv2.rectangle(
                 image,
@@ -245,7 +248,7 @@ class AddMaskFace(object):
     def circle(self,image):
         s_h = randint(int(self.output_size/2-(self.output_size/3)),self.output_size-10)
         s_w = randint(int(self.output_size/2-(self.output_size/3)),self.output_size-10)
-        raduis = randint(int(self.output_size/60),int(min(self.output_size - max(s_h,s_w),int(self.output_size/16))))
+        raduis = randint(int(self.output_size/70),int(min(self.output_size - max(s_h,s_w),int(self.output_size/16))))
         
         img_masked = cv2.circle(
                     image,
@@ -259,7 +262,7 @@ class AddMaskFace(object):
     def circle_mask(self,image):
         s_h = randint(int(self.output_size/2-(self.output_size/3)),self.output_size-10)
         s_w = randint(int(self.output_size/2-(self.output_size/3)),self.output_size-10)
-        raduis = randint(5,int(min(self.output_size - max(s_h,s_w),int(self.output_size/20))))
+        raduis = randint(5,int(min(self.output_size - max(s_h,s_w),int(self.output_size/18))))
         
         img_masked = cv2.circle(
                     image,
@@ -276,11 +279,11 @@ class AddMaskFace(object):
         rad = 0.2
         edgy = 0.05
         c = [randint(offset,self.output_size-offset),randint(offset,self.output_size-offset)]
-        a = get_random_points(n=randint(5,20), scale=randint(4,int(self.output_size/7))) + c
+        a = get_random_points(n=randint(5,20), scale=randint(2,int(self.output_size/7))) + c
         x,y, _ = get_bezier_curve(a,rad=rad, edgy=edgy)
         pts = np.array([x[:],y[:]]).T
         pts = pts.reshape((-1,1,2)).astype(np.int32)
-        masked_image = cv2.polylines(image,[pts],True,color = self.color,thickness=randint(int(self.output_size/35),int(self.output_size/15)))
+        masked_image = cv2.polylines(image,[pts],True,color = self.color,thickness=randint(int(self.output_size/50),int(self.output_size/20)))
         return masked_image
 
 

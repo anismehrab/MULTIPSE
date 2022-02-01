@@ -22,8 +22,8 @@ parser.add_argument('--data_valid', nargs="+" ,default=["/media/anis/InWork/Data
 parser.add_argument('--data_train', nargs="+",default=["/media/anis/InWork/Data/face_dataset/train"], help='Path to trainning dataset.')
 
 parser.add_argument("--checkpoint", type=str, default="",help="checkpoint path")
-parser.add_argument("--checkpoint_path", type=str, default="checkpoints/face_net_checkpoints/black_mask_checkpoints",help="checkpoint_folder_path")
-parser.add_argument("--logger_path", type=str, default="checkpoints/face_net_checkpoints/black_mask_checkpoints/face_net_train_logging.log",help="logger path")
+parser.add_argument("--checkpoint_path", type=str, default="checkpoints/face_net_checkpoints/black_mask_checkpoints/V_mid",help="checkpoint_folder_path")
+parser.add_argument("--logger_path", type=str, default="checkpoints/face_net_checkpoints/black_mask_checkpoints/V_mid/face_net_train_logging.log",help="logger path")
 
 parser.add_argument('--threads', type=int, default=4, help='threads number.')
 
@@ -35,7 +35,7 @@ parser.add_argument("--gamma", type=float, default=0.1,help="learning rate decay
 
 parser.add_argument("--max_dim", type=int, default=512,help="max image dimension")
 parser.add_argument("--min_dim", type=int, default=128,help="min image dimension")
-parser.add_argument("--max_cells", type=int, default=420*420,help="min image dimension")
+parser.add_argument("--max_cells", type=int, default=380*380,help="min image dimension")
 parser.add_argument("--mask_color", type=str ,default = "black",help="mask color: black or white")
 
 args = parser.parse_args()
@@ -57,7 +57,7 @@ def reInitLoader(box):
         mask_transfrom = AddMaskFace(color=(255,255,255))
         
     batch_compos = transforms.Compose([mask_transfrom,FaceNormalize(),FaceToTensor()])
-    dataBatch = DataBatch(transfrom=batch_compos,max_box = box,max_cells= args.max_cells)
+    dataBatch = DataBatch(transfrom=batch_compos,max_box = box,max_cells= args.max_cells,devider=4)
     training_data = FaceDataset(data_dir=args.data_train)
     validation_data = FaceDataset(data_dir=args.data_valid)
     logger.info("===>Trainning Data:[ Train:{}  Valid:{}] Batch:{}".format(len(training_data),len(validation_data),args.batch_size))
@@ -79,7 +79,7 @@ box = (args.min_dim,args.max_dim,args.min_dim,args.max_dim)
 trainloader,validloader = reInitLoader(box)
 #load models
 print("loading model")
-model = face_model.FaceNet()
+model = face_model.FaceNet_Mid()
 
 
 #training device
