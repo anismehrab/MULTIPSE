@@ -1,5 +1,6 @@
 from logging import exception, raiseExceptions
 from os import path
+from tkinter.messagebox import NO
 import torch 
 import numpy as np
 from random import randint
@@ -142,13 +143,14 @@ default_collate_err_msg_format = (
 
 
 class DataBatch:
-    def __init__(self,transfrom,scale,max_box,max_cells,devider=2):
+    def __init__(self,transfrom,scale,max_box,max_cells,devider=2,force_size = None):
         self.transfrom = transfrom
         self.scale = scale
         self.max_box = max_box
         self.max_cells = max_cells
         self.rotate_degree = [None,cv2.ROTATE_90_CLOCKWISE,cv2.ROTATE_180,cv2.ROTATE_90_CLOCKWISE]
         self.devider = devider
+        self.force_size = force_size
 
 
     def collate_fn(self,batch):
@@ -160,7 +162,9 @@ class DataBatch:
         while(patch_h*patch_w > self.max_cells or (patch_h%self.devider !=0 or patch_w%self.devider !=0)):
             patch_h = randint(min_h,max_h)
             patch_w = randint(min_w,max_w)
-
+        if(self.force_size is not None):
+            patch_h = self.force_size
+            patch_w = self.force_size
         degrade = Degradate(scale=self.scale,patch_size_w=patch_w,patch_size_h=patch_h)
         rotate = Rotate(degree=self.rotate_degree[randint(0,3)])
         batch_= []

@@ -10,7 +10,7 @@ import os
 import numpy as np
 from tensorflow.lite.python.interpreter import Interpreter
 import torch
-from models.face_model import FaceNet
+from models.face_model import FaceNet,FaceNet_Mid
 from models.enhance_model import EnhanceNet,EnhanceNetX1,EnhanceNetX2
 from models.anime_model import AnimeNet,AnimeNet2,AnimeNet4
 import utils
@@ -102,8 +102,8 @@ def test_with_image(model,OUT_NAME,dtype = torch.float32):
 
 
 #LOAD TORCH MODEL
-toch_model_path = "checkpoints/face_net_checkpoints/black_mask_checkpoints/checkpoint_base_epoch_101.pth"#"/home/anis/Desktop/AI/MultiSPE/checkpoints/face_net_checkpoints/checkpoint_base_epoch_19.pth"#os.path.join('checkpoints/face_net_checkpoints', 'checkpoint_base_epoch_19.pth')
-torch_model = FaceNet()
+toch_model_path = "checkpoints/face_net_checkpoints/black_mask_checkpoints/V_mid/checkpoint_base_epoch_51.pth"#"/home/anis/Desktop/AI/MultiSPE/checkpoints/face_net_checkpoints/checkpoint_base_epoch_19.pth"#os.path.join('checkpoints/face_net_checkpoints', 'checkpoint_base_epoch_19.pth')
+torch_model = FaceNet_Mid()
         
 #torch_model = architecture.IMDN(upscale=4)
 checkpoint = torch.load(toch_model_path)
@@ -240,9 +240,9 @@ test_with_image(torch_model,'output')
 # scripted_model_optimized._save_for_lite_interpreter(os.path.join('model_zoo','BSRGAN_vulkan_lite_static_quantized_model.pth'))
 scripted_torch_model = torch.jit.script(torch_model)
 scripted_model_optimized = optimize_for_mobile(scripted_torch_model,backend="cpu")
-scripted_model_optimized._save_for_lite_interpreter(os.path.join('checkpoints/face_net_checkpoints/black_mask_checkpoints/script','lite_cpu_facenet.pth'))
+scripted_model_optimized._save_for_lite_interpreter(os.path.join('checkpoints/face_net_checkpoints/black_mask_checkpoints/V_mid/script','lite_cpu_facenet.pth'))
 scripted_model_optimized = optimize_for_mobile(scripted_torch_model,backend="Vulkan")
-scripted_model_optimized._save_for_lite_interpreter(os.path.join('checkpoints/face_net_checkpoints/black_mask_checkpoints/script','lite_vulkan_facenet.pth'))
+scripted_model_optimized._save_for_lite_interpreter(os.path.join('checkpoints/face_net_checkpoints/black_mask_checkpoints/V_mid/script','lite_vulkan_facenet.pth'))
 
 # # #to NNAPI 
 # # scripted_model = torch.jit.script(model_int8_quantized)
