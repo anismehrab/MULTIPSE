@@ -190,7 +190,7 @@ class AddMaskFace(object):
     """Convert ndarrays in sample to Tensors."""
     def __init__(self,color = (0,0,0)):
         self.output_size = None
-        self.masks = [self.circle,self.arbitrary_shape,self.line,self.rectangle,self.circle,self.arbitrary_shape,self.rectangle,self.circle_mask]
+        self.masks = [self.circle,self.arbitrary_shape,self.line,self.circle,self.arbitrary_shape,self.rectangle,self.circle_mask]
         self.color = color
 
     def __call__(self, sample):
@@ -200,9 +200,9 @@ class AddMaskFace(object):
         img_L = cv2.cvtColor(img_L, cv2.COLOR_BGR2RGB)
         h, w = img_L.shape[:2]
         self.output_size = min(h,w)
-        img_L = self.masks[7](img_L)
-        for i in range(randint(2,6)):
-            img_L = self.masks[randint(1,6)](img_L)
+        # img_L = self.masks[6](img_L)
+        for i in range(randint(2,5)):
+            img_L = self.masks[randint(0,4)](img_L)
 
         # print("img_L",img_L.shape)
 
