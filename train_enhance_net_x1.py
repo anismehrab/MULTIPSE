@@ -8,7 +8,7 @@ from torch._C import device
 import torch.nn as nn
 import torch.optim as optim
 from data.dataloader import Dataset
-from data.transform import DataBatch, ToTensor,Normalize,Degradate,RandomCrop
+from data.enhance_transform import DataBatch, ToTensor,Normalize,Degradate,RandomCrop
 from torch.utils.data import DataLoader
 from models import enhance_model
 from utils.train_utils import train,valid,save_checkpoint
@@ -38,7 +38,7 @@ parser.add_argument("--gamma", type=float, default=0.1,help="learning rate decay
 
 parser.add_argument("--max_dim", type=int, default=512,help="max image dimension")
 parser.add_argument("--min_dim", type=int, default=128,help="min image dimension")
-parser.add_argument("--max_cells", type=int, default=380*380,help="min image dimension")
+parser.add_argument("--max_cells", type=int, default=410*410,help="min image dimension")
 
 args = parser.parse_args()
 
@@ -55,7 +55,7 @@ def reInitLoader(box):
         max = max_image_width * max_image_high to fit in GPU """
     data_compos = transforms.Compose([Normalize()])
     batch_compos = transforms.Compose([ToTensor()])
-    dataBatch = DataBatch(transfrom=batch_compos,scale =args.scale ,max_box = box,max_cells= args.max_cells,devider=4)
+    dataBatch = DataBatch(transfrom=batch_compos,scale =args.scale ,max_box = box,max_cells= args.max_cells,devider=4,force_size=None)
     training_data = Dataset(data_dir=args.data_train,transform=data_compos)
     validation_data = Dataset(data_dir=args.data_valid,transform=data_compos)
     logger.info("===>Trainning Data:[ Train:{}  Valid:{}] Batch:{}".format(len(training_data),len(validation_data),args.batch_size))

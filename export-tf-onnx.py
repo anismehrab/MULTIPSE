@@ -102,7 +102,7 @@ def test_with_image(model,OUT_NAME,dtype = torch.float32):
 
 
 #LOAD TORCH MODEL
-toch_model_path = "checkpoints/face_net_checkpoints/black_mask_checkpoints/V_mid/checkpoint_base_epoch_51.pth"#"/home/anis/Desktop/AI/MultiSPE/checkpoints/face_net_checkpoints/checkpoint_base_epoch_19.pth"#os.path.join('checkpoints/face_net_checkpoints', 'checkpoint_base_epoch_19.pth')
+toch_model_path = "checkpoints/face_net_checkpoints/black_mask_checkpoints/V_mid/checkpoint_base_epoch_64.pth"#"/home/anis/Desktop/AI/MultiSPE/checkpoints/face_net_checkpoints/checkpoint_base_epoch_19.pth"#os.path.join('checkpoints/face_net_checkpoints', 'checkpoint_base_epoch_19.pth')
 torch_model = FaceNet_Mid()
         
 #torch_model = architecture.IMDN(upscale=4)
