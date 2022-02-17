@@ -547,7 +547,7 @@ def degradation_bsrgan_plus(img, sf=4, shuffle_prob=0.5, use_sharp=False, lq_pat
 
     h1, w1 = img.shape[:2]
     l_image = img.copy()[:w1 - w1 % sf, :h1 - h1 % sf, ...]  # mod crop
-    h, w = l_image.shape[:2] 
+    h, w = img.shape[:2] 
  
 
     if h1 < lq_patchsize_h*sf or w1 < lq_patchsize_w*sf:
@@ -642,7 +642,6 @@ def degradation_bsrgan_plus_an(img,hq=None, sf=4, shuffle_prob=0.5, use_sharp=Fa
         raise ValueError(f'img size ({h1}X{w1}) is too small!')
 
     if(noise):
-        print("noise is used")
         if use_sharp and noise:
             img = add_sharpening(img)
         hq = img.copy()

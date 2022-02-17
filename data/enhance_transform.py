@@ -12,6 +12,7 @@ import re
 import collections
 from torch._six import string_classes
 import random
+from utils import utils_image
 np_str_obj_array_pattern = re.compile(r'[SaUO]')
 
 
@@ -53,7 +54,7 @@ class Rotate(object):
   
         return sample_
 
-
+import os
 
 class Degradate(object):
     def __init__(self,scale = 4,patch_size_w = 64,patch_size_h=64):
@@ -64,18 +65,18 @@ class Degradate(object):
     def __call__(self, sample):
         img_origin = sample["img_H"]
         img_noisy = sample["img_L"]
-
+        
         img_L=None
         img_H=None
 
         if(self.scale == 1):
-            i = randint(2,5)
-            img_L = cv2.resize(img_origin, (int(img_origin.shape[1]/i), int(img_origin.shape[0]/i)), interpolation=random.choice([1, 2, 3]))
+            i = randint(3,8)
+            img_L = cv2.resize(img_origin.copy(), (int(img_origin.shape[1]/i), int(img_origin.shape[0]/i)), interpolation=random.choice([1, 2, 3]))
             img_L = cv2.resize(img_L, (int(img_origin.shape[1]), int(img_origin.shape[0])), interpolation=random.choice([1, 2, 3]))
             img_L, img_H = random_crop(lq=img_L, hq=img_origin,sf=self.scale, lq_patchsize_w=self.patch_size_w,lq_patchsize_h=self.patch_size_h)
         else:
             img_L, img_H = degradation_bsrgan_plus_an(img=img_noisy,hq=img_origin, sf=self.scale, lq_patchsize_w=self.patch_size_w,lq_patchsize_h=self.patch_size_h,degrade=True,noise=False)
-        
+
         # print("shape L",np.shape(img_L))
         # print("shape H",np.shape(img_H))
         # cv image: H x W x C 

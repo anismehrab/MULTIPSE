@@ -5,10 +5,10 @@
 # from onnxruntime.quantization.quant_utils import QuantizationMode
 
 # import tensorflow as tf
+#from tensorflow.lite.python.interpreter import Interpreter
 
 import os
 import numpy as np
-from tensorflow.lite.python.interpreter import Interpreter
 import torch
 from models import model
 import utils
@@ -213,13 +213,13 @@ test_with_image(base_model,head_model,'test_gournd_truth22')
 scripted_base = torch.jit.script(base_model)
 scripted_head = torch.jit.script(head_model)
 # scripted_model._save_for_lite_interpreter(os.path.join('checkpoints/enhance_checkpoints/torch_script','checkpoint_+'+str(epoch)+'.pth'))
-scripted_base_optimized = optimize_for_mobile(scripted_base,backend="cpu")
-scripted_base_optimized._save_for_lite_interpreter(os.path.join('checkpoints/enhance_net_checkpoints/enhance_net_x3/enhance_checkpoints/torch_script','base_lite_cpu_enhancenet.pth'))
-scripted_base_optimized = optimize_for_mobile(scripted_base,backend="vulkan")
+#scripted_base_optimized = optimize_for_mobile(scripted_base,backend="cpu")
+#scripted_base_optimized._save_for_lite_interpreter(os.path.join('checkpoints/enhance_net_checkpoints/enhance_net_x3/enhance_checkpoints/torch_script','base_lite_cpu_enhancenet.pth'))
+scripted_base_optimized = optimize_for_mobile(scripted_base,backend="Vulkan")
 scripted_base_optimized._save_for_lite_interpreter(os.path.join('checkpoints/enhance_net_checkpoints/enhance_net_x3/enhance_checkpoints/torch_script','base_lite_vulkan_enhancenet.pth'))
-scripted_head_optimized = optimize_for_mobile(scripted_head,backend="cpu")
-scripted_head_optimized._save_for_lite_interpreter(os.path.join('checkpoints/enhance_net_checkpoints/enhance_net_x3/enhance_checkpoints/torch_script','head_lite_cpu_enhancenet.pth'))
-scripted_head_optimized = optimize_for_mobile(scripted_head,backend="vulkan")
+#scripted_head_optimized = optimize_for_mobile(scripted_head,backend="cpu")
+#scripted_head_optimized._save_for_lite_interpreter(os.path.join('checkpoints/enhance_net_checkpoints/enhance_net_x3/enhance_checkpoints/torch_script','head_lite_cpu_enhancenet.pth'))
+scripted_head_optimized = optimize_for_mobile(scripted_head,backend="Vulkan")
 scripted_head_optimized._save_for_lite_interpreter(os.path.join('checkpoints/enhance_net_checkpoints/enhance_net_x3/enhance_checkpoints/torch_script','head_lite_vulkan_enhancenet.pth'))
 # # #to NNAPI 
 # # scripted_model = torch.jit.script(model_int8_quantized)
