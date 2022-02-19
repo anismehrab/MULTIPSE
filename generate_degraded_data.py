@@ -68,7 +68,7 @@ def main(data_path,workers):
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--data_train_path', type=str, default="/media/anis/InWork/Data/enhance_dataset/MY_DATA/train", help='Path to high resolution images.')
+    parser.add_argument('--data_train_path', type=str, default="/media/anis/InWork/Data/enhance_dataset/FFHQ_WILD/train", help='Path to high resolution images.')
     parser.add_argument('--data_valid_path', type=str, default="/media/anis/InWork/Data/dataset/URBAN/valid", help='Path to high resolution images.')
     parser.add_argument('--degradation_type', type=str, default="bsrgan_degradation", help='type of degradation.')
     parser.add_argument('--gen_images', type=int, default=16, help='number of image generated.')

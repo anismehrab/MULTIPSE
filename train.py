@@ -10,7 +10,7 @@ import torch.optim as optim
 from data.dataloader import Dataset
 from data.transform import DataBatch, ToTensor,Normalize,Degradate,RandomCrop
 from torch.utils.data import DataLoader
-from models import model
+from models.model import BaseNet,UpsamplerNet
 from utils.train_utils import train,valid,save_checkpoint
 from utils import utils_logger
 
@@ -23,8 +23,8 @@ parser.add_argument('--data_valid', nargs="+" ,default=["/media/anis/InWork/Data
 parser.add_argument('--data_train', nargs="+",default=["/media/anis/InWork/Data/enhance_dataset/DIV_FLICKR_2K/train","/media/anis/InWork/Data/enhance_dataset/FFHQ/train","/media/anis/InWork/Data/enhance_dataset/CAMERA_FUSION/train","/media/anis/InWork/Data/enhance_dataset/CLOTH/train","/media/anis/InWork/Data/enhance_dataset/DHD_CAMPUS/train","/media/anis/InWork/Data/enhance_dataset/MY_DATA/train","/media/anis/InWork/Data/enhance_dataset/HAND_WRITTING/train","/media/anis/InWork/Data/enhance_dataset/URBAN/train"], help='Path to trainning dataset.')
 
 parser.add_argument("--checkpoint", type=str, default="",help="checkpoint path")
-parser.add_argument("--checkpoint_path", type=str, default="checkpoints/enhance_checkpoins",help="checkpoint_folder_path")
-parser.add_argument("--logger_path", type=str, default="checkpoints/enhance_checkpoins/train_logging.log",help="logger path")
+parser.add_argument("--checkpoint_path", type=str, default="checkpoints/enhance_net_checkpoints/enhance_net_x3/enhance_checkpoints",help="checkpoint_folder_path")
+parser.add_argument("--logger_path", type=str, default="checkpoints/enhance_net_checkpoints/enhance_net_x3/enhance_checkpoints/train_logging.log",help="logger path")
 
 parser.add_argument('--threads', type=int, default=4, help='threads number.')
 parser.add_argument("--start_iter", type=int, default=0,help="iteration")
@@ -72,8 +72,8 @@ box = (args.min_dim,args.max_dim,args.min_dim,args.max_dim)
 trainloader,validloader = reInitLoader(box)
 #load models
 print("loading model")
-base_model = model.BaseNet()
-head_model = model.UpsamplerNet(upscale=args.scale)
+base_model = BaseNet()
+head_model = UpsamplerNet(upscale=args.scale)
 
 #training device
 device = torch.device('cuda' if torch.cuda.is_available() else "cpu")
@@ -111,10 +111,33 @@ if(args.checkpoint != ""):
 
 model = [base_model,head_model]
 
+
+class MyEnsemble(nn.Module):
+    def __init__(self):
+        super(MyEnsemble, self).__init__()
+        self.modelA = BaseNet()
+        self.modelB = UpsamplerNet(upscale=3)
+        if(True):
+            self.modelA.cuda()
+            self.modelB.cuda()
+            self.modelA.load_state_dict(checkpoint["model_base_state_dict"])
+            self.modelB.load_state_dict(checkpoint["model_head_state_dict"])
+
+
+    def forward(self, input):
+        x1 = self.modelA(input)
+        x2 = self.modelB(x1)
+        return x2
+
+# Create models and load state_dicts    
+# Load state dicts
+
+model_c = MyEnsemble()
+model = [model_c]
 #trainning
 
 for i in range(epoch_i,epoch_i+args.epoch):
 
-    loss_t = train(model,trainloader,optimizer,l1_criterion,i,device,args,logger)
+    loss_t =0# train(model,trainloader,optimizer,l1_criterion,i,device,args,logger)
     psnr,ssim,loss_v = valid(model,validloader,l1_criterion,device,args,logger)
-    save_checkpoint(model[0],model[1],i,loss_t,loss_v,psnr,ssim,optimizer,logger,args)
+    save_checkpoint(model[0],None,None,i,loss_t,loss_v,psnr,ssim,optimizer,logger,args)

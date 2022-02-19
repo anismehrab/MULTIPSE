@@ -1,3 +1,4 @@
+from re import I
 import onnx
 import onnxruntime
 from onnx_tf.backend import prepare
@@ -11,7 +12,7 @@ import numpy as np
 from tensorflow.lite.python.interpreter import Interpreter
 import torch
 from models.face_model import FaceNet,FaceNet_Mid
-from models.enhance_model import EnhanceNet,EnhanceNetX1,EnhanceNetX2,EnhanceNetX3
+from models.enhance_model import EnhanceNet,EnhanceNetX1,EnhanceNetX2,EnhanceNetX3,EnhanceNet_x3
 from models.anime_model import AnimeNet,AnimeNet2,AnimeNet4
 import utils
 import time
@@ -72,17 +73,17 @@ def test_with_image(model,OUT_NAME,dtype = torch.float32):
     model.to(device)
     with torch.no_grad():
         for img in util.get_image_paths(L_path):
-            if('1641290199114' in img):
+            if('eagle' in img):
                 torch.cuda.empty_cache()
                 img_L = util.imread_uint(img, n_channels=3)
                 w= np.shape(img_L)[1]
                 h = np.shape(img_L)[0]
                 # img_L = cv2.line(img_L,pt1 = (700, 500), pt2 = (800, 300),
                 #             color = (0, 0, 0),thickness = random.randint(5,20))
-                img_L =  cv2.circle(img_L,center = (350, 278),radius = 20,color = (0, 0, 0),thickness = -1)
-                img_L =  cv2.circle(img_L,center = (330, 278),radius = 20,color = (0, 0, 0),thickness = -1)
-                img_L =  cv2.circle(img_L,center = (310, 278),radius = 20,color = (0, 0, 0),thickness = -1)
-                img_L = cv2.line(img_L,pt1 = (500, 600), pt2 = (600, 800),color = (0, 0, 0),thickness = 30)
+                # img_L =  cv2.circle(img_L,center = (350, 278),radius = 20,color = (0, 0, 0),thickness = -1)
+                # img_L =  cv2.circle(img_L,center = (330, 278),radius = 20,color = (0, 0, 0),thickness = -1)
+                # img_L =  cv2.circle(img_L,center = (310, 278),radius = 20,color = (0, 0, 0),thickness = -1)
+                # img_L = cv2.line(img_L,pt1 = (500, 600), pt2 = (600, 800),color = (0, 0, 0),thickness = 30)
                 util.imsave(img_L, os.path.join('testsets/exported', 'input'+'.png'))
             
                 if(np.shape(img_L)[0] < 1055 and np.shape(img_L)[1] < 1055):
@@ -102,7 +103,7 @@ def test_with_image(model,OUT_NAME,dtype = torch.float32):
 
 
 #LOAD TORCH MODEL
-toch_model_path = "checkpoints/enhance_net_checkpoints/enhance_net_x1/checkpoint_base_epoch_10.pth"#"/home/anis/Desktop/AI/MultiSPE/checkpoints/face_net_checkpoints/checkpoint_base_epoch_19.pth"#os.path.join('checkpoints/face_net_checkpoints', 'checkpoint_base_epoch_19.pth')
+toch_model_path = "checkpoints/enhance_net_checkpoints/enhance_net_x1/checkpoint_base_epoch_18.pth"#"/home/anis/Desktop/AI/MultiSPE/checkpoints/face_net_checkpoints/checkpoint_base_epoch_19.pth"#os.path.join('checkpoints/face_net_checkpoints', 'checkpoint_base_epoch_19.pth')
 torch_model = EnhanceNetX1()
         
 #torch_model = architecture.IMDN(upscale=4)

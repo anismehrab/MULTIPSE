@@ -57,10 +57,11 @@ class Rotate(object):
 import os
 
 class Degradate(object):
-    def __init__(self,scale = 4,patch_size_w = 64,patch_size_h=64):
+    def __init__(self,scale = 4,patch_size_w = 64,patch_size_h=64,resize_manuel = False):
         self.scale = scale
         self.patch_size_w = patch_size_w
         self.patch_size_h= patch_size_h
+        self.resize = resize_manuel;
 
     def __call__(self, sample):
         img_origin = sample["img_H"]
@@ -68,14 +69,20 @@ class Degradate(object):
         
         img_L=None
         img_H=None
-
-        if(self.scale == 1):
-            i = randint(3,8)
+        m = randint(1,9)
+        if(m == 1 or m == 3 or m == 5 or m == 7):
+            i = randint(3,5)
+            #print("resize")
             img_L = cv2.resize(img_origin.copy(), (int(img_origin.shape[1]/i), int(img_origin.shape[0]/i)), interpolation=random.choice([1, 2, 3]))
             img_L = cv2.resize(img_L, (int(img_origin.shape[1]), int(img_origin.shape[0])), interpolation=random.choice([1, 2, 3]))
             img_L, img_H = random_crop(lq=img_L, hq=img_origin,sf=self.scale, lq_patchsize_w=self.patch_size_w,lq_patchsize_h=self.patch_size_h)
-        else:
+        elif(m==2 or m == 4 or m == 6 or m == 8):
+            #print("degradde")
             img_L, img_H = degradation_bsrgan_plus_an(img=img_noisy,hq=img_origin, sf=self.scale, lq_patchsize_w=self.patch_size_w,lq_patchsize_h=self.patch_size_h,degrade=True,noise=False)
+        else:
+            #print("same")
+            img_L, img_H = random_crop(lq=img_origin.copy(), hq=img_origin,sf=self.scale, lq_patchsize_w=self.patch_size_w,lq_patchsize_h=self.patch_size_h)
+
 
         # print("shape L",np.shape(img_L))
         # print("shape H",np.shape(img_H))
@@ -177,13 +184,16 @@ class DataBatch:
         if(self.force_size is not None):
             patch_h = self.force_size
             patch_w = self.force_size
-        degrade = Degradate(scale=self.scale,patch_size_w=patch_w,patch_size_h=patch_h)
+        degrade = Degradate(scale=self.scale,patch_size_w=patch_w,patch_size_h=patch_h,resize_manuel=False)
         rotate = Rotate(degree=self.rotate_degree[randint(0,3)])
         batch_= []
         
         for sample in batch:
             sample_ = degrade(sample)
             sample_ = rotate(sample_)
+            # utils_image.imsave(sample_["img_H"]*255, os.path.join('testsets/exported', 'img_H'+'.png'))
+            # utils_image.imsave(sample_["img_L"]*255, os.path.join('testsets/exported', 'img_L'+'.png'))
+
             sample_ = self.transfrom(sample_)
             batch_.append(sample_)
         

@@ -1,6 +1,7 @@
 import torch.nn as nn
 from . import imdb as B
 import torch
+from models.model import UpsamplerNet,BaseNet
 
 
 class EnhanceNet(nn.Module):
@@ -71,15 +72,14 @@ class EnhanceNet(nn.Module):
 
 
 class EnhanceNetX1(nn.Module):
-    def __init__(self, in_nc=3, nf=64,out_nc=3,act_type="relu"):
+    def __init__(self, in_nc=3, nf=64,out_nc=3,act_type="lrelu"):
         super(EnhanceNetX1, self).__init__()
 
         upscale=4
         self.downsampleer = nn.Sequential(
                     B.conv_block(in_nc,int(nf/upscale), kernel_size=3, stride=2,act_type=act_type),
                     B.conv_block(int(nf/upscale),int(nf/upscale), kernel_size=3, stride=1,act_type=act_type),
-                    B.conv_block(int(nf/upscale),nf, kernel_size=3, stride=1,act_type=act_type),
-                    B.conv_block(nf, nf, kernel_size=3, stride=2,act_type=act_type),
+                    B.conv_block(int(nf/upscale), nf, kernel_size=3, stride=2,act_type=act_type),
                     B.conv_block(nf, nf, kernel_size=3, stride=1,act_type=act_type),
                     B.conv_layer(nf, nf, kernel_size=3),
                     )
@@ -93,10 +93,8 @@ class EnhanceNetX1(nn.Module):
         self.IMDB6 = B.IMDModule(in_channels=nf,act_type=act_type,cc_acti=act_type)
         self.IMDB7 = B.IMDModule(in_channels=nf,act_type=act_type,cc_acti=act_type)
         self.IMDB8 = B.IMDModule(in_channels=nf,act_type=act_type,cc_acti=act_type)
-        self.IMDB9 = B.IMDModule(in_channels=nf,act_type=act_type,cc_acti=act_type)
-        self.IMDB10 = B.IMDModule(in_channels=nf,act_type=act_type,cc_acti=act_type)
 
-        num_modules=10
+        num_modules=8
         self.conv_cat = B.conv_block(nf * num_modules, nf, kernel_size=1, act_type=act_type)
         self.LR_conv = B.conv_layer(nf, nf, kernel_size=3)
 
@@ -117,9 +115,8 @@ class EnhanceNetX1(nn.Module):
         out_B6 = self.IMDB6(out_B5)
         out_B7 = self.IMDB7(out_B6)
         out_B8 = self.IMDB8(out_B7)       
-        out_B9 = self.IMDB9(out_B8)
-        out_B10 = self.IMDB10(out_B9)
-        out_B = self.conv_cat(torch.cat([out_B1, out_B2, out_B3, out_B4, out_B5, out_B6, out_B7, out_B8, out_B9, out_B10], dim=1))
+
+        out_B = self.conv_cat(torch.cat([out_B1, out_B2, out_B3, out_B4, out_B5, out_B6, out_B7, out_B8], dim=1))
         #print("out_B",out_B.size())        
 
         out_lr = torch.add(self.LR_conv(out_B), out_fea)
@@ -298,3 +295,19 @@ class EnhanceNetX4(nn.Module):
         # print("out_put",output.size())
 
         return output                        
+
+
+
+
+
+class EnhanceNet_x3(nn.Module):
+    def __init__(self):
+        super(EnhanceNet_x3, self).__init__()
+        self.modelA = BaseNet()
+        self.modelB = UpsamplerNet(upscale=3)
+
+
+    def forward(self, input):
+        x1 = self.modelA(input)
+        x2 = self.modelB(x1)
+        return x2

@@ -20,7 +20,7 @@ from utils import utils_logger
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--data_valid', nargs="+" ,default=["/media/anis/InWork/Data/enhance_dataset/DIV_FLICKR_2K/valid","/media/anis/InWork/Data/enhance_dataset/FFHQ/valid","/media/anis/InWork/Data/enhance_dataset/CAMERA_FUSION/valid","/media/anis/InWork/Data/enhance_dataset/CLOTH/valid","/media/anis/InWork/Data/enhance_dataset/DHD_CAMPUS/valid","/media/anis/InWork/Data/enhance_dataset/MY_DATA/valid","/media/anis/InWork/Data/enhance_dataset/HAND_WRITTING/valid"], help='path validation dataset.')
-parser.add_argument('--data_train', nargs="+",default=["/media/anis/InWork/Data/enhance_dataset/DIV_FLICKR_2K/train","/media/anis/InWork/Data/enhance_dataset/FFHQ/train","/media/anis/InWork/Data/enhance_dataset/CAMERA_FUSION/train","/media/anis/InWork/Data/enhance_dataset/CLOTH/train","/media/anis/InWork/Data/enhance_dataset/DHD_CAMPUS/train","/media/anis/InWork/Data/enhance_dataset/MY_DATA/train","/media/anis/InWork/Data/enhance_dataset/HAND_WRITTING/train","/media/anis/InWork/Data/enhance_dataset/URBAN/train"], help='Path to trainning dataset.')
+parser.add_argument('--data_train', nargs="+",default=["/media/anis/InWork/Data/enhance_dataset/DIV_FLICKR_2K/train","/media/anis/InWork/Data/enhance_dataset/FFHQ/train","/media/anis/InWork/Data/enhance_dataset/FFHQ_WILD/train","/media/anis/InWork/Data/enhance_dataset/CAMERA_FUSION/train","/media/anis/InWork/Data/enhance_dataset/CLOTH/train","/media/anis/InWork/Data/enhance_dataset/DHD_CAMPUS/train","/media/anis/InWork/Data/enhance_dataset/MY_DATA/train","/media/anis/InWork/Data/enhance_dataset/HAND_WRITTING/train","/media/anis/InWork/Data/enhance_dataset/URBAN/train"], help='Path to trainning dataset.')
 
 parser.add_argument("--checkpoint", type=str, default="",help="checkpoint path")
 parser.add_argument("--checkpoint_path", type=str, default="checkpoints/enhance_net_checkpoints/enhance_net_x1",help="checkpoint_folder_path")
@@ -38,7 +38,7 @@ parser.add_argument("--gamma", type=float, default=0.1,help="learning rate decay
 
 parser.add_argument("--max_dim", type=int, default=512,help="max image dimension")
 parser.add_argument("--min_dim", type=int, default=128,help="min image dimension")
-parser.add_argument("--max_cells", type=int, default=410*410,help="min image dimension")
+parser.add_argument("--max_cells", type=int, default=440*420,help="min image dimension")
 
 args = parser.parse_args()
 
