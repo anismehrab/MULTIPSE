@@ -73,7 +73,7 @@ def test_with_image(model,OUT_NAME,dtype = torch.float32):
     model.to(device)
     with torch.no_grad():
         for img in util.get_image_paths(L_path):
-            if('eagle' in img):
+            if('0008' in img):
                 torch.cuda.empty_cache()
                 img_L = util.imread_uint(img, n_channels=3)
                 w= np.shape(img_L)[1]
@@ -86,16 +86,16 @@ def test_with_image(model,OUT_NAME,dtype = torch.float32):
                 # img_L = cv2.line(img_L,pt1 = (500, 600), pt2 = (600, 800),color = (0, 0, 0),thickness = 30)
                 util.imsave(img_L, os.path.join('testsets/exported', 'input'+'.png'))
             
-                if(np.shape(img_L)[0] < 1055 and np.shape(img_L)[1] < 1055):
-                    print("img{}".format(np.shape(img_L)))
-                    img_L = torch.from_numpy(np.ascontiguousarray(img_L)).permute(2, 0, 1).div(255.).unsqueeze(0)
-                    img_L = img_L.type(dtype)
-                    img_L = img_L.to(device)
-                    start = time.time()
-                    img_E = model(img_L)
-                    print("inference time: {}".format(time.time() - start))
-                    img_E = util.tensor2uint(img_E)
-                    util.imsave(img_E, os.path.join('testsets/exported', OUT_NAME+'.png'))
+                #if(np.shape(img_L)[0] < 1055 and np.shape(img_L)[1] < 1055):
+                print("img{}".format(np.shape(img_L)))
+                img_L = torch.from_numpy(np.ascontiguousarray(img_L)).permute(2, 0, 1).div(255.).unsqueeze(0)
+                img_L = img_L.type(dtype)
+                img_L = img_L.to(device)
+                start = time.time()
+                img_E = model(img_L)
+                print("inference time: {}".format(time.time() - start))
+                img_E = util.tensor2uint(img_E)
+                util.imsave(img_E, os.path.join('testsets/exported', OUT_NAME+'.png'))
 
     model.cpu()
 
@@ -103,7 +103,7 @@ def test_with_image(model,OUT_NAME,dtype = torch.float32):
 
 
 #LOAD TORCH MODEL
-toch_model_path = "checkpoints/enhance_net_checkpoints/enhance_net_x1/checkpoint_base_epoch_18.pth"#"/home/anis/Desktop/AI/MultiSPE/checkpoints/face_net_checkpoints/checkpoint_base_epoch_19.pth"#os.path.join('checkpoints/face_net_checkpoints', 'checkpoint_base_epoch_19.pth')
+toch_model_path = "checkpoints/enhance_net_checkpoints/enhance_net_x1/checkpoint_base_epoch_31.pth"#"/home/anis/Desktop/AI/MultiSPE/checkpoints/face_net_checkpoints/checkpoint_base_epoch_19.pth"#os.path.join('checkpoints/face_net_checkpoints', 'checkpoint_base_epoch_19.pth')
 torch_model = EnhanceNetX1()
         
 #torch_model = architecture.IMDN(upscale=4)

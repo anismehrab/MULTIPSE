@@ -38,7 +38,7 @@ parser.add_argument("--gamma", type=float, default=0.1,help="learning rate decay
 
 parser.add_argument("--max_dim", type=int, default=512,help="max image dimension")
 parser.add_argument("--min_dim", type=int, default=128,help="min image dimension")
-parser.add_argument("--max_cells", type=int, default=440*420,help="min image dimension")
+parser.add_argument("--max_cells", type=int, default=370*375,help="min image dimension")
 
 args = parser.parse_args()
 
@@ -55,7 +55,7 @@ def reInitLoader(box):
         max = max_image_width * max_image_high to fit in GPU """
     data_compos = transforms.Compose([Normalize()])
     batch_compos = transforms.Compose([ToTensor()])
-    dataBatch = DataBatch(transfrom=batch_compos,scale =args.scale ,max_box = box,max_cells= args.max_cells,devider=4,force_size=None)
+    dataBatch = DataBatch(transfrom=batch_compos,scale =args.scale ,max_box = box,max_cells= args.max_cells,devider=4,force_size=None,use_same= True)
     training_data = Dataset(data_dir=args.data_train,transform=data_compos)
     validation_data = Dataset(data_dir=args.data_valid,transform=data_compos)
     logger.info("===>Trainning Data:[ Train:{}  Valid:{}] Batch:{}".format(len(training_data),len(validation_data),args.batch_size))
@@ -107,7 +107,6 @@ if(args.checkpoint != ""):
     # optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
     epoch_i = checkpoint["epoch"] +1
     print("optimizer",optimizer)
-
 model = [model]
 
 #trainning

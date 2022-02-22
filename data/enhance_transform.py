@@ -57,11 +57,11 @@ class Rotate(object):
 import os
 
 class Degradate(object):
-    def __init__(self,scale = 4,patch_size_w = 64,patch_size_h=64,resize_manuel = False):
+    def __init__(self,scale = 4,patch_size_w = 64,patch_size_h=64,use_same = False):
         self.scale = scale
         self.patch_size_w = patch_size_w
         self.patch_size_h= patch_size_h
-        self.resize = resize_manuel;
+        self.use_same = use_same
 
     def __call__(self, sample):
         img_origin = sample["img_H"]
@@ -76,13 +76,12 @@ class Degradate(object):
             img_L = cv2.resize(img_origin.copy(), (int(img_origin.shape[1]/i), int(img_origin.shape[0]/i)), interpolation=random.choice([1, 2, 3]))
             img_L = cv2.resize(img_L, (int(img_origin.shape[1]), int(img_origin.shape[0])), interpolation=random.choice([1, 2, 3]))
             img_L, img_H = random_crop(lq=img_L, hq=img_origin,sf=self.scale, lq_patchsize_w=self.patch_size_w,lq_patchsize_h=self.patch_size_h)
-        elif(m==2 or m == 4 or m == 6 or m == 8):
-            #print("degradde")
-            img_L, img_H = degradation_bsrgan_plus_an(img=img_noisy,hq=img_origin, sf=self.scale, lq_patchsize_w=self.patch_size_w,lq_patchsize_h=self.patch_size_h,degrade=True,noise=False)
-        else:
+        elif(m == 9 and self.use_same):
             #print("same")
             img_L, img_H = random_crop(lq=img_origin.copy(), hq=img_origin,sf=self.scale, lq_patchsize_w=self.patch_size_w,lq_patchsize_h=self.patch_size_h)
-
+        else:
+            #print("degradde")
+            img_L, img_H = degradation_bsrgan_plus_an(img=img_noisy,hq=img_origin, sf=self.scale, lq_patchsize_w=self.patch_size_w,lq_patchsize_h=self.patch_size_h,degrade=True,noise=False)
 
         # print("shape L",np.shape(img_L))
         # print("shape H",np.shape(img_H))
@@ -162,7 +161,7 @@ default_collate_err_msg_format = (
 
 
 class DataBatch:
-    def __init__(self,transfrom,scale,max_box,max_cells,devider=2,force_size = None):
+    def __init__(self,transfrom,scale,max_box,max_cells,devider=2,force_size = None,use_same= False):
         self.transfrom = transfrom
         self.scale = scale
         self.max_box = max_box
@@ -170,6 +169,7 @@ class DataBatch:
         self.rotate_degree = [None,cv2.ROTATE_90_CLOCKWISE,cv2.ROTATE_180,cv2.ROTATE_90_CLOCKWISE]
         self.devider = devider
         self.force_size = force_size
+        self.use_same= use_same
 
 
     def collate_fn(self,batch):
@@ -184,7 +184,7 @@ class DataBatch:
         if(self.force_size is not None):
             patch_h = self.force_size
             patch_w = self.force_size
-        degrade = Degradate(scale=self.scale,patch_size_w=patch_w,patch_size_h=patch_h,resize_manuel=False)
+        degrade = Degradate(scale=self.scale,patch_size_w=patch_w,patch_size_h=patch_h,use_same=self.use_same)
         rotate = Rotate(degree=self.rotate_degree[randint(0,3)])
         batch_= []
         

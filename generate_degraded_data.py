@@ -40,7 +40,7 @@ def add_noise(images_list,j,data_path):
 def main(data_path,workers):
 
 
-    origin_path = os.path.join(data_path,"origin")
+    origin_path = os.path.join(data_path,"ori")
     print("process from  ",origin_path)
     images_list = utils_image.get_image_paths(origin_path)
     size = len(images_list)
