@@ -19,7 +19,7 @@ from utils import utils_logger
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--data_valid', nargs="+" ,default=["/media/anis/InWork/Data/enhance_dataset/DIV_FLICKR_2K/valid","/media/anis/InWork/Data/enhance_dataset/FFHQ/valid","/media/anis/InWork/Data/enhance_dataset/CAMERA_FUSION/valid","/media/anis/InWork/Data/enhance_dataset/CLOTH/valid","/media/anis/InWork/Data/enhance_dataset/DHD_CAMPUS/valid","/media/anis/InWork/Data/enhance_dataset/MY_DATA/valid","/media/anis/InWork/Data/enhance_dataset/HAND_WRITTING/valid"], help='path validation dataset.')
+parser.add_argument('--data_valid', nargs="+" ,default=["/media/anis/InWork/Data/enhance_dataset/DIV_FLICKR_2K/valid","/media/anis/InWork/Data/enhance_dataset/FFHQ/valid","/media/anis/InWork/Data/enhance_dataset/FFHQ_WILD/valid","/media/anis/InWork/Data/enhance_dataset/CAMERA_FUSION/valid","/media/anis/InWork/Data/enhance_dataset/CLOTH/valid","/media/anis/InWork/Data/enhance_dataset/DHD_CAMPUS/valid","/media/anis/InWork/Data/enhance_dataset/MY_DATA/valid","/media/anis/InWork/Data/enhance_dataset/HAND_WRITTING/valid"], help='path validation dataset.')
 parser.add_argument('--data_train', nargs="+",default=["/media/anis/InWork/Data/enhance_dataset/DIV_FLICKR_2K/train","/media/anis/InWork/Data/enhance_dataset/FFHQ/train","/media/anis/InWork/Data/enhance_dataset/FFHQ_WILD/train","/media/anis/InWork/Data/enhance_dataset/CAMERA_FUSION/train","/media/anis/InWork/Data/enhance_dataset/CLOTH/train","/media/anis/InWork/Data/enhance_dataset/DHD_CAMPUS/train","/media/anis/InWork/Data/enhance_dataset/MY_DATA/train","/media/anis/InWork/Data/enhance_dataset/HAND_WRITTING/train","/media/anis/InWork/Data/enhance_dataset/URBAN/train"], help='Path to trainning dataset.')
 
 parser.add_argument("--checkpoint", type=str, default="",help="checkpoint path")
@@ -33,7 +33,7 @@ parser.add_argument('--batch_size', type=int, default=8, help='batch size.')
 parser.add_argument('--epoch', type=int, default=5, help='epoch.')
 parser.add_argument("--scale", type=int, default=1,help="super-resolution scale")
 parser.add_argument("--lr", type=float, default=1e-4,help="learning rate")
-parser.add_argument("--step_size", type=int, default=50,help="learning rate decay per N epochs")
+parser.add_argument("--step_size", type=int, default=100,help="learning rate decay per N epochs")
 parser.add_argument("--gamma", type=float, default=0.1,help="learning rate decay factor for step decay")
 
 parser.add_argument("--max_dim", type=int, default=512,help="max image dimension")

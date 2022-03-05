@@ -12,6 +12,7 @@ import collections
 from torch._six import string_classes
 import random
 from utils.mask_utils import get_random_points,get_bezier_curve
+from utils import utils_blindsr
 np_str_obj_array_pattern = re.compile(r'[SaUO]')
 
 
@@ -38,12 +39,15 @@ class DataBatch:
         while(patch_h*patch_w > self.max_cells or (patch_h%self.devider !=0 or patch_w%self.devider !=0)):
             patch_h = randint(min_h,max_h) 
             patch_w = patch_h #randint(min_w,max_w)
-
+        crop = FaceCrop()
         rescale = FaceRescale((patch_h,patch_w),(patch_h,patch_w))
+        smooth = FaceSmooth()
 
         batch_= []
         for sample in batch:
-            sample_ = rescale(sample)
+            sample_ = crop(sample)
+            sample_ = rescale(sample_)
+            sample_ = smooth(sample_)
             sample_ = self.transfrom(sample_)
             # print(sample_["img_H"].size())
             # print(sample_["img_L"].size())
@@ -128,6 +132,37 @@ class DataBatch:
 
 
 
+
+
+
+
+class FaceCrop(object):
+
+    def __call__(self, sample):
+
+        img_H= sample['img_H']
+
+        h, w = img_H.shape[:2]
+        if(h > w):
+            lq_patchsize = w
+        else:
+            lq_patchsize = h
+
+        rnd_h = random.randint(0, h-lq_patchsize)
+        rnd_w = random.randint(0, w-lq_patchsize)
+
+        rnd_h_H, rnd_w_H = int(rnd_h), int(rnd_w)
+        img_H_ = img_H.copy()[rnd_h_H:rnd_h_H + lq_patchsize, rnd_w_H:rnd_w_H + lq_patchsize, :]
+
+        return {'img_H': img_H_}   
+
+
+
+
+
+
+
+
 class FaceRescale(object):
     """Rescale the image in a sample to a given size.
 
@@ -182,6 +217,32 @@ class FaceRescale(object):
     
 
         return {'img_H': img_H_, 'img_L': img_L_}     
+
+
+
+
+class FaceSmooth(object):
+ 
+
+    def __call__(self, sample):
+
+        img_H, img_L= sample['img_H'], sample['img_L']
+        r = randint(1,16)
+        if(r == 3 or r == 6):
+            i = randint(2,5)
+            img_H_ = cv2.blur(img_H,(i,i))
+            img_L_ = cv2.blur(img_L,(i,i))
+        else:
+            img_H_ = img_H
+            img_L_ = img_L
+
+        return {'img_H': img_H_, 'img_L': img_L_}   
+
+
+
+
+
+
 
 
 

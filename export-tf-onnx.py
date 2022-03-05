@@ -12,7 +12,7 @@ import numpy as np
 from tensorflow.lite.python.interpreter import Interpreter
 import torch
 from models.face_model import FaceNet,FaceNet_Mid
-from models.enhance_model import EnhanceNet,EnhanceNetX1,EnhanceNetX2,EnhanceNetX3,EnhanceNet_x3
+from models.enhance_model import EnhanceNet,EnhanceNetX1,EnhanceNetX2, EnhanceNetX2_v2,EnhanceNetX3,EnhanceNet_x3
 from models.anime_model import AnimeNet,AnimeNet2,AnimeNet4
 import utils
 import time
@@ -73,7 +73,7 @@ def test_with_image(model,OUT_NAME,dtype = torch.float32):
     model.to(device)
     with torch.no_grad():
         for img in util.get_image_paths(L_path):
-            if('0008' in img):
+            if('69008' in img):
                 torch.cuda.empty_cache()
                 img_L = util.imread_uint(img, n_channels=3)
                 w= np.shape(img_L)[1]
@@ -103,8 +103,8 @@ def test_with_image(model,OUT_NAME,dtype = torch.float32):
 
 
 #LOAD TORCH MODEL
-toch_model_path = "checkpoints/enhance_net_checkpoints/enhance_net_x1/checkpoint_base_epoch_31.pth"#"/home/anis/Desktop/AI/MultiSPE/checkpoints/face_net_checkpoints/checkpoint_base_epoch_19.pth"#os.path.join('checkpoints/face_net_checkpoints', 'checkpoint_base_epoch_19.pth')
-torch_model = EnhanceNetX1()
+toch_model_path = "checkpoints/enhance_net_checkpoints/enhance_net_x2/v2/checkpoint_base_epoch_6.pth"#"/home/anis/Desktop/AI/MultiSPE/checkpoints/face_net_checkpoints/checkpoint_base_epoch_19.pth"#os.path.join('checkpoints/face_net_checkpoints', 'checkpoint_base_epoch_19.pth')
+torch_model = EnhanceNetX2_v2()
         
 #torch_model = architecture.IMDN(upscale=4)
 checkpoint = torch.load(toch_model_path)
@@ -141,7 +141,7 @@ test_with_image(torch_model,'output')
         
 # model_fp32_prepared.eval()    
 # model_fp32_prepared.cpu()        
-# model_int8_quantized =torch.quantization.convert(model_fp32_prepared)    
+# torch_model =torch.quantization.convert(model_fp32_prepared)    
 
 
 
@@ -175,9 +175,9 @@ test_with_image(torch_model,'output')
 # # # torch.save(model_quantized.state_dict(), torch_model_quant_graph_path)
 
 
-# quantized_model = torch.quantization.quantize_dynamic(
+# torch_model = torch.quantization.quantize_dynamic(
 #     torch_model, {torch.nn.Conv2d}, dtype=torch.qint8)
-# test_with_image(quantized_model,'quantizated_dynamic_test')
+# test_with_image(torch_model,'quantizated_dynamic_test')
 # torch.save(quantized_model.state_dict(),os.path.join('model_zoo','BSRGAN_dynamic_quantiated_model.pth'))
 
 # # #dynamic/weight_only Quantization
@@ -241,9 +241,9 @@ test_with_image(torch_model,'output')
 # scripted_model_optimized._save_for_lite_interpreter(os.path.join('model_zoo','BSRGAN_vulkan_lite_static_quantized_model.pth'))
 scripted_torch_model = torch.jit.script(torch_model)
 scripted_model_optimized = optimize_for_mobile(scripted_torch_model,backend="cpu")
-scripted_model_optimized._save_for_lite_interpreter(os.path.join('checkpoints/enhance_net_checkpoints/enhance_net_x1/script','lite_cpu_enhancenet_x1.pth'))
+scripted_model_optimized._save_for_lite_interpreter(os.path.join('checkpoints/enhance_net_checkpoints/enhance_net_x2/v2/script','lite_cpu_enhancenet_x2.pth'))
 scripted_model_optimized = optimize_for_mobile(scripted_torch_model,backend="Vulkan")
-scripted_model_optimized._save_for_lite_interpreter(os.path.join('checkpoints/enhance_net_checkpoints/enhance_net_x1/script','lite_vulkan_enhancenet_x1.pth'))
+scripted_model_optimized._save_for_lite_interpreter(os.path.join('checkpoints/enhance_net_checkpoints/enhance_net_x2/v2/script','lite_vulkan_enhancenet_x2.pth'))
 
 # # #to NNAPI 
 # # scripted_model = torch.jit.script(model_int8_quantized)

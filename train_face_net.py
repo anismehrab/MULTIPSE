@@ -18,12 +18,12 @@ from utils import utils_logger
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--data_valid', nargs="+" ,default=["/media/anis/InWork/Data/face_dataset/valid"], help='path validation dataset.')
-parser.add_argument('--data_train', nargs="+",default=["/media/anis/InWork/Data/face_dataset/train"], help='Path to trainning dataset.')
+parser.add_argument('--data_valid', nargs="+" ,default=["/media/anis/InWork/Data/FFHQ_CROPPED/valid","/media/anis/InWork/Data/FFHQ_WILD/valid","/media/anis/InWork/Data/FFHQ_WILD/UN_DEGRADED/valid"], help='path validation dataset.')
+parser.add_argument('--data_train', nargs="+",default=["/media/anis/InWork/Data/FFHQ_CROPPED/train","/media/anis/InWork/Data/FFHQ_WILD/train","/media/anis/InWork/Data/FFHQ_WILD/UN_DEGRADED/train"], help='Path to trainning dataset.')
 
 parser.add_argument("--checkpoint", type=str, default="",help="checkpoint path")
-parser.add_argument("--checkpoint_path", type=str, default="checkpoints/face_net_checkpoints/black_mask_checkpoints/V_mid",help="checkpoint_folder_path")
-parser.add_argument("--logger_path", type=str, default="checkpoints/face_net_checkpoints/black_mask_checkpoints/V_mid/face_net_train_logging.log",help="logger path")
+parser.add_argument("--checkpoint_path", type=str, default="checkpoints/face_net_checkpoints/black_mask_checkpoints/v3",help="checkpoint_folder_path")
+parser.add_argument("--logger_path", type=str, default="checkpoints/face_net_checkpoints/black_mask_checkpoints/v3/face_net_train_logging.log",help="logger path")
 
 parser.add_argument('--threads', type=int, default=4, help='threads number.')
 

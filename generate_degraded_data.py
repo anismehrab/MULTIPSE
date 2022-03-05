@@ -16,7 +16,20 @@ from concurrent.futures import ProcessPoolExecutor
 
 
 
-def add_noise(images_list,j,data_path):
+parser = argparse.ArgumentParser()
+parser.add_argument('--data_train_path_origin', type=str, default="/media/anis/InWork/Data/FFHQ_WILD/valid/ori/60000", help='Path to high resolution images.')
+parser.add_argument('--data_train_path_data', type=str, default="/media/anis/InWork/Data/FFHQ_WILD/valid/data/60000", help='Path to high resolution images.')
+
+parser.add_argument('--data_valid_path', type=str, default="/media/anis/InWork/Data/dataset/URBAN/valid", help='Path to high resolution images.')
+parser.add_argument('--degradation_type', type=str, default="bsrgan_degradation", help='type of degradation.')
+parser.add_argument('--gen_images', type=int, default=16, help='number of image generated.')
+parser.add_argument('--workers', type=int, default=2, help='number of workers.')
+
+args = parser.parse_args()
+
+
+
+def add_noise(images_list,j):
     img_name, ext = os.path.splitext(os.path.basename(images_list[j]))
     img_H = utils_image.imread_uint(images_list[j], 3)# RGB H*W*C
     img_H = utils_image.uint2single(img_H)
@@ -32,15 +45,15 @@ def add_noise(images_list,j,data_path):
     img_l =  utils_image.single2uint(img_l)
 
     # utils_image.imsave(img_l,L_path+img_name_)
-    utils_image.imsave(img_l,os.path.join(data_path,'data/'+img_name+ext))
+    utils_image.imsave(img_l,os.path.join(args.data_train_path_data,img_name+ext))
 
     return j
 
 
-def main(data_path,workers):
+def main(workers):
 
 
-    origin_path = os.path.join(data_path,"ori")
+    origin_path = args.data_train_path_origin
     print("process from  ",origin_path)
     images_list = utils_image.get_image_paths(origin_path)
     size = len(images_list)
@@ -48,7 +61,7 @@ def main(data_path,workers):
     start = time.time()
     print("start processing....")
     with ProcessPoolExecutor(workers) as executer:
-        results = [executer.submit(add_noise,images_list,j,data_path) for j in range(size)]
+        results = [executer.submit(add_noise,images_list,j) for j in range(size)]
     #print("process time",time.time()- start)
     len_ = len(results)
     print("process time {:.3f}s per iteration".format((time.time()- start)/size))
@@ -67,14 +80,6 @@ def main(data_path,workers):
 
 if __name__ == '__main__':
 
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--data_train_path', type=str, default="/media/anis/InWork/Data/enhance_dataset/FFHQ_WILD/train", help='Path to high resolution images.')
-    parser.add_argument('--data_valid_path', type=str, default="/media/anis/InWork/Data/dataset/URBAN/valid", help='Path to high resolution images.')
-    parser.add_argument('--degradation_type', type=str, default="bsrgan_degradation", help='type of degradation.')
-    parser.add_argument('--gen_images', type=int, default=16, help='number of image generated.')
-    parser.add_argument('--workers', type=int, default=2, help='number of workers.')
-
-    args = parser.parse_args()
 
 
     # p1 =mp.Process(main(args.data_train_path,))
@@ -85,5 +90,5 @@ if __name__ == '__main__':
     # thread2 = threading.Thread(target=main,args=(args.data_valid_path,))
     # thread1.start()
     # thread2.start()
-    main(args.data_train_path,args.workers)
+    main(args.workers)
     #main(args.data_valid_path,args.workers)

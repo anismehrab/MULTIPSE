@@ -57,11 +57,12 @@ class Rotate(object):
 import os
 
 class Degradate(object):
-    def __init__(self,scale = 4,patch_size_w = 64,patch_size_h=64,use_same = False):
+    def __init__(self,scale = 4,patch_size_w = 64,patch_size_h=64,use_same = False,use_inter = False):
         self.scale = scale
         self.patch_size_w = patch_size_w
         self.patch_size_h= patch_size_h
         self.use_same = use_same
+        self.use_inter = use_inter
 
     def __call__(self, sample):
         img_origin = sample["img_H"]
@@ -70,21 +71,21 @@ class Degradate(object):
         img_L=None
         img_H=None
         m = randint(1,9)
-        if(m == 1 or m == 3 or m == 5 or m == 7):
-            i = randint(3,5)
+        if((m == 1 or m == 3 or m == 5 or m == 7) and self.use_inter):
+            i = randint(2,5)
             #print("resize")
-            img_L = cv2.resize(img_origin.copy(), (int(img_origin.shape[1]/i), int(img_origin.shape[0]/i)), interpolation=random.choice([1, 2, 3]))
-            img_L = cv2.resize(img_L, (int(img_origin.shape[1]), int(img_origin.shape[0])), interpolation=random.choice([1, 2, 3]))
+            img_L = cv2.resize(img_origin, (int(img_origin.shape[1]/(i+self.scale)), int(img_origin.shape[0]/(i+self.scale))), interpolation=random.choice([1, 2, 3]))
+            # img_L = cv2.resize(img_L, (int(img_origin.shape[1]), int(img_origin.shape[0])), interpolation=random.choice([1, 2, 3]))
+            img_L = cv2.resize(img_L, (int(1/self.scale*img_origin.shape[1]), int(1/self.scale*img_origin.shape[0])), interpolation=random.choice([1, 2, 3]))
             img_L, img_H = random_crop(lq=img_L, hq=img_origin,sf=self.scale, lq_patchsize_w=self.patch_size_w,lq_patchsize_h=self.patch_size_h)
         elif(m == 9 and self.use_same):
             #print("same")
-            img_L, img_H = random_crop(lq=img_origin.copy(), hq=img_origin,sf=self.scale, lq_patchsize_w=self.patch_size_w,lq_patchsize_h=self.patch_size_h)
+            img_L = cv2.resize(img_origin, (int(1/self.scale*img_origin.shape[1]), int(1/self.scale*img_origin.shape[0])), interpolation=random.choice([1, 2, 3]))
+            img_L, img_H = random_crop(lq=img_L, hq=img_origin,sf=self.scale, lq_patchsize_w=self.patch_size_w,lq_patchsize_h=self.patch_size_h)
         else:
             #print("degradde")
             img_L, img_H = degradation_bsrgan_plus_an(img=img_noisy,hq=img_origin, sf=self.scale, lq_patchsize_w=self.patch_size_w,lq_patchsize_h=self.patch_size_h,degrade=True,noise=False)
 
-        # print("shape L",np.shape(img_L))
-        # print("shape H",np.shape(img_H))
         # cv image: H x W x C 
         return {'img_L': img_L,
                 'img_H': img_H}
@@ -161,7 +162,7 @@ default_collate_err_msg_format = (
 
 
 class DataBatch:
-    def __init__(self,transfrom,scale,max_box,max_cells,devider=2,force_size = None,use_same= False):
+    def __init__(self,transfrom,scale,max_box,max_cells,devider=2,force_size = None,use_same= False,use_inter = False):
         self.transfrom = transfrom
         self.scale = scale
         self.max_box = max_box
@@ -170,6 +171,7 @@ class DataBatch:
         self.devider = devider
         self.force_size = force_size
         self.use_same= use_same
+        self.use_inter= use_inter
 
 
     def collate_fn(self,batch):
@@ -184,10 +186,9 @@ class DataBatch:
         if(self.force_size is not None):
             patch_h = self.force_size
             patch_w = self.force_size
-        degrade = Degradate(scale=self.scale,patch_size_w=patch_w,patch_size_h=patch_h,use_same=self.use_same)
+        degrade = Degradate(scale=self.scale,patch_size_w=patch_w,patch_size_h=patch_h,use_same=self.use_same, use_inter = self.use_inter)
         rotate = Rotate(degree=self.rotate_degree[randint(0,3)])
         batch_= []
-        
         for sample in batch:
             sample_ = degrade(sample)
             sample_ = rotate(sample_)
