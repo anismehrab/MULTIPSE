@@ -144,9 +144,9 @@ class FaceCrop(object):
 
         h, w = img_H.shape[:2]
         if(h > w):
-            lq_patchsize = w
+            lq_patchsize = w -1
         else:
-            lq_patchsize = h
+            lq_patchsize = h -1
 
         rnd_h = random.randint(0, h-lq_patchsize)
         rnd_w = random.randint(0, w-lq_patchsize)
@@ -208,8 +208,9 @@ class FaceRescale(object):
             new_h, new_w = self.output_size
 
         new_h, new_w = int(new_h), int(new_w)
+        interpolate= random.choice([1, 2, 3]);
 
-        img_H_ = cv2.resize(img_H, (new_h, new_w), interpolation=cv2.INTER_CUBIC)
+        img_H_ = cv2.resize(img_H, (new_h, new_w), interpolation=interpolate)
         # print("img_H_",img_H_.shape)
 
 

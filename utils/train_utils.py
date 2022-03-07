@@ -209,8 +209,8 @@ def train_cuda_f16(models_list,train_loader,optimizer,l1_criterion,epoch,device,
     for sample in train_loader:
 
         torch.cuda.empty_cache()
-        lr_tensor = sample["img_L"].to(device).half()  # ranges from [0, 1]
-        hr_tensor = sample["img_H"].to(device).half()  # ranges from [0, 1]
+        lr_tensor = sample["img_L"].to(device)  # ranges from [0, 1]
+        hr_tensor = sample["img_H"].to(device)  # ranges from [0, 1]
         
         optimizer.zero_grad()
         with torch.cuda.amp.autocast():

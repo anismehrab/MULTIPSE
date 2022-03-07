@@ -12,7 +12,7 @@ import re
 import collections
 from torch._six import string_classes
 import random
-from utils import utils_image
+from utils import utils_image,utils_blindsr
 np_str_obj_array_pattern = re.compile(r'[SaUO]')
 
 
@@ -83,8 +83,32 @@ class Degradate(object):
             img_L = cv2.resize(img_origin, (int(1/self.scale*img_origin.shape[1]), int(1/self.scale*img_origin.shape[0])), interpolation=random.choice([1, 2, 3]))
             img_L, img_H = random_crop(lq=img_L, hq=img_origin,sf=self.scale, lq_patchsize_w=self.patch_size_w,lq_patchsize_h=self.patch_size_h)
         else:
-            #print("degradde")
-            img_L, img_H = degradation_bsrgan_plus_an(img=img_noisy,hq=img_origin, sf=self.scale, lq_patchsize_w=self.patch_size_w,lq_patchsize_h=self.patch_size_h,degrade=True,noise=False)
+            i = randint(0,5)
+            if(i == 0 or i == 2 or i == 4):
+                img_L, img_H = degradation_bsrgan_plus_an(img=img_noisy,hq=img_origin, sf=self.scale, lq_patchsize_w=self.patch_size_w,lq_patchsize_h=self.patch_size_h,degrade=True,noise=False)
+            else:
+                h1, w1 = img_origin.shape[:2]
+                interpolate= random.choice([1, 2, 3])
+
+                img_L = cv2.resize(img_noisy, (int(1/self.scale*img_origin.shape[1]), int(1/self.scale*img_origin.shape[0])), interpolation=interpolate)
+                h1, w1 = img_L.shape[:2]
+
+                if(h1/(self.patch_size_h*1.0) > w1 /(self.patch_size_w*1.0)):
+                    patch_size_w = int(w1 /(self.patch_size_w*1.0)) * self.patch_size_w
+                    patch_size_h = int(w1 /(self.patch_size_w*1.0)) * self.patch_size_h
+
+                else:
+                    patch_size_w = int(h1 /(self.patch_size_h*1.0)) * self.patch_size_w
+                    patch_size_h = int(h1 /(self.patch_size_h*1.0)) * self.patch_size_h
+
+                img_L,img_H = utils_blindsr.random_crop(img_L,img_origin,sf=self.scale,lq_patchsize_w=patch_size_w,lq_patchsize_h=patch_size_h)
+                # print("img_L",img_L.shape)
+                # print("img_H",img_H.shape)
+
+                img_L = cv2.resize(img_L, (self.patch_size_w, self.patch_size_h),interpolation= interpolate)
+                img_H = cv2.resize(img_H, (self.patch_size_w*self.scale, self.patch_size_h*self.scale), interpolation= interpolate)
+                # print("img_LR",img_L.shape)
+                # print("img_HR",img_H.shape)
 
         # cv image: H x W x C 
         return {'img_L': img_L,

@@ -42,7 +42,7 @@ onnx_quant_path = os.path.join('model_zoo', 'BSRGAN_ONNX_quant.onnx')
 onnx_quant_static_path = os.path.join('model_zoo', 'BSRGAN_ONNX_quant_static.onnx')        
 tf_rep_path = os.path.join('model_zoo', 'BSRGAN_tf_Rep')         
 tf_lite_path = os.path.join('model_zoo', 'BSRGAN_tf_Lite')         
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+device = torch.device('cpu')#'cuda' if torch.cuda.is_available() else 'cpu')
 L_path = os.path.join("testsets", 'test_data')
 D_path = os.path.join("testsets", 'test')
 
@@ -73,7 +73,7 @@ def test_with_image(model,OUT_NAME,dtype = torch.float32):
     model.to(device)
     with torch.no_grad():
         for img in util.get_image_paths(L_path):
-            if('69008' in img):
+            if('1646570299313' in img):
                 torch.cuda.empty_cache()
                 img_L = util.imread_uint(img, n_channels=3)
                 w= np.shape(img_L)[1]
@@ -103,7 +103,7 @@ def test_with_image(model,OUT_NAME,dtype = torch.float32):
 
 
 #LOAD TORCH MODEL
-toch_model_path = "checkpoints/enhance_net_checkpoints/enhance_net_x2/v2/checkpoint_base_epoch_6.pth"#"/home/anis/Desktop/AI/MultiSPE/checkpoints/face_net_checkpoints/checkpoint_base_epoch_19.pth"#os.path.join('checkpoints/face_net_checkpoints', 'checkpoint_base_epoch_19.pth')
+toch_model_path = "checkpoints/enhance_net_checkpoints/enhance_net_x2/v2/checkpoint_base_epoch_28.pth"#"/home/anis/Desktop/AI/MultiSPE/checkpoints/face_net_checkpoints/checkpoint_base_epoch_19.pth"#os.path.join('checkpoints/face_net_checkpoints', 'checkpoint_base_epoch_19.pth')
 torch_model = EnhanceNetX2_v2()
         
 #torch_model = architecture.IMDN(upscale=4)
