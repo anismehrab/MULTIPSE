@@ -10,7 +10,7 @@ from data.dataloader import FaceDataset
 from data.face_transforms import FaceToTensor,AddMaskFace,FaceNormalize,DataBatch
 from torch.utils.data import DataLoader
 from models import face_model
-from utils.train_utils import train,valid,save_checkpoint
+from utils.train_utils import train, train_cuda_f16,valid,save_checkpoint
 from utils import utils_logger
 
 
@@ -27,7 +27,7 @@ parser.add_argument("--logger_path", type=str, default="checkpoints/face_net_che
 
 parser.add_argument('--threads', type=int, default=4, help='threads number.')
 
-parser.add_argument('--batch_size', type=int, default=8, help='batch size.')
+parser.add_argument('--batch_size', type=int, default=12, help='batch size.')
 parser.add_argument('--epoch', type=int, default=5, help='epoch.')
 parser.add_argument("--lr", type=float, default=1e-4,help="learning rate")
 parser.add_argument("--step_size", type=int, default=100,help="learning rate decay per N epochs")
@@ -35,7 +35,7 @@ parser.add_argument("--gamma", type=float, default=0.1,help="learning rate decay
 
 parser.add_argument("--max_dim", type=int, default=512,help="max image dimension")
 parser.add_argument("--min_dim", type=int, default=128,help="min image dimension")
-parser.add_argument("--max_cells", type=int, default=380*380,help="min image dimension")
+parser.add_argument("--max_cells", type=int, default=400*400,help="min image dimension")
 parser.add_argument("--mask_color", type=str ,default = "black",help="mask color: black or white")
 
 args = parser.parse_args()
@@ -57,7 +57,7 @@ def reInitLoader(box):
         mask_transfrom = AddMaskFace(color=(255,255,255))
         
     batch_compos = transforms.Compose([mask_transfrom,FaceNormalize(),FaceToTensor()])
-    dataBatch = DataBatch(transfrom=batch_compos,max_box = box,max_cells= args.max_cells,devider=4)
+    dataBatch = DataBatch(transfrom=batch_compos,max_box = box,max_cells= args.max_cells,devider=4,force_size=None)
     training_data = FaceDataset(data_dir=args.data_train)
     validation_data = FaceDataset(data_dir=args.data_valid)
     logger.info("===>Trainning Data:[ Train:{}  Valid:{}] Batch:{}".format(len(training_data),len(validation_data),args.batch_size))
@@ -79,7 +79,7 @@ box = (args.min_dim,args.max_dim,args.min_dim,args.max_dim)
 trainloader,validloader = reInitLoader(box)
 #load models
 print("loading model")
-model = face_model.FaceNet_Mid()
+model = face_model.FaceNet_v2()
 
 
 #training device
@@ -121,6 +121,6 @@ if(args.checkpoint != ""):
 
 for i in range(epoch_i,epoch_i+args.epoch):
 
-    loss_t = train([model],trainloader,optimizer,l1_criterion,i,device,args,logger)
+    loss_t = train_cuda_f16([model],trainloader,optimizer,l1_criterion,i,device,args,logger)
     psnr,ssim,loss_v = valid([model],validloader,l1_criterion,device,args,logger)
     save_checkpoint(model,None,None,i,loss_t,loss_v,psnr,ssim,optimizer,logger,args)

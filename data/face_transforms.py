@@ -22,11 +22,12 @@ default_collate_err_msg_format = (
 
 
 class DataBatch:
-    def __init__(self,transfrom,max_box,max_cells,devider=4):
+    def __init__(self,transfrom,max_box,max_cells,devider=4,force_size = None):
         self.transfrom = transfrom
         self.max_box = max_box
         self.max_cells = max_cells
         self.devider = devider
+        self.force_size = force_size
         
 
 
@@ -39,6 +40,11 @@ class DataBatch:
         while(patch_h*patch_w > self.max_cells or (patch_h%self.devider !=0 or patch_w%self.devider !=0)):
             patch_h = randint(min_h,max_h) 
             patch_w = patch_h #randint(min_w,max_w)
+
+        if(self.force_size is not None):
+            patch_h = self.force_size
+            patch_w = self.force_size
+
         crop = FaceCrop()
         rescale = FaceRescale((patch_h,patch_w),(patch_h,patch_w))
         smooth = FaceSmooth()
@@ -143,7 +149,9 @@ class FaceCrop(object):
         img_H= sample['img_H']
 
         h, w = img_H.shape[:2]
-        if(h > w):
+        if(h == w):
+            return sample
+        elif(h > w):
             lq_patchsize = w -1
         else:
             lq_patchsize = h -1
@@ -153,7 +161,7 @@ class FaceCrop(object):
 
         rnd_h_H, rnd_w_H = int(rnd_h), int(rnd_w)
         img_H_ = img_H.copy()[rnd_h_H:rnd_h_H + lq_patchsize, rnd_w_H:rnd_w_H + lq_patchsize, :]
-
+        # print("img_H_",img_H_.shape)
         return {'img_H': img_H_}   
 
 
