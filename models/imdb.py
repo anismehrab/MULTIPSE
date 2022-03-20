@@ -60,6 +60,8 @@ def activation(act_type, inplace=True, neg_slope=0.05, n_prelu=1):
         layer = nn.LeakyReLU(neg_slope, inplace)
     elif act_type == 'prelu':
         layer = nn.PReLU(num_parameters=n_prelu, init=neg_slope)
+    elif act_type == 'gelu':
+        layer = nn.GELU()
     else:
         raise NotImplementedError('activation layer [{:s}] is not found'.format(act_type))
     return layer

@@ -57,13 +57,13 @@ class Rotate(object):
 import os
 
 class Degradate(object):
-    def __init__(self,scale = 4,patch_size_w = 64,patch_size_h=64,use_same = False,use_inter = False,use_all = False):
+    def __init__(self,scale = 4,patch_size_w = 64,patch_size_h=64,use_same = False,use_inter = False,use_whole_image = False):
         self.scale = scale
         self.patch_size_w = patch_size_w
         self.patch_size_h= patch_size_h
         self.use_same = use_same
         self.use_inter = use_inter
-        self.use_all = use_all
+        self.use_whole_image = use_whole_image
 
     def __call__(self, sample):
         img_origin = sample["img_H"]
@@ -85,7 +85,7 @@ class Degradate(object):
             img_L, img_H = random_crop(lq=img_L, hq=img_origin,sf=self.scale, lq_patchsize_w=self.patch_size_w,lq_patchsize_h=self.patch_size_h)
         else:
             i = randint(0,5)
-            if((i == 0 or i == 2 or i == 4) and not self.use_all):
+            if((i == 0 or i == 2 or i == 4) and self.use_whole_image):
                 h1, w1 = img_origin.shape[:2]
                 interpolate= random.choice([1, 2, 3])
 
@@ -188,7 +188,7 @@ default_collate_err_msg_format = (
 
 
 class DataBatch:
-    def __init__(self,transfrom,scale,max_box,max_cells,devider=2,force_size = None,use_same= False,use_inter = False,use_all=False):
+    def __init__(self,transfrom,scale,max_box,max_cells,devider=2,force_size = None,use_same= False,use_inter = False,use_whole_image=False):
         self.transfrom = transfrom
         self.scale = scale
         self.max_box = max_box
@@ -198,7 +198,7 @@ class DataBatch:
         self.force_size = force_size
         self.use_same= use_same
         self.use_inter= use_inter
-        self.use_all =use_all
+        self.use_whole_image =use_whole_image
 
 
     def collate_fn(self,batch):
@@ -213,7 +213,7 @@ class DataBatch:
         if(self.force_size is not None):
             patch_h = self.force_size
             patch_w = self.force_size
-        degrade = Degradate(scale=self.scale,patch_size_w=patch_w,patch_size_h=patch_h,use_same=self.use_same, use_inter = self.use_inter,use_all=self.use_all)
+        degrade = Degradate(scale=self.scale,patch_size_w=patch_w,patch_size_h=patch_h,use_same=self.use_same, use_inter = self.use_inter,use_whole_image=self.use_whole_image)
         rotate = Rotate(degree=self.rotate_degree[randint(0,3)])
         batch_= []
         for sample in batch:

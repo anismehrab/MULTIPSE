@@ -1,17 +1,17 @@
 from re import I
 import onnx
+import tensorflow as tf
 import onnxruntime
 from onnx_tf.backend import prepare
 from onnxruntime.quantization import quantize
 from onnxruntime.quantization.quant_utils import QuantizationMode
 import random
-import tensorflow as tf
 
 import os
 import numpy as np
 from tensorflow.lite.python.interpreter import Interpreter
 import torch
-from models.face_model import FaceNet,FaceNet_Mid
+from models.face_model import FaceNet,FaceNet_Mid, FaceNet_v2
 from models.enhance_model import EnhanceNet,EnhanceNetX1,EnhanceNetX2, EnhanceNetX2_v2,EnhanceNetX3,EnhanceNet_x3
 from models.anime_model import AnimeNet,AnimeNet2,AnimeNet4
 import utils
@@ -78,12 +78,12 @@ def test_with_image(model,OUT_NAME,dtype = torch.float32):
                 img_L = util.imread_uint(img, n_channels=3)
                 w= np.shape(img_L)[1]
                 h = np.shape(img_L)[0]
-                # img_L = cv2.line(img_L,pt1 = (700, 500), pt2 = (800, 300),
-                #             color = (0, 0, 0),thickness = random.randint(5,20))
-                # img_L =  cv2.circle(img_L,center = (350, 278),radius = 20,color = (0, 0, 0),thickness = -1)
-                # img_L =  cv2.circle(img_L,center = (330, 278),radius = 20,color = (0, 0, 0),thickness = -1)
-                # img_L =  cv2.circle(img_L,center = (310, 278),radius = 20,color = (0, 0, 0),thickness = -1)
-                # img_L = cv2.line(img_L,pt1 = (500, 600), pt2 = (600, 800),color = (0, 0, 0),thickness = 30)
+                img_L = cv2.line(img_L,pt1 = (700, 500), pt2 = (800, 300),
+                            color = (0, 0, 0),thickness = random.randint(5,20))
+                img_L =  cv2.circle(img_L,center = (350, 278),radius = 20,color = (0, 0, 0),thickness = -1)
+                img_L =  cv2.circle(img_L,center = (330, 278),radius = 20,color = (0, 0, 0),thickness = -1)
+                img_L =  cv2.circle(img_L,center = (310, 278),radius = 20,color = (0, 0, 0),thickness = -1)
+                img_L = cv2.line(img_L,pt1 = (500, 600), pt2 = (600, 800),color = (0, 0, 0),thickness = 30)
                 util.imsave(img_L, os.path.join('testsets/exported', 'input'+'.png'))
             
                 #if(np.shape(img_L)[0] < 1055 and np.shape(img_L)[1] < 1055):
@@ -103,8 +103,9 @@ def test_with_image(model,OUT_NAME,dtype = torch.float32):
 
 
 #LOAD TORCH MODEL
-toch_model_path = "checkpoints/enhance_net_checkpoints/enhance_net_x3/v2/checkpoint_base_epoch_14.pth"#"/home/anis/Desktop/AI/MultiSPE/checkpoints/face_net_checkpoints/checkpoint_base_epoch_19.pth"#os.path.join('checkpoints/face_net_checkpoints', 'checkpoint_base_epoch_19.pth')
-torch_model = EnhanceNetX3()
+main_path = "checkpoints/face_net_checkpoints/black_mask_checkpoints/v3"
+toch_model_path = "checkpoints/face_net_checkpoints/black_mask_checkpoints/v3/checkpoint_base_epoch_53.pth"#"/home/anis/Desktop/AI/MultiSPE/checkpoints/face_net_checkpoints/checkpoint_base_epoch_19.pth"#os.path.join('checkpoints/face_net_checkpoints', 'checkpoint_base_epoch_19.pth')
+torch_model = FaceNet_v2()
         
 #torch_model = architecture.IMDN(upscale=4)
 checkpoint = torch.load(toch_model_path)
@@ -239,11 +240,12 @@ test_with_image(torch_model,'output')
 # scripted_model_optimized._save_for_lite_interpreter(os.path.join('model_zoo','BSRGAN_cpu_lite_static_quantized_model.pth'))
 # scripted_model_optimized = optimize_for_mobile(scripted_model,backend="Vulkan")
 # scripted_model_optimized._save_for_lite_interpreter(os.path.join('model_zoo','BSRGAN_vulkan_lite_static_quantized_model.pth'))
-scripted_torch_model = torch.jit.script(torch_model)
-scripted_model_optimized = optimize_for_mobile(scripted_torch_model,backend="cpu")
-scripted_model_optimized._save_for_lite_interpreter(os.path.join('checkpoints/enhance_net_checkpoints/enhance_net_x3/v2/script','lite_cpu_enhancenet_x3.pth'))
-scripted_model_optimized = optimize_for_mobile(scripted_torch_model,backend="Vulkan")
-scripted_model_optimized._save_for_lite_interpreter(os.path.join('checkpoints/enhance_net_checkpoints/enhance_net_x3/v2/script','lite_vulkan_enhancenet_x3.pth'))
+
+# scripted_torch_model = torch.jit.script(torch_model)
+# scripted_model_optimized = optimize_for_mobile(scripted_torch_model,backend="cpu")
+# scripted_model_optimized._save_for_lite_interpreter(os.path.join('checkpoints/face_net_checkpoints/black_mask_checkpoints/v3/script','lite_cpu_facenet.pth'))
+# scripted_model_optimized = optimize_for_mobile(scripted_torch_model,backend="Vulkan")
+# scripted_model_optimized._save_for_lite_interpreter(os.path.join('checkpoints/face_net_checkpoints/black_mask_checkpoints/v3/script','lite_vulkan_facenet.pth'))
 
 # # #to NNAPI 
 # # scripted_model = torch.jit.script(model_int8_quantized)
@@ -256,36 +258,36 @@ scripted_model_optimized._save_for_lite_interpreter(os.path.join('checkpoints/en
 
 # #TORCH TO ONNX
 
-# def exportToOnnx(model,input,output,path):
-#     print("export the torch model to "+path)
-#     # Export the model
-#     torch.onnx.export(model,               # model being run
-#                         input,                         # model input (or a tuple for multiple inputs)
-#                         path,   # where to save the model (can be a file or file-like object)
-#                         example_outputs=output,
-#                         export_params=True,        # store the trained parameter weights inside the model file
-#                         opset_version=12,          # the ONNX version to export the model to
-#                         do_constant_folding=True,  # whether to execute constant folding for optimization
-#                         input_names = ['input'],
-#                         output_names = ['output'],
-#                         dynamic_axes={
-#                                     'input' : {2 : 'inputc_h', 3: 'inputc_w'},
-#                                     'output' : {2 : 'output_h', 3: 'output_w'},
-#                                     }
-#                                     );
-#     print("finished exporting to onnx")
+def exportToOnnx(model,input,output,path):
+    print("export the torch model to "+path)
+    # Export the model
+    torch.onnx.export(model,               # model being run
+                        input,                         # model input (or a tuple for multiple inputs)
+                        path,   # where to save the model (can be a file or file-like object)
+                        example_outputs=output,
+                        export_params=True,        # store the trained parameter weights inside the model file
+                        opset_version=11,          # the ONNX version to export the model to
+                        do_constant_folding=True,  # whether to execute constant folding for optimization
+                        input_names = ['input'],
+                        output_names = ['output'],
+                        dynamic_axes={
+                                    'input' : {2 : 'inputc_h', 3: 'inputc_w'},
+                                    'output' : {2 : 'output_h', 3: 'output_w'},
+                                    }
+                                    );
+    print("finished exporting to onnx")
 
-# print("mode loaded to {}".format(device))
-# img_L = torch.from_numpy(np.random.randn(1,3, 250, 250).astype(np.float32))
-# img_E = torch.from_numpy(np.random.randn(1,3, 1000, 1000).astype(np.float32))
-# exportToOnnx(model = torch_model,input = img_L,output = img_E,path = os.path.join('model_zoo', 'IMDN_x4_ONNX.pth'))
+print("mode loaded to {}".format(device))
+img_L = torch.from_numpy(np.random.randn(1,3, 250, 250).astype(np.float32))
+img_E = torch.from_numpy(np.random.randn(1,3, 250*1, 250*1).astype(np.float32))
+exportToOnnx(model = torch_model,input = img_L,output = img_E,path = os.path.join(main_path+'/script', 'face_net_onnx.pth'))
 
 
 
 
 
 # # # # Load the ONNX model
-onnx_path = os.path.join('model_zoo', 'IMDN_x4_ONNX.pth')
+onnx_path = os.path.join(main_path+'/script', 'face_net_onnx.pth')
 # print("load onnx")
 # model_onnx = onnx.load(onnx_path)
 
@@ -310,38 +312,38 @@ onnx_path = os.path.join('model_zoo', 'IMDN_x4_ONNX.pth')
 # print(np.shape(outputs))
 
 
-tf_rep_path = os.path.join('model_zoo', 'IMDN_x4_tf_rep')
+tf_rep_path = os.path.join(main_path+'/script', 'face_net_tf_rep')
 # #ONNX to TF
-# model_onnx = onnx.load(onnx_path)
-# print("convert onnx to tensorflow representation")
-# tf_rep = prepare(model_onnx)    
-# tf_rep.export_graph(tf_rep_path)
+model_onnx = onnx.load(onnx_path)
+print("convert onnx to tensorflow representation")
+tf_rep = prepare(model_onnx)    
+tf_rep.export_graph(tf_rep_path)
 
 
 
 # #TF Model Inference
-# print("test tf represenation inference")
-# model_tf = tf.saved_model.load(tf_rep_path)
-# model_tf.trainable = False
+print("test tf represenation inference")
+model_tf = tf.saved_model.load(tf_rep_path)
+model_tf.trainable = False
 
-# input_tensor = tf.random.uniform([1, 3, 40, 40])
-# out = model_tf(**{'input': input_tensor})
-# print(out["output"].shape)
-
-
-
-# tf_lite_path = os.path.join('model_zoo', 'IMDN_x4_tf.tflite')
-# #TF to TFLite
-# print("Convert the tf_rep model to tflite")
-# converter = tf.lite.TFLiteConverter.from_saved_model(tf_rep_path)
+input_tensor = tf.random.uniform([1, 3, 40, 40])
+out = model_tf(**{'input': input_tensor})
+print(out["output"].shape)
 
 
-# tflite_model = converter.convert()
 
-# # Save the model
-# print("save tf lite model to ")
-# with open(tf_lite_path, 'wb') as f:
-#     f.write(tflite_model)
+tf_lite_path = os.path.join(main_path+'/script', 'facenet.tflite')
+#TF to TFLite
+print("Convert the tf_rep model to tflite")
+converter = tf.lite.TFLiteConverter.from_saved_model(tf_rep_path)
+
+
+tflite_model = converter.convert()
+
+# Save the model
+print("save tf lite model to ")
+with open(tf_lite_path, 'wb') as f:
+    f.write(tflite_model)
 
 
 # # #optimization
