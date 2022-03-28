@@ -162,3 +162,40 @@ class AnimeDataSet(Dataset):
 
          
         return sample
+
+
+
+class ColorizeDataset(Dataset):
+    def __init__(self, data_dir,transform=None):
+
+        """data_ir = ["path_to_data/origin or path_to_data/data"] """
+        
+        self.origin_Images = []
+        print("train with",len(data_dir),"datasets")
+        for path_ in data_dir:
+                self.origin_Images.extend(utils_image.get_image_paths(os.path.join(path_,"origin")))
+   
+
+        self.transform = transform
+
+
+    def __len__(self):
+        return len(self.origin_Images)
+
+    def __getitem__(self, idx):
+        
+        #image path
+        origin_path = self.origin_Images[idx]
+        if(origin_path == None):
+          print("path none",self.origin_Images[idx])
+          origin_path = self.origin_Images[idx-1]
+
+
+        img_H = utils_image.imread_uint(origin_path, 3)# RGB H*W*C
+        sample = {"img_H": img_H}
+
+        if(self.transform != None):
+            sample = self.transform(sample)
+
+         
+        return sample
