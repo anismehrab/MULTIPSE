@@ -10,11 +10,13 @@
 import random
 
 import os
+from re import I
 import numpy as np
 import torch
 from models.face_model import FaceNet,FaceNet_Mid, FaceNet_v2
 from models.enhance_model import EnhanceNet,EnhanceNetX1,EnhanceNetX2, EnhanceNetX2_v2,EnhanceNetX3,EnhanceNet_x3,EnhanceNetX1_v3
 from models.anime_model import AnimeNet,AnimeNet2,AnimeNet4
+from models.colorize_model import ColorizeNet
 import utils
 import time
 from torch.utils.mobile_optimizer import optimize_for_mobile
@@ -79,12 +81,14 @@ def test_with_image(model,OUT_NAME,dtype = torch.float32):
                 img_L = util.imread_uint(img, n_channels=3)
                 w= np.shape(img_L)[1]
                 h = np.shape(img_L)[0]
-                img_L = cv2.line(img_L,pt1 = (700, 500), pt2 = (800, 300),
-                            color = (0, 0, 0),thickness = random.randint(5,20))
-                img_L =  cv2.circle(img_L,center = (350, 278),radius = 20,color = (0, 0, 0),thickness = -1)
-                img_L =  cv2.circle(img_L,center = (330, 278),radius = 20,color = (0, 0, 0),thickness = -1)
-                img_L =  cv2.circle(img_L,center = (310, 278),radius = 20,color = (0, 0, 0),thickness = -1)
-                img_L = cv2.line(img_L,pt1 = (500, 600), pt2 = (600, 800),color = (0, 0, 0),thickness = 30)
+                # img_L = cv2.line(img_L,pt1 = (700, 500), pt2 = (800, 300),
+                #             color = (0, 0, 0),thickness = random.randint(5,20))
+                # img_L =  cv2.circle(img_L,center = (350, 278),radius = 20,color = (0, 0, 0),thickness = -1)
+                # img_L =  cv2.circle(img_L,center = (330, 278),radius = 20,color = (0, 0, 0),thickness = -1)
+                # img_L =  cv2.circle(img_L,center = (310, 278),radius = 20,color = (0, 0, 0),thickness = -1)
+                # img_L = cv2.line(img_L,pt1 = (500, 600), pt2 = (600, 800),color = (0, 0, 0),thickness = 30)
+                img_L = cv2.cvtColor(img_L,cv2.COLOR_BGR2GRAY)
+                img_L = cv2.cvtColor(img_L,cv2.COLOR_GRAY2BGR)
                 util.imsave(img_L, os.path.join('testsets/exported', 'input'+'.png'))
             
                 #if(np.shape(img_L)[0] < 1055 and np.shape(img_L)[1] < 1055):
@@ -104,9 +108,9 @@ def test_with_image(model,OUT_NAME,dtype = torch.float32):
 
 
 #LOAD TORCH MODEL
-main_path = "checkpoints/enhance_net_checkpoints/enhance_net_x3/v2"
-toch_model_path = "checkpoints/enhance_net_checkpoints/enhance_net_x3/v2/checkpoint_base_epoch_26.pth"#"/home/anis/Desktop/AI/MultiSPE/checkpoints/face_net_checkpoints/checkpoint_base_epoch_19.pth"#os.path.join('checkpoints/face_net_checkpoints', 'checkpoint_base_epoch_19.pth')
-torch_model = EnhanceNetX3()
+main_path = "checkpoints/colorize_net_checkpoints/v1"
+toch_model_path = "checkpoints/colorize_net_checkpoints/v1/checkpoint_base_epoch_2.pth"#"/home/anis/Desktop/AI/MultiSPE/checkpoints/face_net_checkpoints/checkpoint_base_epoch_19.pth"#os.path.join('checkpoints/face_net_checkpoints', 'checkpoint_base_epoch_19.pth')
+torch_model = ColorizeNet()
         
 #torch_model = architecture.IMDN(upscale=4)
 checkpoint = torch.load(toch_model_path)

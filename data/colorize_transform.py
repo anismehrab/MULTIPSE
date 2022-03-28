@@ -158,11 +158,11 @@ class CvtToGRAY(object):
 
     def __call__(self, sample):
 
-        img_H = sample["img_H"]
-        img_H = cv2.cvtColor(img_H,cv2.COLOR_BGR2GRAY)
-        img_H = cv2.cvtColor(img_H,cv2.COLOR_GRAY2BGR)
+        img_L ,img_H= sample["img_L"], sample['img_H']
+        img_L = cv2.cvtColor(img_L,cv2.COLOR_BGR2GRAY)
+        img_L = cv2.cvtColor(img_L,cv2.COLOR_GRAY2BGR)
   
-        return {'img_H': img_H}
+        return {'img_H': img_H,'img_L':img_L}
 
 
 
@@ -226,8 +226,8 @@ class DataBatch:
 
         batch_= []
         for sample in batch:
-            sample_ = cvt2gray(sample)
-            sample_ = crop(sample_)
+            sample_ = crop(sample)
+            sample_ = cvt2gray(sample_)
             sample_ = rotate(sample_)
             #utils_image.imsave(sample_["img_H"]*255, os.path.join('testsets/exported', 'img_H'+'.png'))
             # utils_image.imsave(sample_["img_L"]*255, os.path.join('testsets/exported', 'img_L'+'.png'))
