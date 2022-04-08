@@ -449,7 +449,7 @@ class EnhanceNetX2_v2(nn.Module):
 
 
 class EnhanceNetX1_v3(nn.Module):
-    def __init__(self, in_nc=3, nf=64,out_nc=3,act_type="gelu"):
+    def __init__(self, in_nc=3, nf=64,out_nc=3,act_type="lrelu"):
         super(EnhanceNetX1_v3, self).__init__()
 
         upscale=4
@@ -475,8 +475,19 @@ class EnhanceNetX1_v3(nn.Module):
         self.IMDB10 = B.IMDModule(in_channels=nf,act_type=act_type,cc_acti=act_type)
         self.IMDB11 = B.IMDModule(in_channels=nf,act_type=act_type,cc_acti=act_type)
         self.IMDB12 = B.IMDModule(in_channels=nf,act_type=act_type,cc_acti=act_type)
-
-        num_modules=12
+        self.IMDB13 = B.IMDModule(in_channels=nf,act_type=act_type,cc_acti=act_type)
+        self.IMDB14 = B.IMDModule(in_channels=nf,act_type=act_type,cc_acti=act_type)
+        self.IMDB15 = B.IMDModule(in_channels=nf,act_type=act_type,cc_acti=act_type)
+        self.IMDB16 = B.IMDModule(in_channels=nf,act_type=act_type,cc_acti=act_type)
+        self.IMDB17 = B.IMDModule(in_channels=nf,act_type=act_type,cc_acti=act_type)
+        self.IMDB18 = B.IMDModule(in_channels=nf,act_type=act_type,cc_acti=act_type)
+        self.IMDB19 = B.IMDModule(in_channels=nf,act_type=act_type,cc_acti=act_type)
+        self.IMDB20 = B.IMDModule(in_channels=nf,act_type=act_type,cc_acti=act_type)
+        self.IMDB21 = B.IMDModule(in_channels=nf,act_type=act_type,cc_acti=act_type)
+        self.IMDB22 = B.IMDModule(in_channels=nf,act_type=act_type,cc_acti=act_type)
+        self.IMDB23 = B.IMDModule(in_channels=nf,act_type=act_type,cc_acti=act_type)
+        self.IMDB24 = B.IMDModule(in_channels=nf,act_type=act_type,cc_acti=act_type)
+        num_modules = 24
         self.conv_cat = B.conv_block(nf * num_modules, nf, kernel_size=1, act_type=act_type)
         self.LR_conv = B.conv_layer(nf, nf, kernel_size=3)
 
@@ -500,8 +511,21 @@ class EnhanceNetX1_v3(nn.Module):
         out_B9 = self.IMDB9(out_B8)
         out_B10 = self.IMDB10(out_B9)
         out_B11 = self.IMDB11(out_B10)       
-        out_B12 = self.IMDB12(out_B11) 
-        out_B = self.conv_cat(torch.cat([out_B1, out_B2, out_B3, out_B4, out_B5, out_B6, out_B7, out_B8, out_B9, out_B10, out_B11, out_B12], dim=1))
+        out_B12 = self.IMDB12(out_B11)
+        out_B13 = self.IMDB1(out_B12)
+        out_B14 = self.IMDB2(out_B13)
+        out_B15 = self.IMDB3(out_B14)
+        out_B16 = self.IMDB4(out_B15)
+        out_B17 = self.IMDB5(out_B16)
+        out_B18 = self.IMDB6(out_B17)
+        out_B19 = self.IMDB7(out_B18)
+        out_B20 = self.IMDB8(out_B19)       
+        out_B21 = self.IMDB9(out_B20)
+        out_B22 = self.IMDB10(out_B21)
+        out_B23 = self.IMDB11(out_B22)       
+        out_B24 = self.IMDB12(out_B23)  
+        out_B = self.conv_cat(torch.cat([out_B1, out_B2, out_B3, out_B4, out_B5, out_B6, out_B7, out_B8, out_B9, out_B10, out_B11, out_B12,
+                    out_B13, out_B14,out_B15, out_B16, out_B17, out_B18, out_B19, out_B20, out_B21, out_B22, out_B23,out_B24], dim=1))
         #print("out_B",out_B.size())        
 
         out_lr = torch.add(self.LR_conv(out_B), out_fea)

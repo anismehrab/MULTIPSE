@@ -2,6 +2,7 @@ from logging import raiseExceptions
 from math import fabs
 import os
 from cv2 import transform
+import cv2
 from torchvision.io import read_image
 from torch.utils.data import Dataset
 from utils import utils_image
@@ -43,18 +44,35 @@ class Dataset(Dataset):
         #image path
         origin_path = self.origin_Images[idx]
         noisy_path = self.noisy_Images[idx]
-        if(origin_path == None):
-          print("path none",self.origin_Images[idx])
-          origin_path = self.origin_Images[idx-1]
-          noisy_path = self.noisy_Images[idx-1]
 
         img_nameo, ext = os.path.splitext(os.path.basename(origin_path))
         img_namen, ext = os.path.splitext(os.path.basename(noisy_path))
 
-        assert img_namen  == img_nameo, 'Only data pairs with same name allowed'
+        assert img_namen  == img_nameo, 'Only data pairs with same name allowed '+img_namen+" != "+img_nameo
 
-        img_origin = utils_image.imread_uint(origin_path, 3)# RGB H*W*C
-        img_noisy = utils_image.imread_uint(noisy_path, 3)# RGB H*W*C
+        if(origin_path == None or noisy_path == None):
+            print("path none",self.origin_Images[idx-1])
+            origin_path = self.origin_Images[idx-1]
+            noisy_path = self.noisy_Images[idx-1]
+
+        img_origin = cv2.imread(origin_path, cv2.IMREAD_UNCHANGED)  # BGR or G
+        img_noisy = cv2.imread(noisy_path, cv2.IMREAD_UNCHANGED)  # BGR or G
+        
+        index = idx                
+        while(img_origin is None or img_noisy is None):
+                index -= 1
+                print(origin_path)
+                origin_path = self.origin_Images[index]
+                img_origin = cv2.imread(origin_path, cv2.IMREAD_UNCHANGED)  # BGR or G
+
+
+                print(noisy_path)
+                noisy_path = self.noisy_Images[index]
+                img_noisy = cv2.imread(noisy_path, cv2.IMREAD_UNCHANGED)  # BGR or G
+                
+        img_origin = cv2.cvtColor(img_origin, cv2.COLOR_BGR2RGB)  # RGB
+        img_noisy = cv2.cvtColor(img_noisy, cv2.COLOR_BGR2RGB)  # RGB
+
         sample = {"img_origin": img_origin,"img_noisy":img_noisy}
 
         if(self.transform != None):

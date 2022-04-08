@@ -6,7 +6,7 @@ import cv2
 import time
 import argparse
 import os
-from random import randint
+from random import randint, random
 from tqdm import tqdm
 import threading
 import multiprocessing as mp
@@ -17,8 +17,8 @@ from concurrent.futures import ProcessPoolExecutor
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--data_train_path_origin', type=str, default="/media/anis/InWork/Data/FFHQ_WILD/valid/ori/60000", help='Path to high resolution images.')
-parser.add_argument('--data_train_path_data', type=str, default="/media/anis/InWork/Data/FFHQ_WILD/valid/data/60000", help='Path to high resolution images.')
+parser.add_argument('--data_train_path_origin', type=str, default="/media/anis/InWork/Data/FFHQ_WILD/train/origin/57000", help='Path to high resolution images.')
+parser.add_argument('--data_train_path_data', type=str, default="/media/anis/InWork/Data/FFHQ_WILD/train/data/57000", help='Path to high resolution images.')
 
 parser.add_argument('--data_valid_path', type=str, default="/media/anis/InWork/Data/dataset/URBAN/valid", help='Path to high resolution images.')
 parser.add_argument('--degradation_type', type=str, default="bsrgan_degradation", help='type of degradation.')
@@ -30,6 +30,7 @@ args = parser.parse_args()
 
 
 def add_noise(images_list,j):
+
     img_name, ext = os.path.splitext(os.path.basename(images_list[j]))
     img_H = utils_image.imread_uint(images_list[j], 3)# RGB H*W*C
     img_H = utils_image.uint2single(img_H)
@@ -40,12 +41,12 @@ def add_noise(images_list,j):
     #     patch_size = randint(init_patchsize,dim_)
     
     
-    img_l, img_h = degradation_bsrgan_plus(img_H, sf=1, shuffle_prob=0.5, use_sharp=False, lq_patchsize_w=img_H.shape[1],lq_patchsize_h=img_H.shape[0], isp_model=None)
+    img_l, img_h = degradation_bsrgan_plus(img_H, sf=1, shuffle_prob=randint(3,8)*0.1, use_sharp=False, lq_patchsize_w=img_H.shape[1],lq_patchsize_h=img_H.shape[0], isp_model=None)
     # img_l =  utils_image.single2uint(img_l)
     img_l =  utils_image.single2uint(img_l)
 
     # utils_image.imsave(img_l,L_path+img_name_)
-    utils_image.imsave(img_l,os.path.join(args.data_train_path_data,img_name+ext))
+    utils_image.imsave(img_l,os.path.join(args.data_train_path_data,img_name+".jpg"))
 
     return j
 

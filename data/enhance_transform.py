@@ -61,8 +61,6 @@ class Degradate(object):
         self.scale = scale
         self.patch_size_w = patch_size_w
         self.patch_size_h= patch_size_h
-        self.use_same = use_same
-        self.use_inter = use_inter
         self.use_whole_image = use_whole_image
 
     def __call__(self, sample):
@@ -71,45 +69,39 @@ class Degradate(object):
         
         img_L=None
         img_H=None
-        m = randint(1,9)
-        if((m == 1 or m == 3 or m == 5 or m == 7) and self.use_inter):
-            i = randint(2,5)
-            #print("resize")
-            img_L = cv2.resize(img_origin, (int(img_origin.shape[1]/(i+self.scale)), int(img_origin.shape[0]/(i+self.scale))), interpolation=random.choice([1, 2, 3]))
-            # img_L = cv2.resize(img_L, (int(img_origin.shape[1]), int(img_origin.shape[0])), interpolation=random.choice([1, 2, 3]))
-            img_L = cv2.resize(img_L, (int(1/self.scale*img_origin.shape[1]), int(1/self.scale*img_origin.shape[0])), interpolation=random.choice([1, 2, 3]))
-            img_L, img_H = random_crop(lq=img_L, hq=img_origin,sf=self.scale, lq_patchsize_w=self.patch_size_w,lq_patchsize_h=self.patch_size_h)
-        elif(m == 9 and self.use_same):
-            #print("same")
-            img_L = cv2.resize(img_origin, (int(1/self.scale*img_origin.shape[1]), int(1/self.scale*img_origin.shape[0])), interpolation=random.choice([1, 2, 3]))
-            img_L, img_H = random_crop(lq=img_L, hq=img_origin,sf=self.scale, lq_patchsize_w=self.patch_size_w,lq_patchsize_h=self.patch_size_h)
-        else:
-            i = randint(0,5)
-            if((i == 0 or i == 2 or i == 4) and self.use_whole_image):
-                h1, w1 = img_origin.shape[:2]
-                interpolate= random.choice([1, 2, 3])
+        h1, w1 = img_origin.shape[:2]
+        interpolate= random.choice([1, 2, 3])
+        height = self.patch_size_h * self.scale
+        width = self.patch_size_w * self.scale
 
-                img_L = cv2.resize(img_noisy, (int(1/self.scale*img_origin.shape[1]), int(1/self.scale*img_origin.shape[0])), interpolation=interpolate)
-                h1, w1 = img_L.shape[:2]
-
-                if(h1/(self.patch_size_h*1.0) > w1 /(self.patch_size_w*1.0)):
-                    patch_size_w = int(w1 /(self.patch_size_w*1.0)) * self.patch_size_w
-                    patch_size_h = int(w1 /(self.patch_size_w*1.0)) * self.patch_size_h
-
-                else:
-                    patch_size_w = int(h1 /(self.patch_size_h*1.0)) * self.patch_size_w
-                    patch_size_h = int(h1 /(self.patch_size_h*1.0)) * self.patch_size_h
-
-                img_L,img_H = utils_blindsr.random_crop(img_L,img_origin,sf=self.scale,lq_patchsize_w=patch_size_w,lq_patchsize_h=patch_size_h)
-                # print("img_L",img_L.shape)
-                # print("img_H",img_H.shape)
-
-                img_L = cv2.resize(img_L, (self.patch_size_w, self.patch_size_h),interpolation= interpolate)
-                img_H = cv2.resize(img_H, (self.patch_size_w*self.scale, self.patch_size_h*self.scale), interpolation= interpolate)
-                # print("img_LR",img_L.shape)
-                # print("img_HR",img_H.shape)
+        if(self.use_whole_image):
+            h = height
+            w = width
+            if(self.patch_size_h> self.patch_size_w):
+                while(h < height and w < width):
+                    h = h +50
+                    w = h/h1 * w1
             else:
-                img_L, img_H = degradation_bsrgan_plus_an(img=img_noisy,hq=img_origin, sf=self.scale, lq_patchsize_w=self.patch_size_w,lq_patchsize_h=self.patch_size_h,degrade=True,noise=False)
+                while(h < height and w < width):
+                    w = w +50
+                    h = w/w1 * h1  
+
+            img_L = cv2.resize(img_noisy, (round(w/self.scale), round(h/self.scale)), interpolation=interpolate)
+            img_H = cv2.resize(img_origin, (round(w), round(h)), interpolation=interpolate)
+
+            img_L,img_H = utils_blindsr.random_crop(img_L,img_H,sf=self.scale,lq_patchsize_w=self.patch_size_w,lq_patchsize_h=self.patch_size_h)        
+        else:
+            if(h1 < height or w1 < width):
+                h = h1
+                w= w1
+                while(h < height or w < width):
+                    h = h +50
+                    w = h/h1 * w1
+
+                img_origin = cv2.resize(img_origin, (round(w), round(h)), interpolation=cv2.INTER_CUBIC)
+                img_noisy = cv2.resize(img_noisy, (round(w), round(h)), interpolation=cv2.INTER_CUBIC)
+
+            img_L, img_H = degradation_bsrgan_plus_an(img=img_noisy,hq=img_origin, sf=self.scale, lq_patchsize_w=self.patch_size_w,lq_patchsize_h=self.patch_size_h,degrade=True,noise=False)
 
 
         # cv image: H x W x C 
@@ -188,7 +180,7 @@ default_collate_err_msg_format = (
 
 
 class DataBatch:
-    def __init__(self,transfrom,scale,max_box,max_cells,devider=2,force_size = None,use_same= False,use_inter = False,use_whole_image=False):
+    def __init__(self,transfrom,scale,max_box,max_cells,devider=2,force_size = None,use_whole_image=False):
         self.transfrom = transfrom
         self.scale = scale
         self.max_box = max_box
@@ -196,8 +188,6 @@ class DataBatch:
         self.rotate_degree = [None,cv2.ROTATE_90_CLOCKWISE,cv2.ROTATE_180,cv2.ROTATE_90_CLOCKWISE]
         self.devider = devider
         self.force_size = force_size
-        self.use_same= use_same
-        self.use_inter= use_inter
         self.use_whole_image =use_whole_image
 
 
@@ -213,7 +203,7 @@ class DataBatch:
         if(self.force_size is not None):
             patch_h = self.force_size
             patch_w = self.force_size
-        degrade = Degradate(scale=self.scale,patch_size_w=patch_w,patch_size_h=patch_h,use_same=self.use_same, use_inter = self.use_inter,use_whole_image=self.use_whole_image)
+        degrade = Degradate(scale=self.scale,patch_size_w=patch_w,patch_size_h=patch_h,use_whole_image=self.use_whole_image)
         rotate = Rotate(degree=self.rotate_degree[randint(0,3)])
         batch_= []
         for sample in batch:

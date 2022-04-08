@@ -19,8 +19,8 @@ from utils import utils_logger
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--data_valid', nargs="+" ,default=["/media/anis/InLooP/Data/EXPLORATION/valid","/media/anis/InWork/Data/enhance_dataset/DIV_FLICKR_2K/valid","/media/anis/InWork/Data/enhance_dataset/FFHQ/valid","/media/anis/InWork/Data/FFHQ_WILD/valid","/media/anis/InWork/Data/enhance_dataset/CAMERA_FUSION/valid","/media/anis/InWork/Data/enhance_dataset/CLOTH/valid","/media/anis/InWork/Data/enhance_dataset/DHD_CAMPUS/valid","/media/anis/InWork/Data/enhance_dataset/MY_DATA/valid","/media/anis/InWork/Data/enhance_dataset/HAND_WRITTING/valid"], help='path validation dataset.')
-parser.add_argument('--data_train', nargs="+",default=["/media/anis/InLooP/Data/EXPLORATION/train","/media/anis/InWork/Data/enhance_dataset/DIV_FLICKR_2K/train","/media/anis/InWork/Data/enhance_dataset/FFHQ/train","/media/anis/InWork/Data/FFHQ_WILD/train","/media/anis/InWork/Data/enhance_dataset/CAMERA_FUSION/train","/media/anis/InWork/Data/enhance_dataset/CLOTH/train","/media/anis/InWork/Data/enhance_dataset/DHD_CAMPUS/train","/media/anis/InWork/Data/enhance_dataset/MY_DATA/train","/media/anis/InWork/Data/enhance_dataset/HAND_WRITTING/train","/media/anis/InWork/Data/enhance_dataset/URBAN/train"], help='Path to trainning dataset.')
+parser.add_argument('--data_valid', nargs="+" ,default=["/media/anis/InWork/Data/FFHQ_CROPPED/With_Noise/valid","/media/anis/InWork/Data/FFHQ_WILD/valid"], help='path validation dataset.')
+parser.add_argument('--data_train', nargs="+",default=["/media/anis/InWork/Data/FFHQ_CROPPED/With_Noise/train","/media/anis/InWork/Data/FFHQ_WILD/train"], help='Path to trainning dataset.')
 
 parser.add_argument("--checkpoint", type=str, default="",help="checkpoint path")
 parser.add_argument("--checkpoint_path", type=str, default="checkpoints/colorize_net_checkpoints/v1",help="checkpoint_folder_path")

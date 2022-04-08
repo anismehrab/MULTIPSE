@@ -14,7 +14,7 @@ from re import I
 import numpy as np
 import torch
 from models.face_model import FaceNet,FaceNet_Mid, FaceNet_v2
-from models.enhance_model import EnhanceNet,EnhanceNetX1,EnhanceNetX2, EnhanceNetX2_v2,EnhanceNetX3,EnhanceNet_x3,EnhanceNetX1_v3
+from models.enhance_model import EnhanceNet,EnhanceNetX1, EnhanceNetX1_v2,EnhanceNetX2, EnhanceNetX2_v2,EnhanceNetX3,EnhanceNet_x3,EnhanceNetX1_v3
 from models.anime_model import AnimeNet,AnimeNet2,AnimeNet4
 from models.colorize_model import ColorizeNet
 import utils
@@ -71,12 +71,11 @@ print(device)
 
 #     model.cpu()
 
-
 def test_with_image(model,OUT_NAME,dtype = torch.float32):
     model.to(device)
     with torch.no_grad():
         for img in util.get_image_paths(L_path):
-            if('1646570299313' in img):
+            if('66017' in img):
                 torch.cuda.empty_cache()
                 img_L = util.imread_uint(img, n_channels=3)
                 w= np.shape(img_L)[1]
@@ -87,8 +86,8 @@ def test_with_image(model,OUT_NAME,dtype = torch.float32):
                 # img_L =  cv2.circle(img_L,center = (330, 278),radius = 20,color = (0, 0, 0),thickness = -1)
                 # img_L =  cv2.circle(img_L,center = (310, 278),radius = 20,color = (0, 0, 0),thickness = -1)
                 # img_L = cv2.line(img_L,pt1 = (500, 600), pt2 = (600, 800),color = (0, 0, 0),thickness = 30)
-                img_L = cv2.cvtColor(img_L,cv2.COLOR_BGR2GRAY)
-                img_L = cv2.cvtColor(img_L,cv2.COLOR_GRAY2BGR)
+                # img_L = cv2.cvtColor(img_L,cv2.COLOR_BGR2GRAY)
+                # img_L = cv2.cvtColor(img_L,cv2.COLOR_GRAY2BGR)
                 util.imsave(img_L, os.path.join('testsets/exported', 'input'+'.png'))
             
                 #if(np.shape(img_L)[0] < 1055 and np.shape(img_L)[1] < 1055):
@@ -108,9 +107,9 @@ def test_with_image(model,OUT_NAME,dtype = torch.float32):
 
 
 #LOAD TORCH MODEL
-main_path = "checkpoints/colorize_net_checkpoints/v1"
-toch_model_path = "checkpoints/colorize_net_checkpoints/v1/checkpoint_base_epoch_2.pth"#"/home/anis/Desktop/AI/MultiSPE/checkpoints/face_net_checkpoints/checkpoint_base_epoch_19.pth"#os.path.join('checkpoints/face_net_checkpoints', 'checkpoint_base_epoch_19.pth')
-torch_model = ColorizeNet()
+main_path = "checkpoints/enhance_net_checkpoints/enhance_net_x1/v2"
+toch_model_path = "checkpoints/enhance_net_checkpoints/enhance_net_x1/v2/checkpoint_base_epoch_27.pth"#"/home/anis/Desktop/AI/MultiSPE/checkpoints/face_net_checkpoints/checkpoint_base_epoch_19.pth"#os.path.join('checkpoints/face_net_checkpoints', 'checkpoint_base_epoch_19.pth')
+torch_model = EnhanceNetX1_v2()
         
 #torch_model = architecture.IMDN(upscale=4)
 checkpoint = torch.load(toch_model_path)
@@ -245,12 +244,12 @@ test_with_image(torch_model,'output')
 # scripted_model_optimized._save_for_lite_interpreter(os.path.join('model_zoo','BSRGAN_cpu_lite_static_quantized_model.pth'))
 # scripted_model_optimized = optimize_for_mobile(scripted_model,backend="Vulkan")
 # scripted_model_optimized._save_for_lite_interpreter(os.path.join('model_zoo','BSRGAN_vulkan_lite_static_quantized_model.pth'))
-
+##############################""
 scripted_torch_model = torch.jit.script(torch_model)
 scripted_model_optimized = optimize_for_mobile(scripted_torch_model,backend="cpu")
-scripted_model_optimized._save_for_lite_interpreter(os.path.join(main_path+'/script','lite_cpu_facenet.pth'))
+scripted_model_optimized._save_for_lite_interpreter(os.path.join(main_path+'/script','lite_cpu_enhance_x1.pth'))
 scripted_model_optimized = optimize_for_mobile(scripted_torch_model,backend="Vulkan")
-scripted_model_optimized._save_for_lite_interpreter(os.path.join(main_path+'/script','lite_vulkan_facenet.pth'))
+scripted_model_optimized._save_for_lite_interpreter(os.path.join(main_path+'/script','lite_vulkan_enhance_x1.pth'))
 
 # # #to NNAPI 
 # # scripted_model = torch.jit.script(model_int8_quantized)

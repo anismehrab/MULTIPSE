@@ -186,9 +186,6 @@ class ToTensor(object):
 
 
 
-
-
-
 default_collate_err_msg_format = (
     "default_collate: batch must contain tensors, numpy arrays, numbers, "
     "dicts or lists; found {}")
