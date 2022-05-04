@@ -7,11 +7,11 @@ from torchvision import transforms
 from torch._C import device
 import torch.nn as nn
 import torch.optim as optim
-from data.dataloader import Dataset
-from data.enhance_transform import DataBatch, ToTensor,Normalize,Degradate,RandomCrop
+from data.dataloader import GanEnhanceDataSet
+from data.gan_enhance_transform import ToTensor,Normalize,DataBatch
 from torch.utils.data import DataLoader
-from models import enhance_model
-from utils.train_utils import train, train_cuda_f16,valid,save_checkpoint
+from models import enhance_gan
+from utils.train_gan_utils import train,valid,save_checkpoint
 from utils import utils_logger
 
 
@@ -40,9 +40,9 @@ parser.add_argument("--lr", type=float, default=1e-4,help="learning rate")
 parser.add_argument("--step_size", type=int, default=100,help="learning rate decay per N epochs")
 parser.add_argument("--gamma", type=float, default=0.1,help="learning rate decay factor for step decay")
 
-parser.add_argument("--max_dim", type=int, default=756,help="max image dimension")
-parser.add_argument("--min_dim", type=int, default=256,help="min image dimension")
-parser.add_argument("--max_cells", type=int, default=500*500,help="min image dimension")#x2 250*250 b8 #x3 190*185 b4 #x1 500*500
+parser.add_argument("--max_dim", type=int, default=256,help="max image dimension")
+parser.add_argument("--min_dim", type=int, default=64,help="min image dimension")
+parser.add_argument("--max_cells", type=int, default=164*164,help="min image dimension")#x2 250*250 b8 #x3 190*185 b4 #x1 500*500
 
 args = parser.parse_args()
 
@@ -60,9 +60,9 @@ def reInitLoader(box):
     data_compos = transforms.Compose([Normalize()])
     batch_compos = transforms.Compose([ToTensor()])
     dataBatch = DataBatch(transfrom=batch_compos,scale =args.scale ,max_box = box,
-                max_cells= args.max_cells,devider=4,force_size=None,use_whole_image= True)
-    training_data = Dataset(data_dir=args.data_train,transform=data_compos)
-    validation_data = Dataset(data_dir=args.data_valid,transform=data_compos)
+                max_cells= args.max_cells,devider=4,force_size=None,use_whole_image= True,workers = args.threads)
+    training_data = GanEnhanceDataSet(data_dir=args.data_train,transform=data_compos)
+    validation_data = GanEnhanceDataSet(data_dir=args.data_valid,transform=data_compos)
     logger.info("===>Trainning Data:[ Train:{}  Valid:{}] Batch:{}".format(len(training_data),len(validation_data),args.batch_size))
     train_loader = DataLoader(training_data, batch_size=args.batch_size,shuffle=True, num_workers=args.threads,collate_fn=dataBatch.collate_fn)
     valid_loader = DataLoader(validation_data, batch_size=args.batch_size,shuffle=True, num_workers=args.threads,collate_fn=dataBatch.collate_fn)
@@ -77,14 +77,14 @@ box = (args.min_dim,args.max_dim,args.min_dim,args.max_dim)
 trainloader,validloader = reInitLoader(box)
 #load models
 print("loading model")
-model = enhance_model.EnhanceNetX1_v2() #enhance_model.EnhanceNet(upscale=args.scale)
-
+generator = enhance_gan.GenEnhanceV1() 
+discriminator = enhance_gan.GanDiscriminatorV1()
 
 #training device
 device = torch.device('cuda' if torch.cuda.is_available() else "cpu")
 logger.info('{:>16s} : {:<s}'.format('DEVICE ID', device.type))
-model.to(device)
-
+generator.to(device)
+discriminator.to(device)
 
 # t = torch.cuda.get_device_properties(0).total_memory
 # r = torch.cuda.memory_reserved(0)
@@ -94,31 +94,37 @@ model.to(device)
 
 
 #loass function
-l1_criterion = nn.L1Loss()
-l1_criterion.to(device)
-logger.info("L1 loss function")
+# adv_criterion: the adversarial loss function; takes the discriminator 
+#                   predictions and the true labels and returns a adversarial 
+#                   loss (which you aim to minimize)
+adv_criterion = nn.BCEWithLogitsLoss() 
+adv_criterion.to(device)
+# recon_criterion: the reconstruction loss function; takes the generator 
+#             outputs and the real images and returns a reconstructuion 
+#             loss (which you aim to minimize)
+recon_criterion = nn.L1Loss() 
+recon_criterion.to(device)
+
+
 
 #optimzer
-params = list(model.parameters()) 
-optimizer = optim.Adam(params, lr=args.lr)
-
+gen_opt = torch.optim.Adam(generator.parameters(), lr=args.lr)
+disc_opt = torch.optim.Adam(discriminator.parameters(), lr=args.lr)
 
 #load checkpoint
 epoch_i = 0
 if(args.checkpoint != ""):
-
     checkpoint = torch.load(args.checkpoint)
-    model.load_state_dict(checkpoint["model_base_state_dict"])
-    # optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
+    generator.load_state_dict(checkpoint["generator_state_dict"])
+    discriminator.load_state_dict(checkpoint["discriminator_state_dict"])
     epoch_i = checkpoint["epoch"] +1
-    print("optimizer",optimizer)
-model = [model]
+
 
 #trainning
 
 for i in range(epoch_i,epoch_i+args.epoch):
 
-    loss_t = train_cuda_f16(model,trainloader,optimizer,l1_criterion,i,device,args,logger)
-    save_checkpoint(model[0],None,None,i,loss_t,0,0,0,optimizer,logger,args)
-    psnr,ssim,loss_v = valid(model,validloader,l1_criterion,device,args,logger)
-    save_checkpoint(model[0],None,None,i,loss_t,loss_v,psnr,ssim,optimizer,logger,args)
+    loss_t = train(generator,discriminator,trainloader,gen_opt,disc_opt,adv_criterion,recon_criterion,i,device,args,logger,100)
+    # save_checkpoint(model[0],None,None,i,loss_t,0,0,0,optimizer,logger,args)
+    # psnr,ssim,loss_v = valid(model,validloader,l1_criterion,device,args,logger)
+    # save_checkpoint(model[0],None,None,i,loss_t,loss_v,psnr,ssim,optimizer,logger,args)

@@ -75,7 +75,7 @@ def test_with_image(model,OUT_NAME,dtype = torch.float32):
     model.to(device)
     with torch.no_grad():
         for img in util.get_image_paths(L_path):
-            if('66017' in img):
+            if('image' in img):
                 torch.cuda.empty_cache()
                 img_L = util.imread_uint(img, n_channels=3)
                 w= np.shape(img_L)[1]
@@ -107,9 +107,9 @@ def test_with_image(model,OUT_NAME,dtype = torch.float32):
 
 
 #LOAD TORCH MODEL
-main_path = "checkpoints/enhance_net_checkpoints/enhance_net_x1/v2"
-toch_model_path = "checkpoints/enhance_net_checkpoints/enhance_net_x1/v2/checkpoint_base_epoch_27.pth"#"/home/anis/Desktop/AI/MultiSPE/checkpoints/face_net_checkpoints/checkpoint_base_epoch_19.pth"#os.path.join('checkpoints/face_net_checkpoints', 'checkpoint_base_epoch_19.pth')
-torch_model = EnhanceNetX1_v2()
+main_path = "checkpoints/enhance_net_checkpoints/enhance_net_x3/v2"
+toch_model_path = "checkpoints/enhance_net_checkpoints/enhance_net_x3/v2/checkpoint_base_epoch_33.pth"#"/home/anis/Desktop/AI/MultiSPE/checkpoints/face_net_checkpoints/checkpoint_base_epoch_19.pth"#os.path.join('checkpoints/face_net_checkpoints', 'checkpoint_base_epoch_19.pth')
+torch_model = EnhanceNetX3()
         
 #torch_model = architecture.IMDN(upscale=4)
 checkpoint = torch.load(toch_model_path)
@@ -247,9 +247,9 @@ test_with_image(torch_model,'output')
 ##############################""
 scripted_torch_model = torch.jit.script(torch_model)
 scripted_model_optimized = optimize_for_mobile(scripted_torch_model,backend="cpu")
-scripted_model_optimized._save_for_lite_interpreter(os.path.join(main_path+'/script','lite_cpu_enhance_x1.pth'))
+scripted_model_optimized._save_for_lite_interpreter(os.path.join(main_path+'/script','lite_cpu_enhance_x3.pth'))
 scripted_model_optimized = optimize_for_mobile(scripted_torch_model,backend="Vulkan")
-scripted_model_optimized._save_for_lite_interpreter(os.path.join(main_path+'/script','lite_vulkan_enhance_x1.pth'))
+scripted_model_optimized._save_for_lite_interpreter(os.path.join(main_path+'/script','lite_vulkan_enhance_x3.pth'))
 
 # # #to NNAPI 
 # # scripted_model = torch.jit.script(model_int8_quantized)
