@@ -228,7 +228,7 @@ class GanEnhanceDataSet(Dataset):
         self.origin_Images = []
         print("train with",len(data_dir),"datasets")
         for path_ in data_dir:
-                self.origin_Images.extend(utils_image.get_image_paths(os.path.join(path_,"origin")))
+                self.origin_Images.extend(utils_image.get_image_paths(path_))
    
 
         self.transform = transform

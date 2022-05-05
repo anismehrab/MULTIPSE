@@ -19,16 +19,16 @@ from utils import utils_logger
 
 
 parser = argparse.ArgumentParser()
-# parser.add_argument('--data_valid', nargs="+" ,default=["/media/anis/InWork/Data/FFHQ_CROPPED/With_Noise/valid","/media/anis/InWork/Data/FFHQ_WILD/valid"], help='path validation dataset.')
-# parser.add_argument('--data_train', nargs="+",default=["/media/anis/InWork/Data/FFHQ_CROPPED/With_Noise/train","/media/anis/InWork/Data/FFHQ_WILD/train"], help='Path to trainning dataset.')
+parser.add_argument('--data_valid', nargs="+" ,default=["/media/anis/InWork/Data/FFHQ_CROPPED/Enhance/valid","/media/anis/InWork/Data/FFHQ_WILD/valid"], help='path validation dataset.')
+parser.add_argument('--data_train', nargs="+",default=["/media/anis/InWork/Data/FFHQ_CROPPED/Enhance/train","/media/anis/InWork/Data/FFHQ_WILD/train"], help='Path to trainning dataset.')
 
-parser.add_argument('--data_valid', nargs="+" ,default=["/media/anis/InLooP/Data/EXPLORATION/valid","/media/anis/InWork/Data/enhance_dataset/DIV_FLICKR_2K/valid","/media/anis/InWork/Data/FFHQ_CROPPED/With_Noise/valid","/media/anis/InWork/Data/FFHQ_WILD/valid","/media/anis/InWork/Data/enhance_dataset/CAMERA_FUSION/valid","/media/anis/InWork/Data/enhance_dataset/DHD_CAMPUS/valid","/media/anis/InWork/Data/enhance_dataset/MY_DATA/valid","/media/anis/InWork/Data/enhance_dataset/HAND_WRITTING/valid"], help='path validation dataset.')
-parser.add_argument('--data_train', nargs="+",default=["/media/anis/InLooP/Data/EXPLORATION/train","/media/anis/InWork/Data/enhance_dataset/DIV_FLICKR_2K/train","/media/anis/InWork/Data/FFHQ_CROPPED/With_Noise/train","/media/anis/InWork/Data/FFHQ_WILD/train","/media/anis/InWork/Data/enhance_dataset/CAMERA_FUSION/train","/media/anis/InWork/Data/enhance_dataset/DHD_CAMPUS/train","/media/anis/InWork/Data/enhance_dataset/MY_DATA/train","/media/anis/InWork/Data/enhance_dataset/HAND_WRITTING/train","/media/anis/InWork/Data/enhance_dataset/URBAN/train"], help='Path to trainning dataset.')
+# parser.add_argument('--data_valid', nargs="+" ,default=["/media/anis/InLooP/Data/EXPLORATION/valid","/media/anis/InWork/Data/enhance_dataset/DIV_FLICKR_2K/valid","/media/anis/InWork/Data/FFHQ_CROPPED/With_Noise/valid","/media/anis/InWork/Data/FFHQ_WILD/valid","/media/anis/InWork/Data/enhance_dataset/CAMERA_FUSION/valid","/media/anis/InWork/Data/enhance_dataset/DHD_CAMPUS/valid","/media/anis/InWork/Data/enhance_dataset/MY_DATA/valid","/media/anis/InWork/Data/enhance_dataset/HAND_WRITTING/valid"], help='path validation dataset.')
+# parser.add_argument('--data_train', nargs="+",default=["/media/anis/InLooP/Data/EXPLORATION/train","/media/anis/InWork/Data/enhance_dataset/DIV_FLICKR_2K/train","/media/anis/InWork/Data/FFHQ_CROPPED/With_Noise/train","/media/anis/InWork/Data/FFHQ_WILD/train","/media/anis/InWork/Data/enhance_dataset/CAMERA_FUSION/train","/media/anis/InWork/Data/enhance_dataset/DHD_CAMPUS/train","/media/anis/InWork/Data/enhance_dataset/MY_DATA/train","/media/anis/InWork/Data/enhance_dataset/HAND_WRITTING/train","/media/anis/InWork/Data/enhance_dataset/URBAN/train"], help='Path to trainning dataset.')
 
 
 parser.add_argument("--checkpoint", type=str, default="",help="checkpoint path")
-parser.add_argument("--checkpoint_path", type=str, default="checkpoints/enhance_net_checkpoints/enhance_net_x1/v2",help="checkpoint_folder_path")
-parser.add_argument("--logger_path", type=str, default="checkpoints/enhance_net_checkpoints/enhance_net_x1/v2/train_logging.log",help="logger path")
+parser.add_argument("--checkpoint_path", type=str, default="checkpoints/enhance_gan_checkpoints/v1",help="checkpoint_folder_path")
+parser.add_argument("--logger_path", type=str, default="checkpoints/enhance_gan_checkpoints/v1/train_logging.log",help="logger path")
 
 parser.add_argument('--threads', type=int, default=4, help='threads number.')
 parser.add_argument("--start_iter", type=int, default=0,help="iteration")
@@ -42,7 +42,7 @@ parser.add_argument("--gamma", type=float, default=0.1,help="learning rate decay
 
 parser.add_argument("--max_dim", type=int, default=256,help="max image dimension")
 parser.add_argument("--min_dim", type=int, default=64,help="min image dimension")
-parser.add_argument("--max_cells", type=int, default=164*164,help="min image dimension")#x2 250*250 b8 #x3 190*185 b4 #x1 500*500
+parser.add_argument("--max_cells", type=int, default=160*158,help="min image dimension")#x2 250*250 b8 #x3 190*185 b4 #x1 500*500
 
 args = parser.parse_args()
 
@@ -124,7 +124,6 @@ if(args.checkpoint != ""):
 
 for i in range(epoch_i,epoch_i+args.epoch):
 
-    loss_t = train(generator,discriminator,trainloader,gen_opt,disc_opt,adv_criterion,recon_criterion,i,device,args,logger,100)
-    # save_checkpoint(model[0],None,None,i,loss_t,0,0,0,optimizer,logger,args)
-    # psnr,ssim,loss_v = valid(model,validloader,l1_criterion,device,args,logger)
-    # save_checkpoint(model[0],None,None,i,loss_t,loss_v,psnr,ssim,optimizer,logger,args)
+    gen_loss,disc_loss = train(generator,discriminator,trainloader,gen_opt,disc_opt,adv_criterion,recon_criterion,i,device,args,logger,100)
+    psnr,ssim,loss_v = valid(generator,validloader,recon_criterion,device,args,logger)
+    save_checkpoint(generator,discriminator,i,gen_loss,disc_loss,loss_v,psnr,ssim,logger,args)
