@@ -42,7 +42,7 @@ parser.add_argument("--gamma", type=float, default=0.1,help="learning rate decay
 
 parser.add_argument("--max_dim", type=int, default=256,help="max image dimension")
 parser.add_argument("--min_dim", type=int, default=64,help="min image dimension")
-parser.add_argument("--max_cells", type=int, default=160*158,help="min image dimension")#x2 250*250 b8 #x3 190*185 b4 #x1 500*500
+parser.add_argument("--max_cells", type=int, default=140*140,help="min image dimension")#x2 250*250 b8 #x3 190*185 b4 #x1 500*500
 
 args = parser.parse_args()
 
@@ -115,8 +115,8 @@ disc_opt = torch.optim.Adam(discriminator.parameters(), lr=args.lr)
 epoch_i = 0
 if(args.checkpoint != ""):
     checkpoint = torch.load(args.checkpoint)
-    generator.load_state_dict(checkpoint["generator_state_dict"])
-    discriminator.load_state_dict(checkpoint["discriminator_state_dict"])
+    generator.load_state_dict(checkpoint["model_base_state_dict"])
+    discriminator.load_state_dict(checkpoint["model_head_state_dict"])
     epoch_i = checkpoint["epoch"] +1
 
 

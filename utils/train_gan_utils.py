@@ -29,11 +29,11 @@ def train(gen,disc,train_loader,gen_opt,disc_opt,adv_criterion,recon_criterion,e
     start.record()
     for sample in train_loader:
 
-        torch.cuda.empty_cache()
         lr_tensor = sample["img_L"].to(device)  # ranges from [0, 1]
         hr_tensor = sample["img_H"].to(device)  # ranges from [0, 1]
         
          ### Update discriminator ###
+        disc_opt.zero_grad() # Zero out the gradient before backpropagation
         with torch.cuda.amp.autocast():
             with torch.no_grad():
                 fake = gen(lr_tensor)
@@ -48,9 +48,10 @@ def train(gen,disc,train_loader,gen_opt,disc_opt,adv_criterion,recon_criterion,e
         scaler.scale(disc_loss).backward(retain_graph=True)
         scaler.step(disc_opt)
         scaler.update()
-        disc_opt.zero_grad() # Zero out the gradient before backpropagation
 
+        torch.cuda.empty_cache()
         ### Update generator ###
+        gen_opt.zero_grad()
         with torch.cuda.amp.autocast():
             fake = gen(lr_tensor)
             disc_fake_hat = disc(fake, lr_tensor)
@@ -62,7 +63,6 @@ def train(gen,disc,train_loader,gen_opt,disc_opt,adv_criterion,recon_criterion,e
         scaler.scale(gen_loss).backward()
         scaler.step(gen_opt)
         scaler.update()
-        gen_opt.zero_grad()
 
 
 
@@ -75,8 +75,8 @@ def train(gen,disc,train_loader,gen_opt,disc_opt,adv_criterion,recon_criterion,e
 
         iteration += 1
         if iteration % display_step == 1:
-            print(f"Epoch {epoch}: Step {iteration}/{len(train_loader)}: Generator loss: {generator_loss/iteration}, Discriminator loss: {discriminator_loss/iteration}")
-    
+            # print(f"Epoch: {epoch} Step: {iteration}/{len(train_loader)} Generator loss: {generator_loss/iteration}, Discriminator loss: {discriminator_loss/iteration}")
+            print("===> Epoch[{}]: Step: {}/{} Generator loss: {:.5f},Discriminator loss: {:.5f}".format(epoch,iteration,len(train_loader),generator_loss,discriminator_loss))
         
     end.record()
     torch.cuda.synchronize()
@@ -132,8 +132,8 @@ def save_checkpoint(generator,discriminator,i,gen_loss,disc_loss,loss_v,psnr,ssi
     model_path = os.path.join(model_foler,"checkpoint_" + "epoch_{}.pth".format(i))
     torch.save({
         'epoch': i,
-        'model_base_state_dict': generator.state_dict(),
-        'model_head_state_dict': discriminator.state_dict(),
+        'generator_state_dict': generator.state_dict(),
+        'discriminator_state_dict': discriminator.state_dict(),
         'gen_loss': gen_loss,
         'disc_loss': disc_loss,
         'valid_loss':loss_v,
