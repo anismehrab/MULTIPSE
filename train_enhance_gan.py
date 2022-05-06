@@ -42,7 +42,7 @@ parser.add_argument("--gamma", type=float, default=0.1,help="learning rate decay
 
 parser.add_argument("--max_dim", type=int, default=256,help="max image dimension")
 parser.add_argument("--min_dim", type=int, default=64,help="min image dimension")
-parser.add_argument("--max_cells", type=int, default=140*140,help="min image dimension")#x2 250*250 b8 #x3 190*185 b4 #x1 500*500
+parser.add_argument("--max_cells", type=int, default=160*180,help="min image dimension")#x2 250*250 b8 #x3 190*185 b4 #x1 500*500
 
 args = parser.parse_args()
 
@@ -102,9 +102,11 @@ adv_criterion.to(device)
 # recon_criterion: the reconstruction loss function; takes the generator 
 #             outputs and the real images and returns a reconstructuion 
 #             loss (which you aim to minimize)
-recon_criterion = nn.L1Loss() 
-recon_criterion.to(device)
-
+gen_criterion = nn.L1Loss() 
+gen_criterion.to(device)
+# itemediate features loss
+disc_mid_criterion = nn.MSELoss()
+disc_mid_criterion.to(device)
 
 
 #optimzer
@@ -124,6 +126,6 @@ if(args.checkpoint != ""):
 
 for i in range(epoch_i,epoch_i+args.epoch):
 
-    gen_loss,disc_loss = train(generator,discriminator,trainloader,gen_opt,disc_opt,adv_criterion,recon_criterion,i,device,args,logger,100)
-    psnr,ssim,loss_v = valid(generator,validloader,recon_criterion,device,args,logger)
+    gen_loss,disc_loss = train(generator,discriminator,trainloader,gen_opt,disc_opt,adv_criterion,gen_criterion,disc_mid_criterion,i,device,args,logger,alpha = 1,beta=0.02)
+    psnr,ssim,loss_v = valid(generator,validloader,gen_criterion,device,args,logger)
     save_checkpoint(generator,discriminator,i,gen_loss,disc_loss,loss_v,psnr,ssim,logger,args)

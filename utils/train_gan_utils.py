@@ -10,7 +10,7 @@ import time
 
 
 
-def train(gen,disc,train_loader,gen_opt,disc_opt,adv_criterion,recon_criterion,epoch,device,args,logger,lambda_recon = 100,display_step = 200):
+def train(gen,disc,train_loader,gen_opt,disc_opt,adv_criterion,gen_criterion,mid_disc_criterion,epoch,device,args,logger,alpha = 1,beta = 0.02,display_step = 200):
     
     scaler = torch.cuda.amp.GradScaler()
 
@@ -37,10 +37,10 @@ def train(gen,disc,train_loader,gen_opt,disc_opt,adv_criterion,recon_criterion,e
         with torch.cuda.amp.autocast():
             with torch.no_grad():
                 fake = gen(lr_tensor)
-            disc_fake_hat = disc(fake.detach(), lr_tensor) # Detach generator
-            disc_fake_loss = adv_criterion(disc_fake_hat, torch.zeros_like(disc_fake_hat))
-            disc_real_hat = disc(hr_tensor, lr_tensor)
-            disc_real_loss = adv_criterion(disc_real_hat, torch.ones_like(disc_real_hat))
+            disc_fake,_,_,_ = disc(fake.detach(), lr_tensor) # Detach generator
+            disc_fake_loss = adv_criterion(disc_fake, torch.zeros_like(disc_fake))
+            disc_real,_,_,_ = disc(hr_tensor, lr_tensor)
+            disc_real_loss = adv_criterion(disc_real, torch.ones_like(disc_real))
             disc_loss = (disc_fake_loss + disc_real_loss) / 2
         
         # disc_loss.backward(retain_graph=True) # Update gradients
@@ -54,10 +54,12 @@ def train(gen,disc,train_loader,gen_opt,disc_opt,adv_criterion,recon_criterion,e
         gen_opt.zero_grad()
         with torch.cuda.amp.autocast():
             fake = gen(lr_tensor)
-            disc_fake_hat = disc(fake, lr_tensor)
-            gen_adv_loss = adv_criterion(disc_fake_hat, torch.ones_like(disc_fake_hat))
-            gen_rec_loss = recon_criterion(hr_tensor, fake)
-            gen_loss = gen_adv_loss + lambda_recon * gen_rec_loss
+            disc_fake,x2_fake,x3_fake,x4_fake = disc(fake, lr_tensor)
+            disc_real,x2_real,x3_real,x4_real = disc(hr_tensor, lr_tensor)
+            gen_adv_loss = adv_criterion(disc_fake, torch.ones_like(disc_fake))
+            gen_loss_drct = gen_criterion(hr_tensor, fake)
+            disc_mid_loss = mid_disc_criterion(x2_real,x2_fake) + mid_disc_criterion(x3_real,x3_fake) + mid_disc_criterion(x4_real,x4_fake)
+            gen_loss = gen_adv_loss + alpha * gen_loss_drct + beta * disc_mid_loss
         # gen_loss.backward() # Update gradients
         # gen_opt.step() # Update optimizer
         scaler.scale(gen_loss).backward()
@@ -76,7 +78,7 @@ def train(gen,disc,train_loader,gen_opt,disc_opt,adv_criterion,recon_criterion,e
         iteration += 1
         if iteration % display_step == 1:
             # print(f"Epoch: {epoch} Step: {iteration}/{len(train_loader)} Generator loss: {generator_loss/iteration}, Discriminator loss: {discriminator_loss/iteration}")
-            print("===> Epoch[{}]: Step: {}/{} Generator loss: {:.5f},Discriminator loss: {:.5f}".format(epoch,iteration,len(train_loader),generator_loss,discriminator_loss))
+            print("===> Epoch[{}]: Step: {}/{} Generator loss: {:.5f}  Discriminator loss: {:.5f}".format(epoch,iteration,len(train_loader),generator_loss/iteration,discriminator_loss/iteration))
         
     end.record()
     torch.cuda.synchronize()

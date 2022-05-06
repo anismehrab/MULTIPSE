@@ -76,13 +76,13 @@ class GanDiscriminatorV1(nn.Module):
         hidden_channels: the initial number of discriminator convolutional filters
     '''
     
-    def __init__(self, in_nc=6, nf=64):
+    def __init__(self, in_nc=6, nf=32):
         super(GanDiscriminatorV1, self).__init__()
         self.upfeature = FeatureMapBlock(in_nc, nf)
-        self.contract1 = ContractingBlock(nf, use_bn=False) #64
-        self.contract2 = ContractingBlock(nf * 2)#128
-        self.contract3 = ContractingBlock(nf * 4)#256
-        self.contract4 = ContractingBlock(nf * 8)#512
+        self.contract1 = ContractingBlock(nf, use_bn=False) 
+        self.contract2 = ContractingBlock(nf * 2)
+        self.contract3 = ContractingBlock(nf * 4)
+        self.contract4 = ContractingBlock(nf * 8)
         #### START CODE HERE ####
         self.final = nn.Conv2d(nf * 16, 1, kernel_size=1)
         #### END CODE HERE ####
@@ -95,4 +95,4 @@ class GanDiscriminatorV1(nn.Module):
         x3 = self.contract3(x2)
         x4 = self.contract4(x3)
         xn = self.final(x4)
-        return xn
+        return xn ,x2,x3,x4
