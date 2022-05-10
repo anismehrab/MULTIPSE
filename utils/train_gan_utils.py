@@ -10,7 +10,7 @@ import time
 
 
 
-def train(gen,disc,train_loader,gen_opt,disc_opt,adv_criterion,img_criterion,features_criterion,epoch,device,args,logger,alpha = 0.001,beta = 0.006,display_step = 200):
+def train(gen,disc,train_loader,gen_opt,disc_opt,adv_criterion,img_criterion,features_criterion,epoch,device,args,logger,alpha = 0.001,beta = 0.006,display_step = 200,disc_steps = 3):
     
     scaler = torch.cuda.amp.GradScaler()
 
@@ -32,23 +32,6 @@ def train(gen,disc,train_loader,gen_opt,disc_opt,adv_criterion,img_criterion,fea
         lr_tensor = sample["img_L"].to(device)  # ranges from [0, 1]
         hr_tensor = sample["img_H"].to(device)  # ranges from [0, 1]
         
-         ### Update discriminator ###
-        disc_opt.zero_grad() # Zero out the gradient before backpropagation
-        with torch.cuda.amp.autocast():
-            with torch.no_grad():
-                fake = gen(lr_tensor)
-            disc_fake,_,_,_ = disc(fake.detach(), lr_tensor) # Detach generator
-            disc_fake_loss = adv_criterion(disc_fake, torch.zeros_like(disc_fake))
-            disc_real,_,_,_ = disc(hr_tensor, lr_tensor)
-            disc_real_loss = adv_criterion(disc_real, torch.ones_like(disc_real))
-            disc_loss = 0.5 * (disc_fake_loss + disc_real_loss)
-        
-        # disc_loss.backward(retain_graph=True) # Update gradients
-        # disc_opt.step() # Update optimizer
-        scaler.scale(disc_loss).backward(retain_graph=True)
-        scaler.step(disc_opt)
-        scaler.update()
-
         torch.cuda.empty_cache()
         ### Update generator ###
         gen_opt.zero_grad()
@@ -65,6 +48,28 @@ def train(gen,disc,train_loader,gen_opt,disc_opt,adv_criterion,img_criterion,fea
         scaler.scale(gen_loss).backward()
         scaler.step(gen_opt)
         scaler.update()
+
+
+        torch.cuda.empty_cache()
+         ### Update discriminator ###
+        for i in range(disc_steps):
+            disc_opt.zero_grad() # Zero out the gradient before backpropagation
+            with torch.cuda.amp.autocast():
+                with torch.no_grad():
+                    fake = gen(lr_tensor)
+                disc_fake,_,_,_ = disc(fake.detach(), lr_tensor) # Detach generator
+                disc_fake_loss = adv_criterion(disc_fake, torch.zeros_like(disc_fake))
+                disc_real,_,_,_ = disc(hr_tensor, lr_tensor)
+                disc_real_loss = adv_criterion(disc_real, torch.ones_like(disc_real))
+                disc_loss = 0.5 * (disc_fake_loss + disc_real_loss)
+            
+            # disc_loss.backward(retain_graph=True) # Update gradients
+            # disc_opt.step() # Update optimizer
+            scaler.scale(disc_loss).backward(retain_graph=True)
+            scaler.step(disc_opt)
+            scaler.update()
+
+
 
 
 

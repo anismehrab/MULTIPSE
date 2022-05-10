@@ -14,7 +14,7 @@ from re import I
 import numpy as np
 import torch
 from models.face_model import FaceNet,FaceNet_Mid, FaceNet_v2
-from models.enhance_model import EnhanceNet,EnhanceNetX1, EnhanceNetX1_v2,EnhanceNetX2, EnhanceNetX2_v2,EnhanceNetX3,EnhanceNet_x3,EnhanceNetX1_v3
+from models import enhance_model
 from models.anime_model import AnimeNet,AnimeNet2,AnimeNet4
 from models.colorize_model import ColorizeNet
 import utils
@@ -78,6 +78,7 @@ def test_with_image(model,OUT_NAME,dtype = torch.float32):
             if('image' in img):
                 torch.cuda.empty_cache()
                 img_L = util.imread_uint(img, n_channels=3)
+                img_L = cv2.resize(img_L,(783,675),interpolation=cv2.INTER_CUBIC)
                 w= np.shape(img_L)[1]
                 h = np.shape(img_L)[0]
                 # img_L = cv2.line(img_L,pt1 = (700, 500), pt2 = (800, 300),
@@ -107,9 +108,9 @@ def test_with_image(model,OUT_NAME,dtype = torch.float32):
 
 
 #LOAD TORCH MODEL
-main_path = "checkpoints/enhance_net_checkpoints/enhance_net_x3/v2"
-toch_model_path = "checkpoints/enhance_net_checkpoints/enhance_net_x3/v2/checkpoint_base_epoch_33.pth"#"/home/anis/Desktop/AI/MultiSPE/checkpoints/face_net_checkpoints/checkpoint_base_epoch_19.pth"#os.path.join('checkpoints/face_net_checkpoints', 'checkpoint_base_epoch_19.pth')
-torch_model = EnhanceNetX3()
+main_path = "checkpoints/enhance_net_checkpoints/enhance_net_x1/v5"
+toch_model_path = "checkpoints/enhance_net_checkpoints/enhance_net_x1/v5/checkpoint_base_epoch_0.pth"#"/home/anis/Desktop/AI/MultiSPE/checkpoints/face_net_checkpoints/checkpoint_base_epoch_19.pth"#os.path.join('checkpoints/face_net_checkpoints', 'checkpoint_base_epoch_19.pth')
+torch_model = enhance_model.EnhanceNetX1_v5()
         
 #torch_model = architecture.IMDN(upscale=4)
 checkpoint = torch.load(toch_model_path)
@@ -247,9 +248,9 @@ test_with_image(torch_model,'output')
 ##############################""
 scripted_torch_model = torch.jit.script(torch_model)
 scripted_model_optimized = optimize_for_mobile(scripted_torch_model,backend="cpu")
-scripted_model_optimized._save_for_lite_interpreter(os.path.join(main_path+'/script','lite_cpu_enhance_x3.pth'))
+scripted_model_optimized._save_for_lite_interpreter(os.path.join(main_path+'/script','lite_cpu_enhance_x1.pth'))
 scripted_model_optimized = optimize_for_mobile(scripted_torch_model,backend="Vulkan")
-scripted_model_optimized._save_for_lite_interpreter(os.path.join(main_path+'/script','lite_vulkan_enhance_x3.pth'))
+scripted_model_optimized._save_for_lite_interpreter(os.path.join(main_path+'/script','lite_vulkan_enhance_x1.pth'))
 
 # # #to NNAPI 
 # # scripted_model = torch.jit.script(model_int8_quantized)

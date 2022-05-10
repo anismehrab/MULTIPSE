@@ -8,78 +8,44 @@ from torch.utils.data import Dataset
 from utils import utils_image
 import numpy as np
 
+
+
+
 class Dataset(Dataset):
-    def __init__(self, data_dir,transform=None,aug_num = 0):
+    def __init__(self, data_dir,transform=None):
 
         """data_ir = ["path_to_data/origin or path_to_data/data"] """
         
-        self.aug_num = aug_num;
         self.origin_Images = []
-        self.noisy_Images = []
         print("train with",len(data_dir),"datasets")
         for path_ in data_dir:
-                
-                self.origin_Images.extend(utils_image.get_image_paths(os.path.join(path_,"origin")))
-                self.noisy_Images.extend(utils_image.get_image_paths(os.path.join(path_,"data")))
-
-
-        if self.aug_num > 0:
-            self.idx_augmented = self.getAugmenteddIdx()
-
-        if(len(self.noisy_Images) != len(self.origin_Images)):
-            print("data and origin folder does not have the same size")     
+                self.origin_Images.extend(utils_image.get_image_paths(path_))
+   
 
         self.transform = transform
 
 
     def __len__(self):
-        if( self.aug_num > 0): return len(self.idx_augmented)
-        return len(self.noisy_Images)
+        return len(self.origin_Images)
 
     def __getitem__(self, idx):
         
-        if self.aug_num > 0:
-            idx = self.idx_augmented[idx]
-
         #image path
         origin_path = self.origin_Images[idx]
-        noisy_path = self.noisy_Images[idx]
-
-        img_nameo, ext = os.path.splitext(os.path.basename(origin_path))
-        img_namen, ext = os.path.splitext(os.path.basename(noisy_path))
-
-        assert img_namen  == img_nameo, 'Only data pairs with same name allowed '+img_namen+" != "+img_nameo
-
-        if(origin_path == None or noisy_path == None):
-            print("path none",self.origin_Images[idx-1])
-            origin_path = self.origin_Images[idx-1]
-            noisy_path = self.noisy_Images[idx-1]
-
-        img_origin = cv2.imread(origin_path, cv2.IMREAD_UNCHANGED)  # BGR or G
-        img_noisy = cv2.imread(noisy_path, cv2.IMREAD_UNCHANGED)  # BGR or G
-        
-        index = idx                
-        while(img_origin is None or img_noisy is None):
-                index -= 1
-                print(origin_path)
-                origin_path = self.origin_Images[index]
-                img_origin = cv2.imread(origin_path, cv2.IMREAD_UNCHANGED)  # BGR or G
+        if(origin_path == None):
+          print("path none",self.origin_Images[idx])
+          origin_path = self.origin_Images[idx-1]
 
 
-                print(noisy_path)
-                noisy_path = self.noisy_Images[index]
-                img_noisy = cv2.imread(noisy_path, cv2.IMREAD_UNCHANGED)  # BGR or G
-                
-        img_origin = cv2.cvtColor(img_origin, cv2.COLOR_BGR2RGB)  # RGB
-        img_noisy = cv2.cvtColor(img_noisy, cv2.COLOR_BGR2RGB)  # RGB
-
-        sample = {"img_origin": img_origin,"img_noisy":img_noisy}
+        img_H = utils_image.imread_uint(origin_path, 3)# RGB H*W*C
+        sample = {"img_H": img_H}
 
         if(self.transform != None):
             sample = self.transform(sample)
 
          
         return sample
+
 
 
     def getAugmenteddIdx(self):

@@ -42,7 +42,7 @@ parser.add_argument("--gamma", type=float, default=0.1,help="learning rate decay
 
 parser.add_argument("--max_dim", type=int, default=256,help="max image dimension")
 parser.add_argument("--min_dim", type=int, default=64,help="min image dimension")
-parser.add_argument("--max_cells", type=int, default=160*165,help="min image dimension")#x2 250*250 b8 #x3 190*185 b4 #x1 500*500
+parser.add_argument("--max_cells", type=int, default=160*140,help="min image dimension")#x2 250*250 b8 #x3 190*185 b4 #x1 500*500
 
 args = parser.parse_args()
 
@@ -126,6 +126,6 @@ if(args.checkpoint != ""):
 
 for i in range(epoch_i,epoch_i+args.epoch):
 
-    gen_loss,disc_loss = train(generator,discriminator,trainloader,gen_opt,disc_opt,adv_criterion,img_criterion,features_criterion,i,device,args,logger,alpha = 0.001,beta=0.006)
+    gen_loss,disc_loss = train(generator,discriminator,trainloader,gen_opt,disc_opt,adv_criterion,img_criterion,features_criterion,i,device,args,logger,alpha = 0.001,beta=0.006,disc_steps=1)
     psnr,ssim,loss_v = valid(generator,validloader,img_criterion,device,args,logger)
     save_checkpoint(generator,discriminator,i,gen_loss,disc_loss,loss_v,psnr,ssim,logger,args)

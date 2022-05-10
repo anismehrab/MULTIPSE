@@ -155,7 +155,7 @@ class Degrade(object):
     def __call__(self, sample):
         img_H = sample["img_H"]
 
-        img_L, img_H = degradation_bsrgan_plus(img_H, sf=self.scale, shuffle_prob=0.5, lq_patchsize_w=self.patch_size_w,lq_patchsize_h=self.patch_size_h)
+        img_L, img_H = degradation_bsrgan_plus(img_H, sf=self.scale, shuffle_prob=0.3, lq_patchsize_w=self.patch_size_w,lq_patchsize_h=self.patch_size_h)
         # cv image: H x W x C 
         return {'img_H': img_H,'img_L':img_L}
 
@@ -252,8 +252,8 @@ class DataBatch:
                 sample_ = self.rescale_fn(sample_)
             sample_ = self.rotate_fn(sample_)
             sample_ = self.degrad_fn(sample_)
-            # utils_image.imsave(sample_["img_H"]*255, os.path.join('testsets/exported', 'img_H'+'.png'))
-            # utils_image.imsave(sample_["img_L"]*255, os.path.join('testsets/exported', 'img_L'+'.png'))
+            utils_image.imsave(sample_["img_H"]*255, os.path.join('testsets/exported', 'img_H'+'.png'))
+            utils_image.imsave(sample_["img_L"]*255, os.path.join('testsets/exported', 'img_L'+'.png'))
             sample_ = self.transform(sample_)
             return sample_
 

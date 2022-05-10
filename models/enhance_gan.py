@@ -7,7 +7,7 @@ from models.gan_utils import *
 
 
 class GenEnhanceV1(nn.Module):
-    def __init__(self, in_nc=3, nf=64,out_nc=3,act_type='lrelu',cc_acti='relu'):
+    def __init__(self, in_nc=3, nf=64,out_nc=3,act_type='relu',cc_acti='relu'):
         super(GenEnhanceV1, self).__init__()
 
         upscale=4
